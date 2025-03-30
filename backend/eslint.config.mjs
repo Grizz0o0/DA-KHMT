@@ -14,7 +14,7 @@ export default [
       prettier: eslintPluginPrettier
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'prettier/prettier': [
         'warn',
@@ -27,7 +27,8 @@ export default [
           useTabs: false,
           singleQuote: true,
           printWidth: 120,
-          jsxSingleQuote: true
+          jsxSingleQuote: true,
+          embeddedLanguageFormatting: 'auto'
         }
       ]
     },

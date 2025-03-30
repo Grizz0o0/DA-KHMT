@@ -1,12 +1,14 @@
 'use strict'
 import { Router } from 'express'
-import UserRouter from '~/routes/users/users.routers'
+import mediasRouter from '~/routes/media/medias.routers'
+import userRouter from '~/routes/user/users.routers'
 const router = Router()
 router.get('/', (req, res) => {
-  return res.status(200).json({
+  res.status(200).json({
     message: 'Hello world'
   })
 })
-router.use('/v1/api/user', UserRouter)
+router.use('/v1/api/users', userRouter)
+router.use('/v1/api/medias', mediasRouter)
 
 export default router

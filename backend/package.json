@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon",
+    "dev": "nodemon --inspect server.ts",
     "build": "rimraf ./dist && tsc --noCheck && tsc-alias",
-    "start": "node dist/index.js",
+    "start": "node dist/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",
@@ -16,8 +16,11 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/compression": "^1.7.5",
     "@types/express": "^5.0.0",
+    "@types/formidable": "^3.4.5",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.13.8",
     "eslint": "^9.21.0",
@@ -33,12 +36,20 @@
     "typescript-eslint": "^8.25.0"
   },
   "dependencies": {
+    "@types/lodash": "^4.17.16",
+    "axios": "^1.8.4",
+    "bcrypt": "^5.1.1",
     "chalk": "^5.4.1",
     "compression": "^1.8.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "formidable": "^3.5.2",
     "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "mongodb": "^6.14.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "sharp": "^0.33.5"
   }
 }
