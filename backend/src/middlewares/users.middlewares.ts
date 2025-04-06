@@ -8,7 +8,6 @@ export const authentication = async (req: Request, res: Response, next: NextFunc
   try {
     const userId = req.headers[HEADER.CLIENT_ID]
     if (!userId) throw new UnauthorizedError('Missing client ID')
-
     const keyStore = await KeyService.findByUserId(userId as string)
     if (!keyStore) throw new NotFoundError('KeyStore not found for user ID')
 

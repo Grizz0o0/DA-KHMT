@@ -2,61 +2,66 @@ import { Router } from 'express'
 import userController from '~/controllers/users.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
 import { authentication, authenticationV2 } from '~/middlewares/users.middlewares'
+import { validateRequest } from '~/middlewares/validate.middleware'
 import {
-  loginValidator,
-  registerValidator,
-  logoutValidator,
-  refreshTokenValidator,
-  forgotPassWordValidator,
-  verifyForgotPassWordValidator,
-  resetPasswordValidator,
-  changePasswordValidator,
-  deleteUserValidator,
-  getUserByIdValidator,
-  updateMeValidator
-} from '~/validators/user.validator'
-import { validate } from '~/middlewares/validate.middleware'
-import { sanitizeRequest } from '~/middlewares/common.middlewares'
-import { UpdateMeReqBody } from '~/models/requests/users.request'
+  loginSchema,
+  registerSchema,
+  logoutSchema,
+  authenticationV2Schema,
+  authenticationSchema,
+  changePasswordSchema,
+  deleteUserSchema,
+  getUserByIdSchema,
+  resetPasswordSchema,
+  verifyForgotPasswordSchema,
+  forgotPasswordSchema,
+  updateMeSchema
+} from '~/validators/users.validator'
 const userRouter = Router()
 
-userRouter.post('/register', validate(registerValidator), asyncHandler(userController.register))
+userRouter.post('/register', validateRequest({ body: registerSchema.body }), asyncHandler(userController.register))
+userRouter.post('/login', validateRequest({ body: loginSchema.body }), asyncHandler(userController.login))
 userRouter.get('/oauth/google', asyncHandler(userController.oAuthGoogle))
-userRouter.post('/login', validate(loginValidator), asyncHandler(userController.login))
-userRouter.post('/forgot-password', validate(forgotPassWordValidator), asyncHandler(userController.forgotPassword))
+userRouter.post(
+  '/forgot-password',
+  validateRequest({ body: forgotPasswordSchema.body }),
+  asyncHandler(userController.forgotPassword)
+)
 userRouter.post(
   '/verify-forgot-password',
-  validate(verifyForgotPassWordValidator),
+  validateRequest({ body: verifyForgotPasswordSchema.body }),
   asyncHandler(userController.verifyForgotPassword)
 )
-userRouter.post('/reset-password', validate(resetPasswordValidator), asyncHandler(userController.resetPassword))
+userRouter.post(
+  '/reset-password',
+  validateRequest({ body: resetPasswordSchema.body }),
+  asyncHandler(userController.resetPassword)
+)
 userRouter.post(
   '/refresh-token',
-  validate(refreshTokenValidator),
+  validateRequest({ headers: authenticationV2Schema }),
   authenticationV2,
   asyncHandler(userController.handlerRefreshToken)
 )
 userRouter.get('', asyncHandler(userController.getAllUsers))
-userRouter.get('/:id', validate(getUserByIdValidator), asyncHandler(userController.getUserById))
+userRouter.get('/:id', validateRequest({ params: getUserByIdSchema.params }), asyncHandler(userController.getUserById))
 
-userRouter.use(authentication)
+userRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
 
-userRouter.post('/logout', validate(logoutValidator), asyncHandler(userController.logout))
-userRouter.post('/change-password', validate(changePasswordValidator), asyncHandler(userController.changePassword))
-userRouter.delete('/:id', validate(deleteUserValidator), asyncHandler(userController.deleteUser))
+userRouter.post('/logout', validateRequest({ headers: logoutSchema.headers }), asyncHandler(userController.logout))
+userRouter.post(
+  '/change-password',
+  validateRequest({ body: changePasswordSchema.body }),
+  asyncHandler(userController.changePassword)
+)
+userRouter.delete(
+  '/:id',
+  validateRequest({ headers: deleteUserSchema.headers, params: deleteUserSchema.params }),
+  asyncHandler(userController.deleteUser)
+)
 userRouter.patch(
   '/:id',
-  validate(updateMeValidator),
-  sanitizeRequest<UpdateMeReqBody>([
-    'username',
-    'phoneNumber',
-    'email',
-    'gender',
-    'dateOfBirth',
-    'address',
-    'coverPhoto',
-    'avatar'
-  ]),
+  validateRequest({ body: updateMeSchema.body, params: updateMeSchema.params }),
   asyncHandler(userController.updateUser)
 )
 

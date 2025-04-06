@@ -8,4 +8,14 @@ const omitInfoData = ({ fields = [], object = {} }: { fields: string[]; object: 
   return _.omit(object, fields)
 }
 
-export { getInfoData, omitInfoData }
+//['a','b'] => {a: 1, b: 1}
+const getSelectData = (select: string[]) => {
+  return Object.fromEntries(select.map((e) => [e, 1]))
+}
+
+//['a','b'] => {a: 0, b: 0}
+const unSelectData = (select: string[]) => {
+  return Object.fromEntries(select.map((e) => [e, 0]))
+}
+
+export { getInfoData, omitInfoData, getSelectData, unSelectData }

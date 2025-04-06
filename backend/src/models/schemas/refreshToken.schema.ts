@@ -1,30 +1,17 @@
+import { z } from 'zod'
 import { ObjectId } from 'mongodb'
 
-export default class RefreshToken {
-  _id: ObjectId
-  userId: ObjectId
-  refreshToken?: string
-  refreshTokened?: string[]
-  expiresAt: Date
-  createdAt: Date
-  updatedAt: Date
-  constructor({
-    userId,
-    refreshToken,
-    refreshTokened,
-    expiresAt
-  }: {
-    userId: ObjectId
-    refreshToken?: string
-    refreshTokened?: string[]
-    expiresAt?: Date
-  }) {
-    this._id = new ObjectId()
-    this.userId = userId
-    this.refreshToken = refreshToken
-    this.refreshTokened = refreshTokened ?? []
-    this.expiresAt = expiresAt ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
-  }
-}
+export const refreshTokenSchema = z.object({
+  _id: z.string().default(() => new ObjectId().toHexString()),
+  userId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
+  refreshToken: z.string().optional(),
+  refreshTokened: z.array(z.string()).optional().default([]),
+  expiresAt: z
+    .date()
+    .optional()
+    .default(() => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date())
+})
+
+export type RefreshTokenType = z.infer<typeof refreshTokenSchema>

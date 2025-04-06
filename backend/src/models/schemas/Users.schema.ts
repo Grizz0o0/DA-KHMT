@@ -1,75 +1,39 @@
+import { z } from 'zod'
 import { ObjectId } from 'mongodb'
-import { UserAuthProvider, UserGender, UserRole, UserVerifyStatus } from '~/constants/users'
-export default class User {
-  _id: ObjectId
-  username: string
-  email: string
-  password: string
-  phoneNumber: string
-  dateOfBirth?: Date
-  gender: UserGender
-  address: string
-  avatar: string
-  coverPhoto: string
-  role: UserRole
-  verify: UserVerifyStatus
-  authProvider: UserAuthProvider
-  tickets: ObjectId[]
-  verifyEmailToken: string
-  forgotPasswordToken: string
-  createdAt: Date
-  updatedAt: Date
+import { UserGender, UserRole, UserVerifyStatus, UserAuthProvider } from '~/constants/users'
 
-  constructor({
-    username = '',
-    email,
-    password,
-    phoneNumber = '',
-    avatar = '',
-    coverPhoto = '',
-    dateOfBirth,
-    gender = UserGender.Other,
-    address = '',
-    role = UserRole.Customer,
-    verify = UserVerifyStatus.Unverified,
-    authProvider = UserAuthProvider.Local,
-    tickets = [],
-    verifyEmailToken = '',
-    forgotPasswordToken = ''
-  }: {
-    username?: string
-    email: string
-    password: string
-    phoneNumber?: string
-    dateOfBirth?: string | Date
-    gender?: UserGender
-    address?: string
-    avatar?: string
-    coverPhoto?: string
-    role?: UserRole
-    verify?: UserVerifyStatus
-    authProvider?: UserAuthProvider
-    tickets?: string[]
-    verifyEmailToken?: string
-    forgotPasswordToken?: string
-  }) {
-    this._id = new ObjectId()
-    this.username = username
-    this.email = email.toLowerCase().trim()
-    this.password = password
-    this.phoneNumber = phoneNumber
-    this.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : undefined
-    this.gender = gender
-    this.address = address
-    this.role = role
-    this.avatar = avatar
-    this.coverPhoto = coverPhoto
-    this.verify = verify
-    this.authProvider = authProvider
-    this.tickets = tickets.map((ticket) => new ObjectId(ticket))
-    this.verifyEmailToken = verifyEmailToken
-    this.forgotPasswordToken = forgotPasswordToken
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
-  }
-}
+const objectIdSchema = z
+  .any()
+  .refine((val) => val instanceof ObjectId || ObjectId.isValid(val), {
+    message: 'Invalid ObjectId'
+  })
+  .transform((val) => (val instanceof ObjectId ? val : new ObjectId(val)))
+
+export const userSchema = z.object({
+  _id: objectIdSchema.default(() => new ObjectId()),
+  username: z.string().default(''),
+  email: z
+    .string()
+    .email()
+    .transform((val) => val.toLowerCase().trim()),
+  password: z.string(),
+  phoneNumber: z.string().default(''),
+  dateOfBirth: z
+    .union([z.string(), z.date()])
+    .optional()
+    .transform((val) => (val ? new Date(val) : undefined)),
+  gender: z.nativeEnum(UserGender).default(UserGender.Other),
+  address: z.string().default(''),
+  avatar: z.string().default(''),
+  coverPhoto: z.string().default(''),
+  role: z.nativeEnum(UserRole).default(UserRole.Customer),
+  verify: z.nativeEnum(UserVerifyStatus).default(UserVerifyStatus.Unverified),
+  authProvider: z.nativeEnum(UserAuthProvider).default(UserAuthProvider.Local),
+  tickets: z.array(objectIdSchema).default([]),
+  verifyEmailToken: z.string().default(''),
+  forgotPasswordToken: z.string().default(''),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date())
+})
+
+export type UserType = z.infer<typeof userSchema>

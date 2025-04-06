@@ -3,7 +3,8 @@ declare namespace Express {
     keyStore?: {
       userId: string | ObjectId
       refreshToken?: string
-      refreshTokened?: [string]
+      refreshTokened?: string[]
+      expiresAt: Date
       [key: string]: any
     }
     user?: {

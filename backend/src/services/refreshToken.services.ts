@@ -4,14 +4,14 @@ import { convertToObjectId } from '../utils/mongoUtils'
 import { ObjectId } from 'mongodb'
 
 class RefreshTokenService {
-  static upsertRefreshToken = async ({ userId, refreshToken, exp }: CreateRefreshTokenReqBody) => {
+  static upsertRefreshToken = async ({ userId, refreshToken, expiresAt }: CreateRefreshTokenReqBody) => {
     try {
       const filter = { userId }
       const update = {
         $set: {
           refreshTokenUsed: [],
           refreshToken,
-          exp
+          expiresAt
         }
       }
       const option = { upsert: true, returnDocument: 'after' as const }
@@ -39,10 +39,15 @@ class RefreshTokenService {
     return await databaseService.refreshTokens.findOneAndDelete({ userId: convertToObjectId(userId) })
   }
 
-  static updateRefreshToken = async ({ userId, refreshToken, newRefreshToken, newExp }: UpdateRefreshTokenReqBody) => {
+  static updateRefreshToken = async ({
+    userId,
+    refreshToken,
+    newRefreshToken,
+    newExpiresAt
+  }: UpdateRefreshTokenReqBody) => {
     const filter = { userId },
       update = {
-        $set: { refreshToken: newRefreshToken, exp: newExp },
+        $set: { refreshToken: newRefreshToken, expiresAt: newExpiresAt },
         $addToSet: { refreshTokenUsed: refreshToken }
       },
       option = { returnDocument: 'after' as const }

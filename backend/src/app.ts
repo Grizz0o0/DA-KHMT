@@ -12,7 +12,6 @@ import { UPLOAD_DIR } from '~/constants/dir'
 const app = express()
 //init folder
 initFolder()
-
 // init middlewares
 app.use(morgan('dev'))
 app.use(helmet())
@@ -24,6 +23,9 @@ app.use(express.urlencoded({ extended: true }))
 databaseService.getDB()
 databaseService.indexUsers()
 databaseService.indexRefreshTokens()
+databaseService.indexAirlines()
+databaseService.indexAirports()
+databaseService.indexAircrafts()
 // init route
 app.use('/', router)
 // handling error

@@ -17,7 +17,7 @@ import {
   GoogleTokenBody,
   GoogleUserInfo
 } from '~/models/requests/users.request'
-import User from '~/models/schemas/users.schema'
+import { userSchema } from '~/models/schemas/users.schema'
 import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
 import RefreshTokenService from '~/services/refreshToken.services'
@@ -40,6 +40,7 @@ class UserService {
   }
 
   static getUserById = async (userId: string) => {
+    console.log(`userId:::${userId}`)
     const foundUser = await databaseService.users.findOne({ _id: convertToObjectId(userId) })
     if (!foundUser) throw new NotFoundError('Not found user')
 
@@ -81,7 +82,7 @@ class UserService {
     const foundUser = await databaseService.users.findOne({ email: payload.email })
     if (!foundUser) throw new NotFoundError('Not found email')
 
-    const match = bcrypt.compare(payload.password, foundUser.password)
+    const match = await bcrypt.compare(payload.password, foundUser.password)
     if (!match) throw new BadRequestError('Password is not match')
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -100,7 +101,7 @@ class UserService {
     await RefreshTokenService.upsertRefreshToken({
       userId: foundUser._id,
       refreshToken,
-      exp: new Date((decodeRefreshToken.exp as number) * 1000)
+      expiresAt: new Date((decodeRefreshToken.exp as number) * 1000)
     })
     return {
       user: getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber'], object: foundUser }),
@@ -113,12 +114,9 @@ class UserService {
     if (holderUser) throw new BadRequestError('Email already registered !')
 
     const passwordHash = bcrypt.hashSync(payload.password, 10)
-    const newUser = await databaseService.users.insertOne(
-      new User({
-        ...payload,
-        password: passwordHash
-      })
-    )
+
+    const parseUser = userSchema.parse({ ...payload, password: passwordHash })
+    const newUser = await databaseService.users.insertOne(parseUser)
 
     const foundUser = await databaseService.users.findOne({ _id: newUser.insertedId })
     if (!foundUser) throw new NotFoundError('User registration failed')
@@ -139,7 +137,7 @@ class UserService {
     await RefreshTokenService.upsertRefreshToken({
       userId: foundUser._id,
       refreshToken,
-      exp: new Date((decodeRefreshToken.exp as number) * 1000)
+      expiresAt: new Date((decodeRefreshToken.exp as number) * 1000)
     })
 
     return {
@@ -214,7 +212,7 @@ class UserService {
         await RefreshTokenService.upsertRefreshToken({
           userId: foundUser._id,
           refreshToken,
-          exp: new Date((decodeRefreshToken.exp as number) * 1000)
+          expiresAt: new Date((decodeRefreshToken.exp as number) * 1000)
         })
         userId = foundUser._id
       }
@@ -274,7 +272,7 @@ class UserService {
 
     if (!accessToken || !newRefreshToken) throw new BadRequestError('Error creating tokens')
     databaseService.refreshTokens.updateOne(
-      { user: holderToken.userId },
+      { userId: holderToken.userId },
       {
         $set: {
           refreshToken: newRefreshToken
@@ -289,7 +287,7 @@ class UserService {
       userId: holderToken.userId,
       refreshToken,
       newRefreshToken: newRefreshToken,
-      newExp: new Date((decodeRefreshToken.exp as number) * 1000)
+      newExpiresAt: new Date((decodeRefreshToken.exp as number) * 1000)
     })
 
     return {
@@ -367,7 +365,7 @@ class UserService {
     const foundUser = await databaseService.users.findOne({ _id: convertToObjectId(payload.userId) })
     if (!foundUser) throw new NotFoundError('Not found user')
 
-    const match = bcrypt.compareSync(payload.password, foundUser.password)
+    const match = await bcrypt.compare(payload.password, foundUser.password)
     if (!match) throw new BadRequestError('Password is not match')
 
     const passwordHash = bcrypt.hashSync(payload.newPassword, 10)

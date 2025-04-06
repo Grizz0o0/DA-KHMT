@@ -4,4 +4,8 @@ const convertToObjectId = (id: string) => {
   return new ObjectId(id)
 }
 
-export { convertToObjectId }
+function isValidObjectId(id: string) {
+  return ObjectId.isValid(id)
+}
+
+export { convertToObjectId, isValidObjectId }
