@@ -217,15 +217,10 @@ export const updateMeSchema = {
       .regex(/^(0|\+84)[0-9]{9}$/, 'Số điện thoại không hợp lệ. Vui lòng nhập số di động Việt Nam hợp lệ')
       .optional(),
     dateOfBirth: z
-      .string()
-      .trim()
-      .refine((val) => !isNaN(Date.parse(val)), 'Ngày sinh phải có định dạng ISO8601')
-      .optional(),
-    gender: z
-      .string({ invalid_type_error: 'Giới tính phải là chuỗi' })
-      .trim()
-      .refine((val) => Object.values(UserGender).includes(val as UserGender), 'Giới tính không hợp lệ')
-      .optional(),
+      .union([z.string(), z.date()])
+      .optional()
+      .transform((val) => (val ? new Date(val) : undefined)),
+    gender: z.nativeEnum(UserGender).optional(),
     address: z.string({ invalid_type_error: 'Địa chỉ phải là chuỗi' }).trim().optional()
   }),
   params: z.object({

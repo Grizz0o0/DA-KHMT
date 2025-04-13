@@ -1,0 +1,20 @@
+### Base URL
+@baseUrl = http://localhost:3052/v1/api
+
+### Authentication Token
+@token = your_authentication_token
+
+### Upload Image
+POST {{baseUrl}}/medias/upload-image
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+Authorization: Bearer {{token}}
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="image"; filename="example.jpg"
+Content-Type: image/jpeg
+
+< ./example.jpg
+------WebKitFormBoundary--
+
+### Get Static Image
+GET {{baseUrl}}/medias/static/image/example.jpg 

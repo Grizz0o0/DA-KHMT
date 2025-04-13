@@ -1,0 +1,93 @@
+### Base URL
+@baseUrl = http://localhost:3052/v1/api
+
+### Authentication Token
+@token = your_authentication_token
+
+### Search Airports
+GET {{baseUrl}}/airports/search?content=han&limit=10&page=1
+
+### Filter Airports
+GET {{baseUrl}}/airports/filter?country=Vietnam&city=Hanoi
+
+### Get List of Airports
+GET {{baseUrl}}/airports?limit=10&page=1
+
+### Get Airport by Code
+GET {{baseUrl}}/airports/code/HAN
+
+### Get Airport by ID
+GET {{baseUrl}}/airports/65f7db3bd0e0c1eaa3cd1950
+
+### Create Airport (Requires Authentication)
+POST {{baseUrl}}/airports
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "code": "HAN",
+  "name": "Noi Bai International Airport",
+  "city": "Hanoi",
+  "country": "Vietnam",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "latitude": 21.2212,
+  "longitude": 105.8072
+}
+
+### Update Airport (Requires Authentication)
+PATCH {{baseUrl}}/airports/65f7db3bd0e0c1eaa3cd1950
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Noi Bai International Airport Updated",
+  "timezone": "Asia/Ho_Chi_Minh"
+}
+
+### Delete Airport (Requires Authentication)
+DELETE {{baseUrl}}/airports/65f7db3bd0e0c1eaa3cd1950
+Authorization: Bearer {{token}}
+
+### Get all airports
+GET  http://localhost:3052/api/airports
+Authorization: Bearer {{token}}
+
+### Get airport by ID
+GET  http://localhost:3052/api/airports/67ed5ea09d53856b76e7e6ba
+Authorization: Bearer {{token}}
+
+### Create new airport
+POST  http://localhost:3052/api/airports
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "New Airport",
+  "code": "NAP",
+  "address": "123 Airport Road",
+  "city": "New City",
+  "country": "New Country"
+}
+
+### Update airport
+PUT  http://localhost:3052/api/airports/67ed5ea09d53856b76e7e6ba
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Updated Airport Name",
+  "address": "456 New Airport Road",
+  "city": "Updated City"
+}
+
+### Delete airport
+DELETE  http://localhost:3052/api/airports/67ed5ea09d53856b76e7e6ba
+Authorization: Bearer {{token}}
+
+### Search airports by city
+GET  http://localhost:3052/api/airports/search?city=Hà Nội
+Authorization: Bearer {{token}}
+
+### Search airports by country
+GET  http://localhost:3052/api/airports/search?country=Việt Nam
+Authorization: Bearer {{token}} 

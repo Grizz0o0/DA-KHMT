@@ -1,17 +1,27 @@
-import { CreateRefreshTokenReqBody, UpdateRefreshTokenReqBody } from '~/models/requests/refreshTokens.request'
+import {
+  createRefreshTokenTypeBody,
+  updateRefreshTokenTypeBody,
+  createRefreshTokenSchema,
+  updateRefreshTokenSchema,
+  findByUserIdSchema,
+  findByRefreshTokenSchema,
+  deleteByUserIdSchema
+} from '~/requestSchemas/refreshTokens.request'
 import databaseService from '~/services/database.services'
 import { convertToObjectId } from '../utils/mongoUtils'
 import { ObjectId } from 'mongodb'
 
 class RefreshTokenService {
-  static upsertRefreshToken = async ({ userId, refreshToken, expiresAt }: CreateRefreshTokenReqBody) => {
+  static upsertRefreshToken = async ({ userId, refreshToken, expiresAt }: createRefreshTokenTypeBody) => {
     try {
-      const filter = { userId }
+      const validatedData = createRefreshTokenSchema.parse({ userId, refreshToken, expiresAt })
+
+      const filter = { userId: validatedData.userId }
       const update = {
         $set: {
           refreshTokenUsed: [],
-          refreshToken,
-          expiresAt
+          refreshToken: validatedData.refreshToken,
+          expiresAt: validatedData.expiresAt
         }
       }
       const option = { upsert: true, returnDocument: 'after' as const }
@@ -24,19 +34,27 @@ class RefreshTokenService {
   }
 
   static findByUserId = async (userId: string) => {
-    return await databaseService.refreshTokens.findOne({ userId: convertToObjectId(userId) })
+    const { userId: validatedUserId } = findByUserIdSchema.parse({ userId })
+
+    return await databaseService.refreshTokens.findOne({ userId: validatedUserId })
   }
 
   static findByRefreshTokenUsed = async (refreshToken: string) => {
-    return await databaseService.refreshTokens.findOne({ refreshTokened: refreshToken })
+    const { refreshToken: validatedRefreshToken } = findByRefreshTokenSchema.parse({ refreshToken })
+
+    return await databaseService.refreshTokens.findOne({ refreshTokened: validatedRefreshToken })
   }
 
   static findByRefreshToken = async (refreshToken: string) => {
-    return await databaseService.refreshTokens.findOne({ refreshToken })
+    const { refreshToken: validatedRefreshToken } = findByRefreshTokenSchema.parse({ refreshToken })
+
+    return await databaseService.refreshTokens.findOne({ refreshToken: validatedRefreshToken })
   }
 
   static deleteByUserId = async (userId: string) => {
-    return await databaseService.refreshTokens.findOneAndDelete({ userId: convertToObjectId(userId) })
+    const { userId: validatedUserId } = deleteByUserIdSchema.parse({ userId })
+
+    return await databaseService.refreshTokens.findOneAndDelete({ userId: validatedUserId })
   }
 
   static updateRefreshToken = async ({
@@ -44,11 +62,18 @@ class RefreshTokenService {
     refreshToken,
     newRefreshToken,
     newExpiresAt
-  }: UpdateRefreshTokenReqBody) => {
-    const filter = { userId },
+  }: updateRefreshTokenTypeBody) => {
+    const validatedData = updateRefreshTokenSchema.parse({
+      userId,
+      refreshToken,
+      newRefreshToken,
+      newExpiresAt
+    })
+
+    const filter = { userId: validatedData.userId },
       update = {
-        $set: { refreshToken: newRefreshToken, expiresAt: newExpiresAt },
-        $addToSet: { refreshTokenUsed: refreshToken }
+        $set: { refreshToken: validatedData.newRefreshToken, expiresAt: validatedData.newExpiresAt },
+        $addToSet: { refreshTokenUsed: validatedData.refreshToken }
       },
       option = { returnDocument: 'after' as const }
     return await databaseService.refreshTokens.findOneAndUpdate(filter, update, option)

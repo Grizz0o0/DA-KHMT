@@ -3,81 +3,113 @@ import { NextFunction, Request, Response } from 'express'
 import { Created, OK } from '~/responses/success.response'
 import AirlinesService from '~/services/airlines.services'
 import {
-  CreateAirlineReqBody,
-  GetListAirlineReqBody,
-  SearchAirlineReqBody,
-  UpdateAirlineReqBody
-} from '~/models/requests/airlines.request'
+  createAirlineTypeBody,
+  updateAirlineTypeBody,
+  searchAirlineTypeQuery,
+  getListAirlineTypeQuery,
+  getAirlineByIdTypeParams,
+  getAirlineByCodeTypeParams
+} from '~/requestSchemas/airlines.request'
 
 class AirlinesController {
   createAirline = async (
-    req: Request<ParamsDictionary, any, CreateAirlineReqBody>,
+    req: Request<ParamsDictionary, any, createAirlineTypeBody>,
     res: Response,
     next: NextFunction
   ) => {
-    new Created({
-      message: 'Create airline success',
-      metadata: await AirlinesService.createAirline(req.body)
-    }).send(res)
+    try {
+      const airline = await AirlinesService.createAirline(req.body)
+      new Created({
+        message: 'Create airline success',
+        metadata: { airline }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   updateAirline = async (
-    req: Request<ParamsDictionary, any, UpdateAirlineReqBody>,
+    req: Request<ParamsDictionary, any, updateAirlineTypeBody>,
     res: Response,
     next: NextFunction
   ) => {
-    new OK({
-      message: 'Update airline success',
-      metadata: await AirlinesService.updateAirline(req.params.airlineId, req.body)
-    }).send(res)
+    try {
+      const airline = await AirlinesService.updateAirline(req.params.airlineId, req.body)
+      new OK({
+        message: 'Update airline success',
+        metadata: { airline }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   deleteAirline = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Delete airline success',
-      metadata: await AirlinesService.deleteAirline(req.params.airlineId)
-    }).send(res)
-  }
-
-  searchAirline = async (
-    req: Request<ParamsDictionary, any, SearchAirlineReqBody>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    const query = {
-      limit: Number(req.query.limit) || 10,
-      page: Number(req.query.page) || 1,
-      content: req.query.content?.toString() || ''
+    try {
+      const airline = await AirlinesService.deleteAirline(req.params.airlineId)
+      new OK({
+        message: 'Delete airline success',
+        metadata: { airline }
+      }).send(res)
+    } catch (error) {
+      next(error)
     }
-    new Created({
-      message: 'Search airline success',
-      metadata: await AirlinesService.searchAirline(query)
-    }).send(res)
   }
 
-  getListAirline = async (
-    req: Request<ParamsDictionary, any, GetListAirlineReqBody>,
+  searchAirline = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const { airlines, pagination } = await AirlinesService.searchAirline(req.query as searchAirlineTypeQuery)
+      new OK({
+        message: 'Search airline success',
+        metadata: { airlines, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getListAirline = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const { airlines, pagination } = await AirlinesService.getListAirline(req.query as getListAirlineTypeQuery)
+      new OK({
+        message: 'Get list airline success',
+        metadata: { airlines, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getAirlineByCode = async (
+    req: Request<ParamsDictionary, any, getAirlineByCodeTypeParams>,
     res: Response,
     next: NextFunction
   ) => {
-    new Created({
-      message: 'Search airline success',
-      metadata: await AirlinesService.getListAirline(req.query)
-    }).send(res)
+    try {
+      const airline = await AirlinesService.getAirlineByCode(req.params.airlineCode)
+      new OK({
+        message: 'Get Airline By Code success',
+        metadata: { airline }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
-  getAirlineByCode = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Airline By Code success',
-      metadata: await AirlinesService.getAirlineByCode(req.params.airlineCode)
-    }).send(res)
-  }
-
-  getAirlineById = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Airline By Id success',
-      metadata: await AirlinesService.getAirlineById(req.params.airlineId)
-    }).send(res)
+  getAirlineById = async (
+    req: Request<ParamsDictionary, any, getAirlineByIdTypeParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const airline = await AirlinesService.getAirlineById(req.params.airlineId)
+      new OK({
+        message: 'Get Airline By Id success',
+        metadata: { airline }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 }
 

@@ -3,103 +3,147 @@ import { NextFunction, Request, Response } from 'express'
 import { Created, OK } from '~/responses/success.response'
 import AircraftsService from '~/services/aircrafts.services'
 import {
-  CreateAircraftReqBody,
-  FilterAircraft,
-  GetListAircraftReqBody,
-  SearchAircraftReqBody,
-  UpdateAircraftReqBody
-} from '~/models/requests/aircrafts.request'
+  createAircraftTypeBody,
+  updateAircraftTypeBody,
+  searchAircraftTypeQuery,
+  getListAircraftTypeQuery,
+  filterAircraftTypeQuery,
+  getAircraftByManufacturerTypeQuery,
+  getAircraftByModelTypeQuery
+} from '~/requestSchemas/aircrafts.request'
 
 class AircraftController {
   createAircraft = async (
-    req: Request<ParamsDictionary, any, CreateAircraftReqBody>,
+    req: Request<ParamsDictionary, any, createAircraftTypeBody>,
     res: Response,
     next: NextFunction
   ) => {
-    new Created({
-      message: 'Create aircraft success',
-      metadata: await AircraftsService.createAircraft(req.body)
-    }).send(res)
+    try {
+      const aircraft = await AircraftsService.createAircraft(req.body)
+      new Created({
+        message: 'Create aircraft success',
+        metadata: { aircraft }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   updateAircraft = async (
-    req: Request<ParamsDictionary, any, UpdateAircraftReqBody>,
+    req: Request<ParamsDictionary, any, updateAircraftTypeBody>,
     res: Response,
     next: NextFunction
   ) => {
-    new OK({
-      message: 'Update aircraft success',
-      metadata: await AircraftsService.updateAircraft(req.params.aircraftId, req.body as UpdateAircraftReqBody)
-    }).send(res)
+    try {
+      const aircraft = await AircraftsService.updateAircraft(req.params.aircraftId, req.body)
+      new OK({
+        message: 'Update aircraft success',
+        metadata: { aircraft }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   deleteAircraft = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Delete aircraft success',
-      metadata: await AircraftsService.deleteAircraft(req.params.aircraftId)
-    }).send(res)
-  }
-
-  searchAircraft = async (
-    req: Request<ParamsDictionary, any, SearchAircraftReqBody>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    const query = {
-      limit: Number(req.query.limit) || 10,
-      page: Number(req.query.page) || 1,
-      content: req.query.content?.toString() || ''
+    try {
+      const aircraft = await AircraftsService.deleteAircraft(req.params.aircraftId)
+      new OK({
+        message: 'Delete aircraft success',
+        metadata: { aircraft }
+      }).send(res)
+    } catch (error) {
+      next(error)
     }
-    new Created({
-      message: 'Search aircraft success',
-      metadata: await AircraftsService.searchAircraft(query)
-    }).send(res)
   }
 
-  getListAircraft = async (
-    req: Request<ParamsDictionary, any, GetListAircraftReqBody>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    new Created({
-      message: 'Get list aircraft success',
-      metadata: await AircraftsService.getListAircraft(req.query)
-    }).send(res)
+  searchAircraft = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const { aircrafts, pagination } = await AircraftsService.searchAircraft(req.query as searchAircraftTypeQuery)
+      new OK({
+        message: 'Search aircraft success',
+        metadata: { aircrafts, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   getAircraftById = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Aircraft By Id success',
-      metadata: await AircraftsService.getAircraftById(req.params.aircraftId)
-    }).send(res)
+    try {
+      const aircraft = await AircraftsService.getAircraftById(req.params.aircraftId)
+      new OK({
+        message: 'Get Aircraft By Id success',
+        metadata: { aircraft }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   getAircraftByAircraftCode = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Aircraft By AircraftCode success',
-      metadata: await AircraftsService.getAircraftByAircraftCode(req.params.code)
-    }).send(res)
+    try {
+      const aircraft = await AircraftsService.getAircraftByAircraftCode(req.params.code)
+      new OK({
+        message: 'Get Aircraft By AircraftCode success',
+        metadata: { aircraft }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   getAircraftByModel = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Aircraft By Model success',
-      metadata: await AircraftsService.getAircraftByModel(req.params.model)
-    }).send(res)
+    try {
+      const { aircrafts, pagination } = await AircraftsService.getAircraftByModel(
+        req.query as getAircraftByModelTypeQuery
+      )
+      new OK({
+        message: 'Get Aircraft By Model success',
+        metadata: { aircrafts, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getListAircraft = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const { aircrafts, pagination } = await AircraftsService.getListAircraft(req.query as getListAircraftTypeQuery)
+      new OK({
+        message: 'Get list aircraft success',
+        metadata: { aircrafts, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   getAircraftByManufacturer = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Aircraft By Manufacturer success',
-      metadata: await AircraftsService.getAircraftByManufacturer(req.params.manufacturer)
-    }).send(res)
+    try {
+      console.log(req.query)
+      const { aircrafts, pagination } = await AircraftsService.getAircraftByManufacturer(
+        req.query as getAircraftByManufacturerTypeQuery
+      )
+      new OK({
+        message: 'Get Aircraft By Manufacturer success',
+        metadata: { aircrafts, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
-  filterAircraft = async (req: Request<ParamsDictionary, any, FilterAircraft>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Aircraft By Manufacturer success',
-      metadata: await AircraftsService.filterAircraft(req.query)
-    }).send(res)
+  filterAircraft = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const { aircrafts, pagination } = await AircraftsService.filterAircraft(req.query as filterAircraftTypeQuery)
+      new OK({
+        message: 'Filter aircraft success',
+        metadata: { aircrafts, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 }
 

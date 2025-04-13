@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import userController from '~/controllers/users.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication, authenticationV2 } from '~/middlewares/users.middlewares'
+import { authentication, authenticationV2 } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import {
   loginSchema,
@@ -16,7 +16,7 @@ import {
   verifyForgotPasswordSchema,
   forgotPasswordSchema,
   updateMeSchema
-} from '~/validators/users.validator'
+} from '~/requestSchemas/users.request'
 const userRouter = Router()
 
 userRouter.post('/register', validateRequest({ body: registerSchema.body }), asyncHandler(userController.register))
@@ -62,7 +62,7 @@ userRouter.delete(
 userRouter.patch(
   '/:id',
   validateRequest({ body: updateMeSchema.body, params: updateMeSchema.params }),
-  asyncHandler(userController.updateUser)
+  asyncHandler(userController.updateMe)
 )
 
 export default userRouter

@@ -1,22 +1,77 @@
 import { Router } from 'express'
 import aircraftsControllers from '~/controllers/aircrafts.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/users.middlewares'
+import { authentication } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
-import { authenticationSchema } from '~/validators/users.validator'
+import { authenticationSchema } from '~/requestSchemas/users.request'
+import {
+  createAircraftSchema,
+  updateAircraftSchema,
+  deleteAircraftSchema,
+  getAircraftByIdSchema,
+  getAircraftByAircraftCodeSchema,
+  getAircraftByModelSchema,
+  getAircraftByManufacturerSchema,
+  searchAircraftSchema,
+  getListAircraftSchema,
+  filterAircraftSchema
+} from '~/requestSchemas/aircrafts.request'
+
 const aircraftRouter = Router()
 
-aircraftRouter.get('/', asyncHandler(aircraftsControllers.getListAircraft))
-aircraftRouter.get('/search', asyncHandler(aircraftsControllers.searchAircraft))
-aircraftRouter.get('/filter', asyncHandler(aircraftsControllers.filterAircraft))
-aircraftRouter.get('/:aircraftId', asyncHandler(aircraftsControllers.getAircraftById))
-aircraftRouter.get('/code/:code', asyncHandler(aircraftsControllers.getAircraftByAircraftCode))
-aircraftRouter.get('/model/:model', asyncHandler(aircraftsControllers.getAircraftByModel))
-aircraftRouter.get('/manufacturer/:manufacturer', asyncHandler(aircraftsControllers.getAircraftByManufacturer))
+// Public routes
+aircraftRouter.get(
+  '/',
+  validateRequest({ query: getListAircraftSchema.query }),
+  asyncHandler(aircraftsControllers.getListAircraft)
+)
+aircraftRouter.get(
+  '/search',
+  validateRequest({ query: searchAircraftSchema.query }),
+  asyncHandler(aircraftsControllers.searchAircraft)
+)
+aircraftRouter.get(
+  '/filter',
+  validateRequest({ query: filterAircraftSchema.query }),
+  asyncHandler(aircraftsControllers.filterAircraft)
+)
+aircraftRouter.get(
+  '/manufacturer',
+  validateRequest({ query: getAircraftByManufacturerSchema.query }),
+  asyncHandler(aircraftsControllers.getAircraftByManufacturer)
+)
+aircraftRouter.get(
+  '/model',
+  validateRequest({ query: getAircraftByModelSchema.query }),
+  asyncHandler(aircraftsControllers.getAircraftByModel)
+)
+aircraftRouter.get(
+  '/code/:code',
+  validateRequest({ params: getAircraftByAircraftCodeSchema.params }),
+  asyncHandler(aircraftsControllers.getAircraftByAircraftCode)
+)
+aircraftRouter.get(
+  '/:aircraftId',
+  validateRequest({ params: getAircraftByIdSchema.params }),
+  asyncHandler(aircraftsControllers.getAircraftById)
+)
 
+// Protected routes
 aircraftRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
-aircraftRouter.post('/', asyncHandler(aircraftsControllers.createAircraft))
-aircraftRouter.patch('/:aircraftId', asyncHandler(aircraftsControllers.updateAircraft))
-aircraftRouter.delete('/:aircraftId', asyncHandler(aircraftsControllers.deleteAircraft))
+aircraftRouter.post(
+  '/',
+  validateRequest({ body: createAircraftSchema.body }),
+  asyncHandler(aircraftsControllers.createAircraft)
+)
+aircraftRouter.patch(
+  '/:aircraftId',
+  validateRequest({ params: updateAircraftSchema.params, body: updateAircraftSchema.body }),
+  asyncHandler(aircraftsControllers.updateAircraft)
+)
+aircraftRouter.delete(
+  '/:aircraftId',
+  validateRequest({ params: deleteAircraftSchema.params }),
+  asyncHandler(aircraftsControllers.deleteAircraft)
+)
 
 export default aircraftRouter

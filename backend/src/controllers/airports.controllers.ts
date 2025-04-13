@@ -1,95 +1,145 @@
 import { ParamsDictionary } from 'express-serve-static-core'
 import { NextFunction, Request, Response } from 'express'
-import { Created, OK } from '~/responses/success.response'
+import { Created, OK, PartialContent } from '~/responses/success.response'
 import {
-  CreateAirportReqBody,
-  FilterAirportReqBody,
-  GetListAirportReqBody,
-  SearchAirportReqBody,
-  UpdateAirportReqBody
-} from '~/models/requests/airports.request'
+  createAirportTypeBody,
+  updateAirportTypeBody,
+  searchAirportTypeQuery,
+  getListAirportTypeQuery,
+  filterAirportTypeQuery
+} from '~/requestSchemas/airports.request'
 import AirportsService from '~/services/airports.services'
 
 class AirportsController {
-  createAirport = async (
-    req: Request<ParamsDictionary, any, CreateAirportReqBody>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    new Created({
-      message: 'Create airport success',
-      metadata: await AirportsService.createAirport(req.body)
-    }).send(res)
+  createAirport = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const newAirport = await AirportsService.createAirport(req.body)
+      new Created({
+        message: 'Create airport success',
+        metadata: { airport: newAirport }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   updateAirport = async (
-    req: Request<ParamsDictionary, any, UpdateAirportReqBody>,
+    req: Request<ParamsDictionary, any, updateAirportTypeBody>,
     res: Response,
     next: NextFunction
   ) => {
-    new OK({
-      message: 'Update airport success',
-      metadata: await AirportsService.updateAirport(req.params.airportId, req.body)
-    }).send(res)
+    try {
+      const updatedAirport = await AirportsService.updateAirport(req.params.airportId, req.body)
+      new OK({
+        message: 'Update airport success',
+        metadata: { airport: updatedAirport }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   deleteAirport = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Delete airport success',
-      metadata: await AirportsService.deleteAirport(req.params.airportId)
-    }).send(res)
+    try {
+      const deletedAirport = await AirportsService.deleteAirport(req.params.airportId)
+      new OK({
+        message: 'Delete airport success',
+        metadata: { airport: deletedAirport }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   searchAirport = async (
-    req: Request<ParamsDictionary, any, SearchAirportReqBody>,
+    req: Request<ParamsDictionary, any, searchAirportTypeQuery>,
     res: Response,
     next: NextFunction
   ) => {
-    const query = {
-      limit: Number(req.query.limit) || 10,
-      page: Number(req.query.page) || 1,
-      content: req.query.content?.toString() || ''
+    try {
+      const query = {
+        limit: Number(req.query.limit) || 10,
+        page: Number(req.query.page) || 1,
+        content: req.query.content?.toString() || '',
+        select: req.query?.select as string[]
+      }
+      const { airports, pagination } = await AirportsService.searchAirport(query)
+      new OK({
+        message: 'Search airport success',
+        metadata: { airports },
+        pagination
+      }).send(res)
+    } catch (error) {
+      next(error)
     }
-    new OK({
-      message: 'Search airport success',
-      metadata: await AirportsService.searchAirport(query)
-    }).send(res)
   }
 
   filterAirport = async (
-    req: Request<ParamsDictionary, any, FilterAirportReqBody>,
+    req: Request<ParamsDictionary, any, filterAirportTypeQuery>,
     res: Response,
     next: NextFunction
   ) => {
-    new OK({
-      message: 'Filter airport success',
-      metadata: await AirportsService.filterAirport(req.query)
-    }).send(res)
+    try {
+      const { airports, pagination } = await AirportsService.filterAirport({
+        country: req.query.country as string,
+        city: req.query.city as string,
+        limit: req.query?.limit ? Number(req.query.limit) : undefined,
+        page: req.query?.page ? Number(req.query.page) : undefined,
+        order: req.query?.order as string,
+        select: req.query?.select as string[]
+      })
+
+      new OK({
+        message: 'Filter airport success',
+        metadata: { airports },
+        pagination
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
-  getListAirport = async (
-    req: Request<ParamsDictionary, any, GetListAirportReqBody>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    new OK({
-      message: 'Search airport success',
-      metadata: await AirportsService.getListAirport(req.query)
-    }).send(res)
+  getListAirport = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { airports, pagination } = await AirportsService.getListAirport({
+        limit: req.query?.limit ? Number(req.query.limit) : undefined,
+        page: req.query?.page ? Number(req.query.page) : undefined,
+        order: req.query?.order as string,
+        select: req.query?.select as string[]
+      })
+
+      new OK({
+        message: 'Get list airports success',
+        metadata: { airports },
+        pagination
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   getAirportByCode = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Airport By Code success',
-      metadata: await AirportsService.getAirportByCode(req.params.airportCode)
-    }).send(res)
+    try {
+      const airport = await AirportsService.getAirportByCode(req.params.code)
+      new OK({
+        message: 'Get Airport By Code success',
+        metadata: { airport }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   getAirportById = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
-    new OK({
-      message: 'Get Airport By Id success',
-      metadata: await AirportsService.getAirportById(req.params.airportId)
-    }).send(res)
+    try {
+      const airport = await AirportsService.getAirportById(req.params.airportId)
+      new OK({
+        message: 'Get Airport By Id success',
+        metadata: { airport }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 }
 

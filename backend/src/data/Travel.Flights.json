@@ -1,0 +1,1386 @@
+[{
+  "_id": {
+    "$oid": "67f75cf335ac163293c89e04"
+  },
+  "flightNumber": "VN123",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1949"
+  },
+  "departureTime": {
+    "$date": "2023-08-15T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2023-08-15T10:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1200000,
+  "availableSeats": 119,
+  "createdAt": {
+    "$date": "2025-04-10T05:53:55.301Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T05:53:55.301Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f5035ac163293c89e05"
+  },
+  "flightNumber": "VN124",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1949"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-15T11:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-15T13:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1150000,
+  "availableSeats": 150,
+  "createdAt": {
+    "$date": "2025-04-10T06:04:00.449Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:04:00.449Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f6135ac163293c89e06"
+  },
+  "flightNumber": "VN125",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1950"
+  },
+  "departureTime": {
+    "$date": "2024-04-15T14:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-15T16:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1300000,
+  "availableSeats": 100,
+  "createdAt": {
+    "$date": "2025-04-10T06:04:17.780Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:04:17.780Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f6a35ac163293c89e07"
+  },
+  "flightNumber": "VN126",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1950"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-15T17:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-15T19:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1250000,
+  "availableSeats": 110,
+  "createdAt": {
+    "$date": "2025-04-10T06:04:26.275Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:04:26.275Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f7135ac163293c89e08"
+  },
+  "flightNumber": "VN127",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1951"
+  },
+  "departureTime": {
+    "$date": "2024-04-16T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-16T10:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1350000,
+  "availableSeats": 90,
+  "createdAt": {
+    "$date": "2025-04-10T06:04:33.084Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:04:33.084Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f7835ac163293c89e09"
+  },
+  "flightNumber": "VN128",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1951"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-16T11:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-16T13:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1400000,
+  "availableSeats": 80,
+  "createdAt": {
+    "$date": "2025-04-10T06:04:40.905Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:04:40.905Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f7f35ac163293c89e0a"
+  },
+  "flightNumber": "VN129",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1952"
+  },
+  "departureTime": {
+    "$date": "2024-04-16T14:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-16T16:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1450000,
+  "availableSeats": 70,
+  "createdAt": {
+    "$date": "2025-04-10T06:04:47.578Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:04:47.578Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f8535ac163293c89e0b"
+  },
+  "flightNumber": "VN130",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1952"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-16T17:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-16T19:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1500000,
+  "availableSeats": 60,
+  "createdAt": {
+    "$date": "2025-04-10T06:04:53.790Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:04:53.790Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f8c35ac163293c89e0c"
+  },
+  "flightNumber": "VN131",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1953"
+  },
+  "departureTime": {
+    "$date": "2024-04-17T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-17T10:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1550000,
+  "availableSeats": 50,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:00.449Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:00.449Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75f9a35ac163293c89e0d"
+  },
+  "flightNumber": "VN132",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1953"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-17T11:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-17T13:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1600000,
+  "availableSeats": 40,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:14.578Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:14.578Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fa235ac163293c89e0e"
+  },
+  "flightNumber": "VN133",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1954"
+  },
+  "departureTime": {
+    "$date": "2024-04-17T14:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-17T16:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1650000,
+  "availableSeats": 30,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:22.011Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:22.011Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fa835ac163293c89e0f"
+  },
+  "flightNumber": "VN134",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1954"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-17T17:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-17T19:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1700000,
+  "availableSeats": 20,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:28.174Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:28.175Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fb135ac163293c89e10"
+  },
+  "flightNumber": "VN135",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1955"
+  },
+  "departureTime": {
+    "$date": "2024-04-18T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-18T10:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1750000,
+  "availableSeats": 15,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:37.772Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:37.772Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fb935ac163293c89e11"
+  },
+  "flightNumber": "VN136",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1955"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-18T11:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-18T13:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1800000,
+  "availableSeats": 10,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:45.572Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:45.572Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fc035ac163293c89e12"
+  },
+  "flightNumber": "VN137",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1956"
+  },
+  "departureTime": {
+    "$date": "2024-04-18T14:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-18T16:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1850000,
+  "availableSeats": 5,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:52.957Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:52.957Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fc735ac163293c89e13"
+  },
+  "flightNumber": "VN138",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1956"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-18T17:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-18T19:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1900000,
+  "availableSeats": 3,
+  "createdAt": {
+    "$date": "2025-04-10T06:05:59.347Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:05:59.347Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fcd35ac163293c89e14"
+  },
+  "flightNumber": "VN139",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1957"
+  },
+  "departureTime": {
+    "$date": "2024-04-19T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-19T10:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 1950000,
+  "availableSeats": 2,
+  "createdAt": {
+    "$date": "2025-04-10T06:06:05.547Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:06:05.547Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fd535ac163293c89e15"
+  },
+  "flightNumber": "VN140",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1957"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-19T11:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-19T13:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 2000000,
+  "availableSeats": 1,
+  "createdAt": {
+    "$date": "2025-04-10T06:06:13.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:06:13.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fdc35ac163293c89e16"
+  },
+  "flightNumber": "VN141",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1958"
+  },
+  "departureTime": {
+    "$date": "2024-04-19T14:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-19T16:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 2050000,
+  "availableSeats": 0,
+  "createdAt": {
+    "$date": "2025-04-10T06:06:20.052Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:06:20.052Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f75fe335ac163293c89e17"
+  },
+  "flightNumber": "VN142",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1958"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-19T17:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-19T19:30:00.000Z"
+  },
+  "duration": 150,
+  "price": 2100000,
+  "availableSeats": 0,
+  "createdAt": {
+    "$date": "2025-04-10T06:06:27.018Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:06:27.018Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7607435ac163293c89e18"
+  },
+  "flightNumber": "VN301",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1959"
+  },
+  "departureTime": {
+    "$date": "2024-04-20T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-20T14:30:00.000Z"
+  },
+  "duration": 390,
+  "price": 3500000,
+  "availableSeats": 200,
+  "createdAt": {
+    "$date": "2025-04-10T06:08:52.378Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:08:52.378Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7608135ac163293c89e19"
+  },
+  "flightNumber": "VN302",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1959"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-20T05:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-20T12:00:00.000Z"
+  },
+  "duration": 390,
+  "price": 3200000,
+  "availableSeats": 180,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:05.492Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:09:05.492Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7608735ac163293c89e1a"
+  },
+  "flightNumber": "VN303",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1960"
+  },
+  "departureTime": {
+    "$date": "2024-04-20T22:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-21T04:30:00.000Z"
+  },
+  "duration": 390,
+  "price": 3800000,
+  "availableSeats": 220,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:11.439Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:09:11.439Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7608d35ac163293c89e1b"
+  },
+  "flightNumber": "VN304",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1960"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-20T23:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-21T06:00:00.000Z"
+  },
+  "duration": 390,
+  "price": 3400000,
+  "availableSeats": 190,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:17.964Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:09:17.964Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7609f35ac163293c89e1c"
+  },
+  "flightNumber": "VN305",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1961"
+  },
+  "departureTime": {
+    "$date": "2024-04-21T09:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-21T15:30:00.000Z"
+  },
+  "duration": 500,
+  "price": 1200000,
+  "availableSeats": 100,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:35.035Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T13:08:43.878Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760a535ac163293c89e1d"
+  },
+  "flightNumber": "VN306",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1961"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-21T10:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-21T17:00:00.000Z"
+  },
+  "duration": 390,
+  "price": 4200000,
+  "availableSeats": 160,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:41.584Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:09:41.584Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760ab35ac163293c89e1e"
+  },
+  "flightNumber": "VN307",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1962"
+  },
+  "departureTime": {
+    "$date": "2024-04-22T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-22T14:30:00.000Z"
+  },
+  "duration": 390,
+  "price": 4500000,
+  "availableSeats": 140,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:47.685Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:09:47.685Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760b135ac163293c89e1f"
+  },
+  "flightNumber": "VN308",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1962"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-22T09:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-22T16:00:00.000Z"
+  },
+  "duration": 390,
+  "price": 4800000,
+  "availableSeats": 120,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:53.039Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:09:53.039Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760b735ac163293c89e20"
+  },
+  "flightNumber": "VN309",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1963"
+  },
+  "departureTime": {
+    "$date": "2024-04-23T11:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-23T17:30:00.000Z"
+  },
+  "duration": 390,
+  "price": 3000000,
+  "availableSeats": 240,
+  "createdAt": {
+    "$date": "2025-04-10T06:09:59.261Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:09:59.261Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760be35ac163293c89e21"
+  },
+  "flightNumber": "VN310",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1963"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-23T13:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-23T20:00:00.000Z"
+  },
+  "duration": 390,
+  "price": 2800000,
+  "availableSeats": 260,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:06.360Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:06.360Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760c535ac163293c89e22"
+  },
+  "flightNumber": "VN311",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1964"
+  },
+  "departureTime": {
+    "$date": "2024-04-24T07:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-24T15:30:00.000Z"
+  },
+  "duration": 510,
+  "price": 5500000,
+  "availableSeats": 300,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:13.994Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:13.994Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760cc35ac163293c89e23"
+  },
+  "flightNumber": "VN312",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1964"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-24T08:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-24T17:00:00.000Z"
+  },
+  "duration": 510,
+  "price": 5200000,
+  "availableSeats": 280,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:20.712Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:20.712Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760d335ac163293c89e24"
+  },
+  "flightNumber": "VN313",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1965"
+  },
+  "departureTime": {
+    "$date": "2024-04-25T09:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-25T17:30:00.000Z"
+  },
+  "duration": 510,
+  "price": 4800000,
+  "availableSeats": 250,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:27.736Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:27.736Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760d935ac163293c89e25"
+  },
+  "flightNumber": "VN314",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1965"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-25T10:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-25T19:00:00.000Z"
+  },
+  "duration": 510,
+  "price": 4200000,
+  "availableSeats": 320,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:33.374Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:33.374Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760e035ac163293c89e26"
+  },
+  "flightNumber": "VN315",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1966"
+  },
+  "departureTime": {
+    "$date": "2024-04-26T08:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-26T16:30:00.000Z"
+  },
+  "duration": 510,
+  "price": 5800000,
+  "availableSeats": 180,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:40.032Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:40.032Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760e635ac163293c89e27"
+  },
+  "flightNumber": "VN316",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1966"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-26T09:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-26T18:00:00.000Z"
+  },
+  "duration": 510,
+  "price": 6200000,
+  "availableSeats": 150,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:46.249Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:46.249Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760ec35ac163293c89e28"
+  },
+  "flightNumber": "VN317",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1967"
+  },
+  "departureTime": {
+    "$date": "2024-04-27T10:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-27T18:30:00.000Z"
+  },
+  "duration": 510,
+  "price": 6500000,
+  "availableSeats": 120,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:52.478Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:52.478Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760f335ac163293c89e29"
+  },
+  "flightNumber": "VN318",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1967"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "departureTime": {
+    "$date": "2024-04-27T11:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-27T20:00:00.000Z"
+  },
+  "duration": 510,
+  "price": 6800000,
+  "availableSeats": 100,
+  "createdAt": {
+    "$date": "2025-04-10T06:10:59.961Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:10:59.961Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f760fb35ac163293c89e2a"
+  },
+  "flightNumber": "VN319",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1968"
+  },
+  "departureTime": {
+    "$date": "2024-04-28T12:00:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-28T20:30:00.000Z"
+  },
+  "duration": 510,
+  "price": 7200000,
+  "availableSeats": 80,
+  "createdAt": {
+    "$date": "2025-04-10T06:11:07.375Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T06:11:07.375Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7bca4b015ac9e45cc970c"
+  },
+  "flightNumber": "VN320",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1949"
+  },
+  "departureTime": {
+    "$date": "2024-04-28T06:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-28T15:00:00.000Z"
+  },
+  "duration": 510,
+  "price": 1200000,
+  "availableSeats": 60,
+  "createdAt": {
+    "$date": "2025-04-10T12:42:12.977Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T12:42:12.977Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7be4c395162c97157daa5"
+  },
+  "flightNumber": "VN330",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1949"
+  },
+  "departureTime": {
+    "$date": "2024-04-28T06:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-28T15:00:00.000Z"
+  },
+  "duration": 510,
+  "price": 1200000,
+  "availableSeats": 60,
+  "createdAt": {
+    "$date": "2025-04-10T12:49:16.758Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T12:49:16.758Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f7c2c25cf0d3268256506c"
+  },
+  "flightNumber": "VN340",
+  "airlineId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1946"
+  },
+  "aircraftId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1947"
+  },
+  "departureAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1948"
+  },
+  "arrivalAirportId": {
+    "$oid": "65f7db3bd0e0c1eaa3cd1949"
+  },
+  "departureTime": {
+    "$date": "2024-04-28T06:30:00.000Z"
+  },
+  "arrivalTime": {
+    "$date": "2024-04-28T15:00:00.000Z"
+  },
+  "duration": 510,
+  "price": 1200000,
+  "availableSeats": 60,
+  "createdAt": {
+    "$date": "2025-04-10T13:08:18.736Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T13:08:18.736Z"
+  }
+}]

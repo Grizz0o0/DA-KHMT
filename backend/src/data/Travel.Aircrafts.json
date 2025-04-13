@@ -1,0 +1,1854 @@
+[{
+  "_id": {
+    "$oid": "67efbfd5c04dfe3c5a60b76c"
+  },
+  "model": "A320",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 25,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 5,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 180,
+  "aircraftCode": "A320-001",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T11:17:41.790Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T15:51:35.462Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efc038c04dfe3c5a60b76d"
+  },
+  "model": "B737",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 4,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 190,
+  "aircraftCode": "B737-100",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T11:19:20.976Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T11:19:20.976Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd079fa8b24ab6106f55a"
+  },
+  "model": "B787",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 30,
+      "seatsPerRow": 8
+    },
+    "business": {
+      "rows": 6,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 264,
+  "aircraftCode": "B787-8",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:28:41.601Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:28:41.601Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd1e12547fc93d7020e57"
+  },
+  "model": "B777",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 40,
+      "seatsPerRow": 9
+    },
+    "business": {
+      "rows": 8,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 392,
+  "aircraftCode": "B777-300ER",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:34:41.306Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:34:41.306Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd20e2547fc93d7020e58"
+  },
+  "model": "B727",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 24,
+      "seatsPerRow": 6
+    }
+  },
+  "capacity": 144,
+  "aircraftCode": "B727-200",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:35:26.323Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:35:26.323Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd2532547fc93d7020e59"
+  },
+  "model": "A350",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 35,
+      "seatsPerRow": 8
+    },
+    "business": {
+      "rows": 10,
+      "seatsPerRow": 4
+    },
+    "firstClass": {
+      "rows": 2,
+      "seatsPerRow": 2
+    }
+  },
+  "capacity": 324,
+  "aircraftCode": "A350-900",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:36:35.018Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:36:35.018Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd2a02547fc93d7020e5a"
+  },
+  "model": "A380",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 50,
+      "seatsPerRow": 10
+    },
+    "business": {
+      "rows": 15,
+      "seatsPerRow": 4
+    },
+    "firstClass": {
+      "rows": 3,
+      "seatsPerRow": 2
+    }
+  },
+  "capacity": 566,
+  "aircraftCode": "A380-800",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:37:52.481Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:37:52.481Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd2e22547fc93d7020e5b"
+  },
+  "model": "A310",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 30,
+      "seatsPerRow": 8
+    }
+  },
+  "capacity": 240,
+  "aircraftCode": "A310-300",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:38:58.516Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:38:58.516Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd3022547fc93d7020e5c"
+  },
+  "model": "C919",
+  "manufacturer": "COMAC",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 3,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 180,
+  "aircraftCode": "C919-001",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:39:30.200Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:39:30.200Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd3172547fc93d7020e5d"
+  },
+  "model": "E190",
+  "manufacturer": "Embraer",
+  "airlineId": {
+    "$oid": "67ea79020f19cb4ddb47f9d9"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 20,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 80,
+  "aircraftCode": "E190-STD",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:39:51.572Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:39:51.572Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd4542547fc93d7020e5e"
+  },
+  "model": "A220",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 25,
+      "seatsPerRow": 5
+    }
+  },
+  "capacity": 125,
+  "aircraftCode": "A220-100",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:45:08.179Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:45:08.179Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd4812547fc93d7020e5f"
+  },
+  "model": "A330",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 40,
+      "seatsPerRow": 9
+    },
+    "business": {
+      "rows": 8,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 392,
+  "aircraftCode": "A330-300",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:45:53.265Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:45:53.265Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd4a82547fc93d7020e60"
+  },
+  "model": "B757",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 30,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 6,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 204,
+  "aircraftCode": "B757-200",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:46:32.591Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:46:32.591Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd4c62547fc93d7020e61"
+  },
+  "model": "B767",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 36,
+      "seatsPerRow": 8
+    }
+  },
+  "capacity": 288,
+  "aircraftCode": "B767-300",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:47:02.070Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:47:02.070Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd4d72547fc93d7020e62"
+  },
+  "model": "MC-21",
+  "manufacturer": "Irkut",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 6
+    }
+  },
+  "capacity": 168,
+  "aircraftCode": "MC21-300",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:47:19.161Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:47:19.161Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd4fe2547fc93d7020e63"
+  },
+  "model": "Tu-204",
+  "manufacturer": "Tupolev",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 30,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 4,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 196,
+  "aircraftCode": "Tu204-100",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:47:58.698Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:47:58.698Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5112547fc93d7020e64"
+  },
+  "model": "CRJ900",
+  "manufacturer": "Bombardier",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 20,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 80,
+  "aircraftCode": "CRJ-900",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:48:17.698Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:48:17.698Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd51e2547fc93d7020e65"
+  },
+  "model": "ERJ145",
+  "manufacturer": "Embraer",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 15,
+      "seatsPerRow": 3
+    }
+  },
+  "capacity": 45,
+  "aircraftCode": "ERJ-145",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:48:30.570Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:48:30.570Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd52a2547fc93d7020e66"
+  },
+  "model": "ARJ21",
+  "manufacturer": "COMAC",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 20,
+      "seatsPerRow": 5
+    }
+  },
+  "capacity": 100,
+  "aircraftCode": "ARJ21-700",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:48:42.869Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:48:42.869Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5382547fc93d7020e67"
+  },
+  "model": "Il-96",
+  "manufacturer": "Ilyushin",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 35,
+      "seatsPerRow": 9
+    },
+    "business": {
+      "rows": 5,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 335,
+  "aircraftCode": "Il96-300",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:48:56.078Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:48:56.078Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5442547fc93d7020e68"
+  },
+  "model": "A310",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 34,
+      "seatsPerRow": 8
+    }
+  },
+  "capacity": 272,
+  "aircraftCode": "A310-200",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:49:08.151Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:49:08.151Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5612547fc93d7020e69"
+  },
+  "model": "B747",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 50,
+      "seatsPerRow": 10
+    },
+    "business": {
+      "rows": 12,
+      "seatsPerRow": 4
+    },
+    "firstClass": {
+      "rows": 3,
+      "seatsPerRow": 2
+    }
+  },
+  "capacity": 554,
+  "aircraftCode": "B747-400",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:49:37.372Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:49:37.372Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd56e2547fc93d7020e6a"
+  },
+  "model": "A321",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 35,
+      "seatsPerRow": 6
+    }
+  },
+  "capacity": 210,
+  "aircraftCode": "A321-200",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:49:50.306Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:49:50.306Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd57c2547fc93d7020e6b"
+  },
+  "model": "B737 MAX",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 33,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 4,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 214,
+  "aircraftCode": "B737MAX-8",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:50:04.418Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:50:04.418Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5872547fc93d7020e6c"
+  },
+  "model": "CSeries CS300",
+  "manufacturer": "Bombardier",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 25,
+      "seatsPerRow": 5
+    }
+  },
+  "capacity": 125,
+  "aircraftCode": "CS300",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:50:15.652Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:50:15.652Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5922547fc93d7020e6d"
+  },
+  "model": "E195-E2",
+  "manufacturer": "Embraer",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 112,
+  "aircraftCode": "E195-E2",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:50:26.317Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:50:26.317Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd59e2547fc93d7020e6e"
+  },
+  "model": "DC-10",
+  "manufacturer": "McDonnell Douglas",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 36,
+      "seatsPerRow": 9
+    },
+    "business": {
+      "rows": 6,
+      "seatsPerRow": 4
+    }
+  },
+  "capacity": 348,
+  "aircraftCode": "DC-10-30",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:50:38.699Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:50:38.699Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5b12547fc93d7020e6f"
+  },
+  "model": "MD-11",
+  "manufacturer": "McDonnell Douglas",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 38,
+      "seatsPerRow": 9
+    }
+  },
+  "capacity": 342,
+  "aircraftCode": "MD-11",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:50:57.856Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:50:57.856Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67efd5be2547fc93d7020e70"
+  },
+  "model": "L-1011",
+  "manufacturer": "Lockheed",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 32,
+      "seatsPerRow": 9
+    }
+  },
+  "capacity": 288,
+  "aircraftCode": "L-1011",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-04T12:51:10.069Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-04T12:51:10.069Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67f14efa7e13f2e2920ea27e"
+  },
+  "model": "Superjet 100",
+  "manufacturer": "Sukhoi",
+  "airlineId": {
+    "$oid": "67ea7a19b05a3166a211d664"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 22,
+      "seatsPerRow": 5
+    }
+  },
+  "aircraftCode": "SSJ100",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-05T15:40:42.210Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-05T15:40:42.210Z"
+  },
+  "capacity": 110
+},
+{
+  "_id": {
+    "$oid": "67f2918f7f3ba28801be2976"
+  },
+  "model": "A318",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 22,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "A318-100",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:37:03.072Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:37:03.072Z"
+  },
+  "capacity": 132
+},
+{
+  "_id": {
+    "$oid": "67f292197f3ba28801be2977"
+  },
+  "model": "B707",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 7
+    }
+  },
+  "aircraftCode": "B707-320",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:39:21.191Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:39:21.191Z"
+  },
+  "capacity": 196
+},
+{
+  "_id": {
+    "$oid": "67f2922f7f3ba28801be2978"
+  },
+  "model": "Yak-42",
+  "manufacturer": "Yakovlev",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 24,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "Yak42",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:39:43.562Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:39:43.562Z"
+  },
+  "capacity": 144
+},
+{
+  "_id": {
+    "$oid": "67f292517f3ba28801be2979"
+  },
+  "model": "B777X",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 52,
+      "seatsPerRow": 10
+    },
+    "business": {
+      "rows": 14,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "B777-9",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:40:17.456Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:40:17.456Z"
+  },
+  "capacity": 576
+},
+{
+  "_id": {
+    "$oid": "67f2925b7f3ba28801be297a"
+  },
+  "model": "A350",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 48,
+      "seatsPerRow": 9
+    },
+    "business": {
+      "rows": 10,
+      "seatsPerRow": 4
+    },
+    "firstClass": {
+      "rows": 2,
+      "seatsPerRow": 2
+    }
+  },
+  "aircraftCode": "A350-00",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:40:27.012Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:40:27.012Z"
+  },
+  "capacity": 476
+},
+{
+  "_id": {
+    "$oid": "67f292627f3ba28801be297b"
+  },
+  "model": "Tu-154",
+  "manufacturer": "Tupolev",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 30,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "Tu154M",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:40:34.672Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:40:34.672Z"
+  },
+  "capacity": 180
+},
+{
+  "_id": {
+    "$oid": "67f2927a7f3ba28801be297c"
+  },
+  "model": "DHC-8",
+  "manufacturer": "De Havilland",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 20,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "Q400",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:40:58.582Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:40:58.582Z"
+  },
+  "capacity": 80
+},
+{
+  "_id": {
+    "$oid": "67f292807f3ba28801be297d"
+  },
+  "model": "ATR 72",
+  "manufacturer": "ATR",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 18,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "ATR72-600",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:41:04.954Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:41:04.954Z"
+  },
+  "capacity": 72
+},
+{
+  "_id": {
+    "$oid": "67f292867f3ba28801be297e"
+  },
+  "model": "E175",
+  "manufacturer": "Embraer",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 21,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "E175",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:41:10.874Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:41:10.874Z"
+  },
+  "capacity": 84
+},
+{
+  "_id": {
+    "$oid": "67f2928c7f3ba28801be297f"
+  },
+  "model": "CRJ700",
+  "manufacturer": "Bombardier",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 19,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "CRJ-700",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:41:16.664Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:41:16.664Z"
+  },
+  "capacity": 76
+},
+{
+  "_id": {
+    "$oid": "67f2929b7f3ba28801be2980"
+  },
+  "model": "An-148",
+  "manufacturer": "Antonov",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 23,
+      "seatsPerRow": 5
+    }
+  },
+  "aircraftCode": "An148",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:41:31.190Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:41:31.190Z"
+  },
+  "capacity": 115
+},
+{
+  "_id": {
+    "$oid": "67f292a37f3ba28801be2981"
+  },
+  "model": "A340",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 50,
+      "seatsPerRow": 9
+    },
+    "business": {
+      "rows": 8,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "A340-600",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:41:39.333Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:41:39.333Z"
+  },
+  "capacity": 482
+},
+{
+  "_id": {
+    "$oid": "67f292ba7f3ba28801be2982"
+  },
+  "model": "B727",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 27,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "B727-300",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:42:02.825Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:42:02.825Z"
+  },
+  "capacity": 162
+},
+{
+  "_id": {
+    "$oid": "67f292c57f3ba28801be2983"
+  },
+  "model": "C919",
+  "manufacturer": "COMAC",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "C919",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:42:13.620Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:42:13.620Z"
+  },
+  "capacity": 168
+},
+{
+  "_id": {
+    "$oid": "67f292cc7f3ba28801be2984"
+  },
+  "model": "MD-90",
+  "manufacturer": "McDonnell Douglas",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 29,
+      "seatsPerRow": 5
+    }
+  },
+  "aircraftCode": "MD-90",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:42:20.292Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:42:20.292Z"
+  },
+  "capacity": 145
+},
+{
+  "_id": {
+    "$oid": "67f293957f3ba28801be2987"
+  },
+  "model": "An-24",
+  "manufacturer": "Antonov",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 17,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "An24",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:45:41.363Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:45:41.363Z"
+  },
+  "capacity": 68
+},
+{
+  "_id": {
+    "$oid": "67f293a37f3ba28801be2988"
+  },
+  "model": "DC-8",
+  "manufacturer": "McDonnell Douglas",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 32,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "DC-8-63",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:45:55.922Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:45:55.922Z"
+  },
+  "capacity": 192
+},
+{
+  "_id": {
+    "$oid": "67f293ae7f3ba28801be2989"
+  },
+  "model": "BAe 146",
+  "manufacturer": "British Aerospace",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 23,
+      "seatsPerRow": 5
+    }
+  },
+  "aircraftCode": "BAe146-200",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:46:06.613Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:46:06.613Z"
+  },
+  "capacity": 115
+},
+{
+  "_id": {
+    "$oid": "67f293b57f3ba28801be298a"
+  },
+  "model": "Tu-204SM",
+  "manufacturer": "Tupolev",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 4,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "Tu204SM",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:46:13.980Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:46:13.980Z"
+  },
+  "capacity": 184
+},
+{
+  "_id": {
+    "$oid": "67f293bb7f3ba28801be298b"
+  },
+  "model": "E170",
+  "manufacturer": "Embraer",
+  "airlineId": {
+    "$oid": "67ecb1801bc777f0dd6729b3"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 20,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "E170",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:46:19.856Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:46:19.856Z"
+  },
+  "capacity": 80
+},
+{
+  "_id": {
+    "$oid": "67f294b97f3ba28801be298c"
+  },
+  "model": "A310",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 38,
+      "seatsPerRow": 8
+    },
+    "business": {
+      "rows": 6,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "A310-400",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:50:33.747Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:50:33.747Z"
+  },
+  "capacity": 328
+},
+{
+  "_id": {
+    "$oid": "67f294c17f3ba28801be298d"
+  },
+  "model": "Bae ATP",
+  "manufacturer": "British Aerospace",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 18,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "ATP",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:50:41.899Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:50:41.899Z"
+  },
+  "capacity": 72
+},
+{
+  "_id": {
+    "$oid": "67f294c97f3ba28801be298e"
+  },
+  "model": "An-140",
+  "manufacturer": "Antonov",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 16,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "An140",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:50:49.776Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:50:49.776Z"
+  },
+  "capacity": 64
+},
+{
+  "_id": {
+    "$oid": "67f294d07f3ba28801be298f"
+  },
+  "model": "BAe Jetstream 41",
+  "manufacturer": "British Aerospace",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 10,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "JS41",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:50:56.158Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:50:56.158Z"
+  },
+  "capacity": 40
+},
+{
+  "_id": {
+    "$oid": "67f294d87f3ba28801be2990"
+  },
+  "model": "Let L-410",
+  "manufacturer": "Let Kunovice",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 9,
+      "seatsPerRow": 3
+    }
+  },
+  "aircraftCode": "L410",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:51:04.747Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:51:04.747Z"
+  },
+  "capacity": 27
+},
+{
+  "_id": {
+    "$oid": "67f294df7f3ba28801be2991"
+  },
+  "model": "Saab 2000",
+  "manufacturer": "Saab",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 17,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "Saab2000",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:51:11.313Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:51:11.313Z"
+  },
+  "capacity": 68
+},
+{
+  "_id": {
+    "$oid": "67f294f27f3ba28801be2992"
+  },
+  "model": "ARJ21",
+  "manufacturer": "COMAC",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 25,
+      "seatsPerRow": 5
+    }
+  },
+  "aircraftCode": "ARJ21-600",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:51:30.235Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:51:30.235Z"
+  },
+  "capacity": 125
+},
+{
+  "_id": {
+    "$oid": "67f294fa7f3ba28801be2993"
+  },
+  "model": "IL-86",
+  "manufacturer": "Ilyushin",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 36,
+      "seatsPerRow": 8
+    }
+  },
+  "aircraftCode": "IL86",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:51:38.027Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:51:38.027Z"
+  },
+  "capacity": 288
+},
+{
+  "_id": {
+    "$oid": "67f295097f3ba28801be2994"
+  },
+  "model": "DC-10",
+  "manufacturer": "McDonnell Douglas",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 42,
+      "seatsPerRow": 9
+    }
+  },
+  "aircraftCode": "DC-10-20",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:51:53.132Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:51:53.132Z"
+  },
+  "capacity": 378
+},
+{
+  "_id": {
+    "$oid": "67f295127f3ba28801be2995"
+  },
+  "model": "B707-120",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67ecb1951bc777f0dd6729b4"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 26,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "B707-120",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:52:02.463Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:52:02.463Z"
+  },
+  "capacity": 156
+},
+{
+  "_id": {
+    "$oid": "67f295257f3ba28801be2996"
+  },
+  "model": "Fokker 100",
+  "manufacturer": "Fokker",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 25,
+      "seatsPerRow": 5
+    }
+  },
+  "aircraftCode": "F100",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:52:21.400Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:52:21.400Z"
+  },
+  "capacity": 125
+},
+{
+  "_id": {
+    "$oid": "67f2952c7f3ba28801be2997"
+  },
+  "model": "Dornier 328",
+  "manufacturer": "Dornier",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 10,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "Do328",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:52:28.020Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:52:28.020Z"
+  },
+  "capacity": 40
+},
+{
+  "_id": {
+    "$oid": "67f295317f3ba28801be2998"
+  },
+  "model": "Tu-134",
+  "manufacturer": "Tupolev",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 22,
+      "seatsPerRow": 5
+    }
+  },
+  "aircraftCode": "Tu134A",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:52:33.988Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:52:33.988Z"
+  },
+  "capacity": 110
+},
+{
+  "_id": {
+    "$oid": "67f2953b7f3ba28801be2999"
+  },
+  "model": "ERJ145",
+  "manufacturer": "Embraer",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 18,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "ERJ145",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:52:43.211Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:52:43.211Z"
+  },
+  "capacity": 72
+},
+{
+  "_id": {
+    "$oid": "67f295457f3ba28801be299a"
+  },
+  "model": "MC-21",
+  "manufacturer": "Irkut",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 28,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "MC21-200",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:52:53.601Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:52:53.601Z"
+  },
+  "capacity": 168
+},
+{
+  "_id": {
+    "$oid": "67f2954e7f3ba28801be299b"
+  },
+  "model": "A330neo",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 48,
+      "seatsPerRow": 8
+    },
+    "business": {
+      "rows": 10,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "A330-800",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:53:02.979Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:53:02.979Z"
+  },
+  "capacity": 424
+},
+{
+  "_id": {
+    "$oid": "67f295567f3ba28801be299c"
+  },
+  "model": "B720",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 27,
+      "seatsPerRow": 6
+    }
+  },
+  "aircraftCode": "B720B",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:53:10.236Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:53:10.236Z"
+  },
+  "capacity": 162
+},
+{
+  "_id": {
+    "$oid": "67f2955c7f3ba28801be299d"
+  },
+  "model": "A300",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 35,
+      "seatsPerRow": 8
+    }
+  },
+  "aircraftCode": "A300B4",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:53:16.494Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:53:16.494Z"
+  },
+  "capacity": 280
+},
+{
+  "_id": {
+    "$oid": "67f295627f3ba28801be299e"
+  },
+  "model": "B787-10",
+  "manufacturer": "Boeing",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 50,
+      "seatsPerRow": 9
+    },
+    "business": {
+      "rows": 12,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "B787-10",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-06T14:53:22.775Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-06T14:53:22.775Z"
+  },
+  "capacity": 498
+},
+{
+  "_id": {
+    "$oid": "67f745bdab88d1274d37927d"
+  },
+  "model": "A321XLR",
+  "manufacturer": "Airbus",
+  "airlineId": {
+    "$oid": "67f1468dcb002bbc19067802"
+  },
+  "seatConfiguration": {
+    "economy": {
+      "rows": 40,
+      "seatsPerRow": 6
+    },
+    "business": {
+      "rows": 6,
+      "seatsPerRow": 4
+    }
+  },
+  "aircraftCode": "A321XLR",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-10T04:14:53.482Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-10T04:14:53.482Z"
+  },
+  "capacity": 264
+}]

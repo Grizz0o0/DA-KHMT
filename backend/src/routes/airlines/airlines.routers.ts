@@ -1,15 +1,38 @@
 import { Router } from 'express'
 import airlinesControllers from '~/controllers/airlines.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/users.middlewares'
+import { authentication } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
-import { authenticationSchema } from '~/validators/users.validator'
+import { authenticationSchema } from '~/requestSchemas/users.request'
+import {
+  searchAirlineSchema,
+  getListAirlineSchema,
+  getAirlineByCodeSchema,
+  getAirlineByIdSchema
+} from '~/requestSchemas/airlines.request'
+
 const airlinesRouter = Router()
 
-airlinesRouter.get('/search', asyncHandler(airlinesControllers.searchAirline))
-airlinesRouter.get('/', asyncHandler(airlinesControllers.getListAirline))
-airlinesRouter.get('/code/:airlineCode', asyncHandler(airlinesControllers.getAirlineByCode))
-airlinesRouter.get('/:airlineId', asyncHandler(airlinesControllers.getAirlineById))
+airlinesRouter.get(
+  '/search',
+  validateRequest({ query: searchAirlineSchema.query }),
+  asyncHandler(airlinesControllers.searchAirline)
+)
+airlinesRouter.get(
+  '/',
+  validateRequest({ query: getListAirlineSchema.query }),
+  asyncHandler(airlinesControllers.getListAirline)
+)
+airlinesRouter.get(
+  '/code/:airlineCode',
+  validateRequest({ params: getAirlineByCodeSchema.params }),
+  asyncHandler(airlinesControllers.getAirlineByCode)
+)
+airlinesRouter.get(
+  '/:airlineId',
+  validateRequest({ params: getAirlineByIdSchema.params }),
+  asyncHandler(airlinesControllers.getAirlineById)
+)
 
 airlinesRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
 airlinesRouter.post('/', asyncHandler(airlinesControllers.createAirline))

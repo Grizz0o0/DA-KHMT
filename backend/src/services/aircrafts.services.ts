@@ -1,42 +1,64 @@
 import 'dotenv/config'
 import {
-  CreateAircraftReqBody,
-  UpdateAircraftReqBody,
-  SearchAircraftReqBody,
-  GetListAircraftReqBody,
-  FilterAircraft
-} from '~/models/requests/aircrafts.request'
-import { AircraftType, aircraftSchema } from '~/models/schemas/aircrafts.schema'
+  createAircraftTypeBody,
+  updateAircraftTypeBody,
+  searchAircraftTypeQuery,
+  getListAircraftTypeQuery,
+  filterAircraftTypeQuery,
+  getAircraftByManufacturerTypeQuery,
+  getAircraftByModelTypeQuery
+} from '~/requestSchemas/aircrafts.request'
+import {
+  createAircraftSchema,
+  updateAircraftSchema,
+  searchAircraftSchema,
+  getListAircraftSchema,
+  filterAircraftSchema,
+  deleteAircraftSchema,
+  getAircraftByIdSchema,
+  getAircraftByModelSchema,
+  getAircraftByManufacturerSchema,
+  getAircraftByAircraftCodeSchema
+} from '~/requestSchemas/aircrafts.request'
+import { AircraftType, aircraftSchema } from '~/models/aircrafts.model'
 import { BadRequestError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
 import { convertToObjectId, isValidObjectId } from '~/utils/mongoUtils'
 import { getInfoData, getSelectData, omitInfoData, unSelectData } from '~/utils/objectUtils'
+import { createPagination } from '~/responses/success.response'
+import { ObjectId } from 'mongodb'
 
 class AircraftService {
-  static async isAircraftExists(name: string) {
-    return await databaseService.aircrafts.findOne({ name })
+  static async isAircraftExists(aircraftCode: string) {
+    return await databaseService.aircrafts.findOne({ aircraftCode })
   }
 
-  static async createAircraft(payload: CreateAircraftReqBody) {
-    const holderAircraft = await databaseService.aircrafts.findOne({ aircraftCode: payload.aircraftCode })
+  static async createAircraft(payload: createAircraftTypeBody) {
+    const validatedData = createAircraftSchema.body.parse(payload)
+
+    const holderAircraft = await databaseService.aircrafts.findOne({ aircraftCode: validatedData.aircraftCode })
     if (holderAircraft) throw new BadRequestError('Aircraft already registered')
 
-    const parsedAircraft = aircraftSchema.parse({ ...payload, airlineId: convertToObjectId(payload.airlineId) })
-    console.log(parsedAircraft)
+    const parsedAircraft = aircraftSchema.parse(validatedData)
     const aircraft = await databaseService.aircrafts.insertOne(parsedAircraft)
 
     if (!aircraft.insertedId) throw new BadRequestError('Create Aircraft failed')
     return aircraft
   }
 
-  static async updateAircraft(id: string, payload: UpdateAircraftReqBody) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestError('The provided ID is not a valid MongoDB ObjectId. It should be a 24-character hex')
+  static async updateAircraft(id: string, payload: updateAircraftTypeBody) {
+    updateAircraftSchema.params.parse({ aircraftId: id })
+    const validatedData = updateAircraftSchema.body.parse(payload)
+
+    const existingAircraft = await databaseService.aircrafts.findOne({ _id: convertToObjectId(id) })
+    if (!existingAircraft) {
+      throw new BadRequestError('Aircraft not found')
     }
+
     const updatedAircraft = await databaseService.aircrafts.findOneAndUpdate(
       { _id: convertToObjectId(id) },
       {
-        $set: { ...payload },
+        $set: { ...validatedData },
         $currentDate: {
           updatedAt: true
         }
@@ -48,11 +70,10 @@ class AircraftService {
   }
 
   static async deleteAircraft(id: string) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestError('The provided ID is not a valid MongoDB ObjectId. It should be a 24-character hex')
-    }
-    const del = await databaseService.aircrafts.findOneAndDelete({ _id: convertToObjectId(id) })
-    if (!del) throw new BadRequestError('Update Aircraft failed')
+    const { aircraftId } = deleteAircraftSchema.params.parse({ aircraftId: id }) as { aircraftId: ObjectId }
+
+    const del = await databaseService.aircrafts.findOneAndDelete({ _id: aircraftId })
+    if (!del) throw new BadRequestError('Delete Aircraft failed')
     return omitInfoData({ fields: ['createAt', 'updateAt'], object: del })
   }
 
@@ -61,18 +82,38 @@ class AircraftService {
     page = 1,
     limit = 10,
     select = ['model', 'manufacturer', 'seatConfiguration', 'capacity', 'aircraftCode', 'status', 'score']
-  }: SearchAircraftReqBody) {
-    const skip = (page - 1) * limit
+  }: searchAircraftTypeQuery) {
+    const validatedQuery = searchAircraftSchema.query.parse({
+      content,
+      page,
+      limit,
+      select
+    })
+    console.log(validatedQuery)
+    if (!validatedQuery.content || validatedQuery.content.trim() === '') {
+      return { aircrafts: [], pagination: createPagination(1, 10, 0) }
+    }
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+
+    const totalItems = await databaseService.aircrafts.countDocuments({
+      $text: { $search: validatedQuery.content }
+    })
+
     const aircrafts = await databaseService.aircrafts
       .find(
-        { $text: { $search: content } },
-        { projection: { ...getSelectData(select), score: { $meta: 'textScore' } } }
+        { $text: { $search: validatedQuery.content } },
+        { projection: { ...getSelectData(validatedQuery.select ?? []), score: { $meta: 'textScore' } } }
       )
       .skip(skip)
-      .limit(limit)
+      .limit(validatedQuery.limit ?? 10)
       .sort({ score: { $meta: 'textScore' } })
       .toArray()
-    return aircrafts
+
+    // Tạo thông tin phân trang
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+
+    return { aircrafts, pagination }
   }
 
   static async getListAircraft({
@@ -80,17 +121,93 @@ class AircraftService {
     page = 1,
     order = 'asc',
     select = ['model', 'manufacturer', 'seatConfiguration', 'capacity', 'aircraftCode', 'status']
-  }: GetListAircraftReqBody) {
-    const skip = (page - 1) * limit
-    const sortBy: { [key: string]: 1 | -1 } = order === 'asc' ? { _id: 1 } : { _id: -1 }
-    const products = await databaseService.aircrafts
+  }: getListAircraftTypeQuery) {
+    const validatedQuery = getListAircraftSchema.query.parse({
+      limit,
+      page,
+      order,
+      select
+    })
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+
+    const sortField = 'aircraftCode'
+    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: validatedQuery.order === 'asc' ? 1 : -1 }
+
+    // Đếm tổng số lượng
+    const totalItems = await databaseService.aircrafts.countDocuments({})
+
+    const aircrafts = await databaseService.aircrafts
       .find()
       .sort(sortBy)
       .skip(skip)
-      .project(getSelectData(select as []))
-      .limit(+limit)
+      .project(getSelectData(validatedQuery.select ?? []))
+      .limit(validatedQuery.limit ?? 10)
       .toArray()
-    return products
+
+    // Tạo thông tin phân trang
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+
+    return { aircrafts, pagination }
+  }
+
+  static async getAircraftByManufacturer({ manufacturer, page = 1, limit = 10 }: getAircraftByManufacturerTypeQuery) {
+    const validatedQuery = getAircraftByManufacturerSchema.query.parse({ manufacturer, page, limit })
+    console.log(validatedQuery)
+    if (!validatedQuery.manufacturer || validatedQuery.manufacturer.trim() === '') {
+      return { aircrafts: [], pagination: createPagination(1, 10, 0) }
+    }
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+    const totalItems = await databaseService.aircrafts.countDocuments({ manufacturer: validatedQuery.manufacturer })
+
+    const aircrafts = await databaseService.aircrafts
+      .find({ manufacturer: validatedQuery.manufacturer })
+      .skip(skip)
+      .limit(validatedQuery.limit ?? 10)
+      .toArray()
+
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+    return {
+      aircrafts: aircrafts.map((aircraft) => omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })),
+      pagination
+    }
+  }
+
+  static async getAircraftById(id: string) {
+    const { aircraftId } = getAircraftByIdSchema.params.parse({ aircraftId: id })
+
+    const aircraft = await databaseService.aircrafts.findOne({ _id: aircraftId })
+    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
+  }
+
+  static async getAircraftByModel({ model, page = 1, limit = 10 }: getAircraftByModelTypeQuery) {
+    const validatedQuery = getAircraftByModelSchema.query.parse({ model, page, limit })
+
+    if (!validatedQuery.model || validatedQuery.model.trim() === '') {
+      return { aircrafts: [], pagination: createPagination(1, 10, 0) }
+    }
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+    const totalItems = await databaseService.aircrafts.countDocuments({ model: validatedQuery.model })
+
+    const aircrafts = await databaseService.aircrafts
+      .find({ model: validatedQuery.model })
+      .skip(skip)
+      .limit(validatedQuery.limit ?? 10)
+      .toArray()
+
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+    return {
+      aircrafts: aircrafts.map((aircraft) => omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })),
+      pagination
+    }
+  }
+
+  static async getAircraftByAircraftCode(aircraftCode: string) {
+    const { code } = getAircraftByAircraftCodeSchema.params.parse({ code: aircraftCode })
+
+    const aircraft = await databaseService.aircrafts.findOne({ aircraftCode: code })
+    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
   }
 
   static async filterAircraft({
@@ -102,45 +219,44 @@ class AircraftService {
     page = 1,
     order = 'asc',
     select = ['model', 'manufacturer', 'seatConfiguration', 'capacity', 'aircraftCode', 'status']
-  }: FilterAircraft) {
-    const query = {} as any
-    if (model) query.model = model
-    if (manufacturer) query.manufacturer = manufacturer
-    if (aircraftCode) query.aircraftCode = aircraftCode
-    if (status) query.status = status
-    const skip = (page - 1) * limit
-    const sortBy: { [key: string]: 1 | -1 } = order === 'asc' ? { _id: 1 } : { _id: -1 }
-    const products = await databaseService.aircrafts
+  }: filterAircraftTypeQuery) {
+    const validatedQuery = filterAircraftSchema.query.parse({
+      model,
+      manufacturer,
+      aircraftCode,
+      status,
+      limit,
+      page,
+      order,
+      select
+    })
+
+    const query: Record<string, any> = {}
+    if (validatedQuery.model) query.model = validatedQuery.model
+    if (validatedQuery.manufacturer) query.manufacturer = validatedQuery.manufacturer
+    if (validatedQuery.aircraftCode) query.aircraftCode = validatedQuery.aircraftCode
+    if (validatedQuery.status) query.status = validatedQuery.status
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+
+    const sortField = 'aircraftCode'
+    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: validatedQuery.order === 'asc' ? 1 : -1 }
+
+    // Đếm tổng số lượng phù hợp với điều kiện
+    const totalItems = await databaseService.aircrafts.countDocuments(query)
+
+    const aircrafts = await databaseService.aircrafts
       .find(query)
       .sort(sortBy)
       .skip(skip)
-      .project(getSelectData(select as []))
-      .limit(+limit)
+      .project(getSelectData(validatedQuery.select ?? []))
+      .limit(validatedQuery.limit ?? 10)
       .toArray()
-    return products
-  }
 
-  static async getAircraftById(id: string) {
-    if (!isValidObjectId(id)) {
-      throw new BadRequestError('The provided ID is not a valid MongoDB ObjectId. It should be a 24-character hex')
-    }
-    const aircraft = await databaseService.aircrafts.findOne({ _id: convertToObjectId(id) })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
-  }
+    // Tạo thông tin phân trang
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
 
-  static async getAircraftByModel(model: string) {
-    const aircraft = await databaseService.aircrafts.findOne({ model })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
-  }
-
-  static async getAircraftByManufacturer(manufacturer: string) {
-    const aircraft = await databaseService.aircrafts.findOne({ manufacturer })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
-  }
-
-  static async getAircraftByAircraftCode(aircraftCode: string) {
-    const aircraft = await databaseService.aircrafts.findOne({ aircraftCode })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
+    return { aircrafts, pagination }
   }
 }
 

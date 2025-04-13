@@ -1,0 +1,78 @@
+### Base URL
+@baseUrl = http://localhost:3052/v1/api
+
+### Authentication Token
+@token = your_authentication_token
+
+### Get List Flights with pagination and sorting
+GET {{baseUrl}}/flights?page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}}
+
+### Search Flights by flight number
+GET {{baseUrl}}/flights/search?content=VN123&page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}}
+
+### Filter Flights (comprehensive search)
+GET {{baseUrl}}/flights/filter?flightNumber=VN123&airlineId=65f7db3bd0e0c1eaa3cd1946&departureTime=2023-08-15T08:00:00Z&price=1200000&page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Create a new flight
+POST {{baseUrl}}/flights
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "flightNumber": "VN123",
+  "airlineId": "65f7db3bd0e0c1eaa3cd1946",
+  "aircraftId": "65f7db3bd0e0c1eaa3cd1947",
+  "departureAirportId": "65f7db3bd0e0c1eaa3cd1948",
+  "arrivalAirportId": "65f7db3bd0e0c1eaa3cd1949",
+  "departureTime": "2023-08-15T08:00:00Z",
+  "arrivalTime": "2023-08-15T10:30:00Z",
+  "duration": 150,
+  "price": 1200000,
+  "availableSeats": 120
+}
+
+### Update a flight
+PATCH {{baseUrl}}/flights/65f7db3bd0e0c1eaa3cd1950
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "flightNumber": "VN123-updated",
+  "price": 1500000,
+  "availableSeats": 100
+}
+
+### Delete a flight
+DELETE {{baseUrl}}/flights/65f7db3bd0e0c1eaa3cd1950
+Authorization: Bearer {{token}}
+
+### Get flight by flight number
+GET {{baseUrl}}/flights/number/VN123
+Authorization: Bearer {{token}}
+
+### Get flights by airline ID with pagination
+GET {{baseUrl}}/flights/airline/65f7db3bd0e0c1eaa3cd1946?page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}}
+
+### Get flights by aircraft ID with pagination
+GET {{baseUrl}}/flights/aircraft/65f7db3bd0e0c1eaa3cd1947?page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}}
+
+### Get flights by departure airport ID with pagination
+GET {{baseUrl}}/flights/departure-airport/65f7db3bd0e0c1eaa3cd1948?page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}}
+
+### Get flights by arrival airport ID with pagination
+GET {{baseUrl}}/flights/arrival-airport/65f7db3bd0e0c1eaa3cd1949?page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}}
+
+### Get flights by time range (departure or arrival)
+GET {{baseUrl}}/flights/time-range?startTime=2023-08-15T08:00:00Z&endTime=2023-08-15T10:30:00Z&type=departure&page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}}
+
+### Get flights by price and available seats
+GET {{baseUrl}}/flights/price-seats?price=1200000&availableSeats=120&page=1&limit=10&order=asc&sortBy=departureTime
+Authorization: Bearer {{token}} 

@@ -26,6 +26,8 @@ databaseService.indexRefreshTokens()
 databaseService.indexAirlines()
 databaseService.indexAirports()
 databaseService.indexAircrafts()
+databaseService.indexFlights()
+// databaseService.indexTickets()
 // init route
 app.use('/', router)
 // handling error
