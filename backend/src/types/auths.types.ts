@@ -20,13 +20,8 @@ export interface TokenPayload extends JwtPayload {
   [key: string]: any
 }
 
-export interface TokenPair {
-  accessToken: string
-  refreshToken: string
-}
-
-export interface TokenOptions {
-  expiresIn: string
+export interface CreateTokenPairParams {
+  payload: TokenPayload
   secretKey: string
 }
 

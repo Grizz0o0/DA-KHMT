@@ -23,8 +23,8 @@ import {
 import { AircraftType, aircraftSchema } from '~/models/aircrafts.model'
 import { BadRequestError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
-import { convertToObjectId, isValidObjectId } from '~/utils/mongoUtils'
-import { getInfoData, getSelectData, omitInfoData, unSelectData } from '~/utils/objectUtils'
+import { convertToObjectId, isValidObjectId } from '~/utils/mongo.utils'
+import { getInfoData, getSelectData, omitInfoData, unSelectData } from '~/utils/object.utils'
 import { createPagination } from '~/responses/success.response'
 import { ObjectId } from 'mongodb'
 

@@ -1,7 +1,8 @@
 import { z } from 'zod'
 import { ObjectId } from 'mongodb'
-import { BookingStatus, PaymentStatus } from '~/constants/bookings'
-
+import { BookingStatus } from '~/constants/bookings'
+import { AircraftClass } from '~/constants/aircrafts'
+import { PaymentStatus } from '~/constants/payments'
 const objectIdSchema = z
   .any()
   .refine((val) => val instanceof ObjectId || ObjectId.isValid(val), {
@@ -11,12 +12,14 @@ const objectIdSchema = z
 
 export const bookingSchema = z.object({
   _id: objectIdSchema.default(() => new ObjectId()),
-  userId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
-  flightId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
-  bookingTime: z.coerce.date(),
-  status: z.nativeEnum(BookingStatus).default(BookingStatus.Pending),
+  userId: objectIdSchema,
+  flightId: objectIdSchema,
+  seatClass: z.nativeEnum(AircraftClass),
+  bookingTime: z.date().default(() => new Date()),
+  quantity: z.number().int().min(1, 'Phải đặt ít nhất 1 vé'),
   totalPrice: z.coerce.number().nonnegative('Tổng tiền phải lớn hơn hoặc bằng 0'),
-  paymentStatus: z.nativeEnum(PaymentStatus).default(PaymentStatus.Unpaid),
+  status: z.nativeEnum(BookingStatus).default(BookingStatus.Pending),
+  paymentStatus: z.nativeEnum(PaymentStatus).default(PaymentStatus.PENDING),
   createdAt: z.date().default(() => new Date()),
   updatedAt: z.date().default(() => new Date())
 })

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import airportsControllers from '~/controllers/airports.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/auth.middlewares'
+import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import { authenticationSchema } from '~/requestSchemas/users.request'
 import {
@@ -14,7 +14,7 @@ import {
   getListAirportSchema,
   filterAirportSchema
 } from '~/requestSchemas/airports.request'
-
+import { UserRole } from '~/constants/users'
 const airportsRouter = Router()
 
 // Public routes
@@ -45,7 +45,7 @@ airportsRouter.get(
 )
 
 // Protected routes
-airportsRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
+airportsRouter.use(validateRequest({ headers: authenticationSchema }), authentication, authorizeRoles(UserRole.ADMIN))
 airportsRouter.post(
   '/',
   validateRequest({ body: createAirportSchema.body }),

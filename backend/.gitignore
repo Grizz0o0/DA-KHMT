@@ -3,3 +3,4 @@ dist/
 uploads/
 .vscode/
 .env
+update-ngrok.sh

@@ -11,15 +11,16 @@ const objectIdSchema = z
 export const flightSchema = z.object({
   _id: objectIdSchema.default(() => new ObjectId()),
   flightNumber: z.string().min(1, 'Số hiệu chuyến bay không được để trống'),
-  airlineId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
-  aircraftId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
-  departureAirportId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
-  arrivalAirportId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
+  airlineId: objectIdSchema,
+  aircraftId: objectIdSchema,
+  departureAirportId: objectIdSchema,
+  arrivalAirportId: objectIdSchema,
   departureTime: z.coerce.date(),
   arrivalTime: z.coerce.date(),
   duration: z.number().positive('Thời gian bay phải là số dương'),
   price: z.number().nonnegative('Giá vé phải lớn hơn hoặc bằng 0'),
   availableSeats: z.number().int().nonnegative('Số ghế phải >= 0'),
+  isActive: z.boolean().default(true),
   createdAt: z.date().default(() => new Date()),
   updatedAt: z.date().default(() => new Date())
 })

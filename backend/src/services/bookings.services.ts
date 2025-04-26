@@ -4,36 +4,29 @@ import { bookingSchema } from '~/models/bookings.model'
 import {
   createBookingSchema,
   CreateBookingTypeBody,
-  updateBookingSchema,
   UpdateBookingTypeBody,
-  UpdateBookingTypeParams,
-  deleteBookingSchema,
-  DeleteBookingTypeParams,
   searchBookingsSchema,
   SearchBookingsTypeQuery
 } from '~/requestSchemas/bookings.request'
-import { omitInfoData } from '~/utils/objectUtils'
-import { BookingStatus, PaymentStatus } from '~/constants/bookings'
+import { omitInfoData } from '~/utils/object.utils'
+import { BookingStatus } from '~/constants/bookings'
 import { ObjectId } from 'mongodb'
 import { Sort } from 'mongodb'
-
+import { PaymentStatus } from '~/constants/payments'
 class BookingsService {
   static async createBooking(payload: CreateBookingTypeBody) {
-    const validatedData = createBookingSchema.body.parse(payload)
-
-    const user = await databaseService.users.findOne({ _id: validatedData.userId })
+    const user = await databaseService.users.findOne({ _id: payload.userId })
     if (!user) throw new BadRequestError('Người dùng không tồn tại')
 
-    const flight = await databaseService.flights.findOne({ _id: validatedData.flightId })
+    const flight = await databaseService.flights.findOne({ _id: payload.flightId })
     if (!flight) throw new BadRequestError('Chuyến bay không tồn tại')
-    if (flight.availableSeats <= 0) throw new BadRequestError('Chuyến bay đã hết ghế')
+    if (flight.availableSeats < payload.quantity) throw new BadRequestError('Số ghế còn lại không đủ')
 
-    const parsedBooking = bookingSchema.parse(validatedData)
+    const parsedBooking = bookingSchema.parse(payload)
     const booking = await databaseService.bookings.insertOne(parsedBooking)
     if (!booking.insertedId) throw new BadRequestError('Tạo booking thất bại')
 
-    await databaseService.flights.updateOne({ _id: validatedData.flightId }, { $inc: { availableSeats: -1 } })
-
+    await databaseService.flights.updateOne({ _id: payload.flightId }, { $inc: { availableSeats: -1 } })
     const createdBooking = await databaseService.bookings.findOne({ _id: booking.insertedId })
     return omitInfoData({ fields: ['createAt', 'updateAt'], object: createdBooking })
   }
@@ -50,7 +43,7 @@ class BookingsService {
     // Nếu đang update status thành Confirmed hoặc Cancelled
     if (payload.status === BookingStatus.Confirmed || payload.status === BookingStatus.Cancelled) {
       // Nếu chưa thanh toán, không cho phép xác nhận
-      if (booking.paymentStatus !== PaymentStatus.Paid) {
+      if (booking.paymentStatus !== PaymentStatus.SUCCESS) {
         throw new BadRequestError('Phải thanh toán trước khi xác nhận booking')
       }
     }
@@ -76,7 +69,7 @@ class BookingsService {
     }
 
     // Nếu đã thanh toán, không cho phép xóa
-    if (booking.paymentStatus === PaymentStatus.Paid) {
+    if (booking.paymentStatus === PaymentStatus.SUCCESS) {
       throw new BadRequestError('Không thể xóa booking đã thanh toán')
     }
 
@@ -102,7 +95,7 @@ class BookingsService {
       limit,
       sortBy,
       sortOrder
-    } = searchBookingsSchema.query.parse(query)
+    } = query
 
     // Build filter
     const filter: Record<string, any> = {}
@@ -171,11 +164,11 @@ class BookingsService {
       databaseService.bookings.countDocuments({ status: BookingStatus.Confirmed }),
       databaseService.bookings.countDocuments({ status: BookingStatus.Cancelled }),
       databaseService.bookings.countDocuments({ status: BookingStatus.Pending }),
-      databaseService.bookings.countDocuments({ paymentStatus: PaymentStatus.Paid }),
-      databaseService.bookings.countDocuments({ paymentStatus: PaymentStatus.Unpaid }),
+      databaseService.bookings.countDocuments({ paymentStatus: PaymentStatus.SUCCESS }),
+      databaseService.bookings.countDocuments({ paymentStatus: PaymentStatus.PENDING }),
       databaseService.bookings
         .aggregate([
-          { $match: { paymentStatus: PaymentStatus.Paid } },
+          { $match: { paymentStatus: PaymentStatus.SUCCESS } },
           { $group: { _id: null, total: { $sum: '$totalPrice' } } }
         ])
         .toArray()

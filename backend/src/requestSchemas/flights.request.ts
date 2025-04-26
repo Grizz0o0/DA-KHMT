@@ -98,7 +98,11 @@ export type getListFlightTypeQuery = z.infer<typeof getListFlightSchema.query>
 
 export const searchFlightSchema = {
   query: z.object({
-    content: z.string().optional(),
+    departureAirport: z.string().trim().min(1, 'Điểm đi là bắt buộc'),
+    arrivalAirport: z.string().trim().min(1, 'Điểm đến là bắt buộc'),
+    departureTime: z.coerce.date({ required_error: 'Ngày khởi hành là bắt buộc' }),
+    arrivalTime: z.coerce.date({ required_error: 'Ngày đến là bắt buộc' }),
+    passengerCount: z.coerce.number().int().min(1).default(1),
     ...paginationParams
   })
 }

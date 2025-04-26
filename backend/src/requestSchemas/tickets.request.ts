@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb'
 import { z } from 'zod'
 import { TicketStatus } from '~/constants/tickets'
-
+import { UserGender } from '~/constants/users'
+import { AircraftClass } from '~/constants/aircrafts'
 const objectIdSchema = z
   .custom<ObjectId>((val) => val instanceof ObjectId || ObjectId.isValid(val), {
     message: 'ObjectId không hợp lệ'
@@ -14,7 +15,7 @@ const paginationParams = {
   order: z.enum(['asc', 'desc']).default('asc'),
   sortBy: z
     .enum(['bookingId', 'flightId', 'passengerEmail', 'passengerPassport', 'status', 'seatNumber'])
-    .default('bookingId')
+    .default('seatNumber')
 }
 
 // Schema for passenger information
@@ -23,7 +24,7 @@ const passengerSchema = z.object({
   email: z.string().email('Invalid email format'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   dateOfBirth: z.string().datetime(),
-  gender: z.enum(['male', 'female', 'other']),
+  gender: z.nativeEnum(UserGender),
   nationality: z.string().min(1, 'Nationality is required'),
   passportNumber: z.string(),
   idNumber: z.string()
@@ -32,9 +33,11 @@ const passengerSchema = z.object({
 // Schema for creating a ticket
 export const createTicketSchema = {
   body: z.object({
+    userId: objectIdSchema,
     bookingId: objectIdSchema,
     flightId: objectIdSchema,
     seatNumber: z.string().min(1, 'Seat number is required'),
+    seatClass: z.nativeEnum(AircraftClass),
     passenger: passengerSchema,
     price: z.number().min(0, 'Price must be non-negative'),
     status: z.nativeEnum(TicketStatus).default(TicketStatus.Unused)
@@ -45,8 +48,10 @@ export type createTicketTypeBody = z.infer<typeof createTicketSchema.body>
 // Schema for creating multiple tickets
 export const createMultipleTicketsSchema = {
   body: z.object({
+    userId: objectIdSchema,
     bookingId: objectIdSchema,
     flightId: objectIdSchema,
+    seatClass: z.nativeEnum(AircraftClass),
     tickets: z.array(
       z.object({
         seatNumber: z.string().min(1, 'Seat number is required'),
@@ -77,6 +82,7 @@ export const updateTicketSchema = {
     ticketId: objectIdSchema
   }),
   body: z.object({
+    seatClass: z.nativeEnum(AircraftClass).optional(),
     seatNumber: z.string().min(1, 'Seat number is required').optional(),
     passenger: passengerSchema.optional(),
     price: z.number().min(0, 'Price must be non-negative').optional(),
@@ -91,6 +97,7 @@ export const searchTicketsSchema = {
   query: z.object({
     bookingId: objectIdSchema.optional(),
     flightId: objectIdSchema.optional(),
+    seatClass: z.nativeEnum(AircraftClass).optional(),
     passengerEmail: z.string().optional(),
     passengerPassport: z.string().optional(),
     status: z.nativeEnum(TicketStatus).optional(),

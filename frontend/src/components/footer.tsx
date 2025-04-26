@@ -1,183 +1,159 @@
-import Image from 'next/image';
+import { Plane } from 'lucide-react';
 import Link from 'next/link';
 
 function Footer() {
     return (
-        <div className="flex pt-14 pb-4 w-full overflow-x-hidden overflow-y-hidden bg-gray-800">
-            <div className="flex items-center space-x-4 w-[1222] min-h-14 mb-[100] p-4 mx-auto">
-                <div className="w-1/3 mb-auto mt-[-40] ">
-                    <div className="">
-                        <Link className="min-w-[278] px-3 " href="/">
-                            <Image
-                                alt="logo"
-                                src={
-                                    'https://d1785e74lyxkqq.cloudfront.net/_next/static/v2_2/a/ad89f39fe62c8b500e6f9a25fa4427d8.svg'
-                                }
-                                width={200}
-                                height={90}
-                            />
+        <footer className="bg-gray-900 text-white pt-12 pb-6">
+            <div className="container mx-auto px-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                    <div>
+                        <Link href="/" className="flex items-center gap-2 mb-4">
+                            <Plane className="h-6 w-6 text-white" />
+                            <span className="font-bold text-xl">Fly24h</span>
                         </Link>
+                        <p className="text-gray-400">
+                            Đặt vé máy bay đến các điểm đến trên khắp Việt Nam
+                            và Châu Á với giá tốt nhất.
+                        </p>
                     </div>
-                    <div className="">
-                        <ul className="text-gray-400 text-sm font-medium">
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                Điện thoại: 08 1919 8989
+
+                    <div>
+                        <h3 className="font-semibold text-lg mb-4">Công Ty</h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link
+                                    href="/about"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Về Chúng Tôi
+                                </Link>
                             </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                Email: contact@fullstack.edu.vn
+                            <li>
+                                <Link
+                                    href="/careers"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Tuyển Dụng
+                                </Link>
                             </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                Địa chỉ: Số 1, ngõ 41, Trần Duy Hưng, Cầu Giấy,
-                                Hà Nội
+                            <li>
+                                <Link
+                                    href="/news"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Tin Tức
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/partners"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Đối Tác
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="font-semibold text-lg mb-4">Hỗ Trợ</h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link
+                                    href="/help"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Trung Tâm Hỗ Trợ
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/contact"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Liên Hệ Chúng Tôi
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/faq"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Câu Hỏi Thường Gặp
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/booking-policy"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Chính Sách Đặt Vé
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="font-semibold text-lg mb-4">Pháp Lý</h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link
+                                    href="/terms"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Điều Khoản & Điều Kiện
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/privacy"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Chính Sách Bảo Mật
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/cookies"
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Chính Sách Cookie
+                                </Link>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div className="flex w-2/3 px-3">
-                    <div className="flex flex-col w-1/3 px-3">
-                        <div className="mb-8">
-                            <div className="mb-3">
-                                <h3 className="text-white text-base font-bold leading-5">
-                                    Về Traveloka
-                                </h3>
-                            </div>
-                            <ul className="text-gray-400 text-sm font-medium">
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Cách đặt chỗ</Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">
-                                        Liên hệ chúng tôi
-                                    </Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Trợ giúp</Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Tuyển dụng</Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Về chúng tôi</Link>
-                                </li>
-                            </ul>
+
+                <div className="border-t border-gray-800 pt-6 mt-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center">
+                        <p className="text-gray-400 text-sm">
+                            &copy; {new Date().getFullYear()} Fly24h. Đã đăng ký
+                            bản quyền.
+                        </p>
+                        <div className="flex space-x-4 mt-4 md:mt-0">
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-white transition-colors"
+                            >
+                                Facebook
+                            </a>
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-white transition-colors"
+                            >
+                                Instagram
+                            </a>
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-white transition-colors"
+                            >
+                                Twitter
+                            </a>
                         </div>
-                        <div className="mb-8">
-                            <div className="mb-3">
-                                <h3 className="text-white text-base font-bold leading-5">
-                                    Theo dõi chúng tôi trên
-                                </h3>
-                            </div>
-                            <ul className="text-gray-400 text-sm font-medium">
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Facebook</Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Instagram</Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">TikTok</Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Youtube</Link>
-                                </li>
-                                <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                    <Link href="/activities">Telegram</Link>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="flex flex-col w-1/3 px-3">
-                        <div className="mb-3">
-                            <h3 className="text-white text-base font-bold leading-5">
-                                Sản phẩm
-                            </h3>
-                        </div>
-                        <ul className="text-gray-400 text-sm font-medium">
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Khách sạn</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Vé máy bay</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Vé xe khách</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Đưa đón sân bay</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Cho thuê xe</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    Hoạt động & Vui chơi
-                                </Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Du thuyền</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Biệt thự</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Căn hộ</Link>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="flex flex-col w-1/3 px-3">
-                        <div className="mb-3">
-                            <h3 className="text-white text-base font-bold leading-5">
-                                Khác
-                            </h3>
-                        </div>
-                        <ul className="text-gray-400 text-sm font-medium">
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    Traveloka Affiliate
-                                </Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Traveloka Blog</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    Chính Sách Quyền Riêng
-                                </Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    Đăng ký nơi nghỉ của bạn
-                                </Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    Đăng ký doanh nghiệp hoạt động du lịch của
-                                    bạn
-                                </Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">Khu vực báo chí</Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    Quy chế hoạt động
-                                </Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    Vulnerability Disclosure Program
-                                </Link>
-                            </li>
-                            <li className="mb-3 cursor-pointer hover:underline hover:text-white">
-                                <Link href="/activities">
-                                    APAC Travel Insights
-                                </Link>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
+        </footer>
     );
 }
 

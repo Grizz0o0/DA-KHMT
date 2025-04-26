@@ -37,7 +37,6 @@ import { ObjectId } from 'mongodb'
 class FlightController {
   createFLight = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body)
       const newFlight = await FlightServices.createFlight(req.body)
       new Created({
         message: 'Create flight success',
@@ -227,8 +226,28 @@ class FlightController {
 
   searchFlights = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { content, page, limit, order, sortBy } = searchFlightSchema.query.parse(req.query)
-      const { flights, pagination } = await FlightServices.searchFlight({ content, page, limit, order, sortBy })
+      const {
+        departureAirport,
+        arrivalAirport,
+        departureTime,
+        arrivalTime,
+        passengerCount,
+        page,
+        limit,
+        order,
+        sortBy
+      } = searchFlightSchema.query.parse(req.query)
+      const { flights, pagination } = await FlightServices.searchFlight({
+        departureAirport,
+        arrivalAirport,
+        departureTime,
+        arrivalTime,
+        passengerCount,
+        page,
+        limit,
+        order,
+        sortBy
+      })
       new OK({
         message: 'Search flights successfully',
         metadata: { flights, pagination }

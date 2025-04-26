@@ -1,52 +1,46 @@
-import AuthModal from '@/components/authModal';
-import { cookies } from 'next/headers';
-import Image from 'next/image';
+import { Plane } from 'lucide-react';
 import Link from 'next/link';
+import AuthModal from './AuthModal';
 
 async function Header() {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('accessToken');
-
     return (
-        <div className="flex justify-between items-center w-[1222] min-h-14 mx-auto py-1 px-4">
-            <ul className="flex items-center space-x-4 font-bold text-gray-600 ">
-                <li>
-                    <Link href="/">
-                        <Image
-                            alt="logo"
-                            src={
-                                'https://d1785e74lyxkqq.cloudfront.net/_next/static/v2_2/9/97f3e7a54e9c6987283b78e016664776.svg'
-                            }
-                            width={135}
-                            height={43}
-                        />
+        <header className="bg-white shadow-sm py-4 px-6 sticky top-0 z-50">
+            <div className="container mx-auto flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-2">
+                    <Plane className="h-6 w-6 text-airline-blue" />
+                    <span className="font-bold text-xl text-airline-blue">
+                        Fly24h
+                    </span>
+                </Link>
+                <nav className="hidden md:flex items-center space-x-6">
+                    <Link
+                        href="/"
+                        className="text-gray-600 hover:text-airline-blue transition-colors"
+                    >
+                        Trang Chủ
                     </Link>
-                </li>
-                <li>
-                    <Link href="/hotel">Khách sạn</Link>
-                </li>
-                <li>
-                    <Link href="/flight">Vé máy bay</Link>
-                </li>
-                <li>
-                    <Link href="/bus-and-shuttle">Vé xe khách</Link>
-                </li>
-                <li>
-                    <Link href="/airport-transfer">Đưa đón xân bay</Link>
-                </li>
-                <li>
-                    <Link href="/car-rental">Cho thuê xe</Link>
-                </li>
-                <li>
-                    <Link href="/activities">Hoạt động&vui chơi</Link>
-                </li>
-            </ul>
-            <div className="flex items-center space-x-4 ">
-                <ul className="flex items-center space-x-4 font-bold text-gray-600">
-                    {!accessToken && <AuthModal />}
-                </ul>
+                    <Link
+                        href="/flights"
+                        className="text-gray-600 hover:text-airline-blue transition-colors"
+                    >
+                        Chuyến Bay
+                    </Link>
+                    <Link
+                        href="/about"
+                        className="text-gray-600 hover:text-airline-blue transition-colors"
+                    >
+                        Giới Thiệu
+                    </Link>
+                    <Link
+                        href="/contact"
+                        className="text-gray-600 hover:text-airline-blue transition-colors"
+                    >
+                        Liên Hệ
+                    </Link>
+                </nav>
+                <AuthModal />
             </div>
-        </div>
+        </header>
     );
 }
 

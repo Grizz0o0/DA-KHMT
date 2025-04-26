@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { ObjectId } from 'mongodb'
 import { AircraftStatus } from '~/constants/aircrafts'
-import { convertToObjectId } from '~/utils/mongoUtils'
 
 // Định nghĩa schema cho cấu hình ghế (SeatClassConfig)
 const seatClassConfigSchema = z.object({
@@ -28,7 +27,7 @@ export const aircraftSchema = z
     _id: objectIdSchema.default(() => new ObjectId()),
     model: z.string(),
     manufacturer: z.string(),
-    airlineId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
+    airlineId: objectIdSchema,
     seatConfiguration: seatConfigurationSchema,
     aircraftCode: z.string(),
     capacity: z.number().optional(),

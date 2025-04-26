@@ -3,11 +3,10 @@ export enum UserVerifyStatus {
   Verified,
   Banned
 }
-
 export enum UserRole {
-  Customer = 'customer',
-  Staff = 'staff',
-  Admin = 'admin'
+  ADMIN = 'admin',
+  USER = 'user',
+  STAFF = 'staff'
 }
 
 export enum UserGender {

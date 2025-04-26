@@ -67,7 +67,7 @@ Authorization: Bearer {{token}}
 {
   "seatNumber": "B1",
   "price": 1200000,
-  "status": "confirmed"
+  "status": "used"
 }
 
 ### Delete a ticket
@@ -79,11 +79,11 @@ GET {{baseUrl}}/tickets/65f1a2b3c4d5e6f7g8h9i0j3
 Authorization: Bearer {{token}}
 
 ### Search tickets
-GET {{baseUrl}}/tickets?page=1&limit=10&sortBy=createdAt&order=desc
+GET {{baseUrl}}/tickets?passengerEmail=passenger14@example.com&page=1&limit=10&sortBy=status&order=desc&status=used
 Authorization: Bearer {{token}}
 
 ### Get tickets by booking ID
-GET {{baseUrl}}/tickets/booking/65f1a2b3c4d5e6f7g8h9i0j1?page=1&limit=10&sortBy=createdAt&order=desc
+GET {{baseUrl}}/tickets/booking/67f9125f65dc0237b65916c0?page=1&limit=5&sortBy=status&order=desc
 Authorization: Bearer {{token}}
 
 ### Get tickets by flight ID

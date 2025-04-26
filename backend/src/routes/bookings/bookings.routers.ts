@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import bookingsControllers from '~/controllers/bookings.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/auth.middlewares'
+import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import {
   createBookingSchema,
@@ -11,7 +11,7 @@ import {
   getBookingByIdSchema
 } from '~/requestSchemas/bookings.request'
 import { authenticationSchema } from '~/requestSchemas/users.request'
-
+import { UserRole } from '~/constants/users'
 const bookingsRouter = Router()
 bookingsRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
 
@@ -33,6 +33,7 @@ bookingsRouter.patch(
 bookingsRouter.delete(
   '/:bookingId',
   validateRequest({ params: deleteBookingSchema.params }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(bookingsControllers.deleteBooking)
 )
 
@@ -40,11 +41,12 @@ bookingsRouter.delete(
 bookingsRouter.get(
   '/search',
   validateRequest({ query: searchBookingsSchema.query }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(bookingsControllers.searchBookings)
 )
 
 // Get booking stats
-bookingsRouter.get('/stats', asyncHandler(bookingsControllers.getBookingStats))
+bookingsRouter.get('/stats', authorizeRoles(UserRole.ADMIN), asyncHandler(bookingsControllers.getBookingStats))
 
 // Get booking by id
 bookingsRouter.get(

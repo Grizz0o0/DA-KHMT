@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import ticketsControllers from '~/controllers/tickets.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/auth.middlewares'
+import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import {
   createTicketSchema,
@@ -19,7 +19,7 @@ import {
   updateMultipleTicketsStatusSchema
 } from '~/requestSchemas/tickets.request'
 import { authenticationSchema } from '~/requestSchemas/users.request'
-
+import { UserRole } from '~/constants/users'
 const ticketsRouter = Router()
 ticketsRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
 
@@ -27,6 +27,7 @@ ticketsRouter.use(validateRequest({ headers: authenticationSchema }), authentica
 ticketsRouter.post(
   '/',
   validateRequest({ body: createTicketSchema.body }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(ticketsControllers.createTicket)
 )
 
@@ -34,6 +35,7 @@ ticketsRouter.post(
 ticketsRouter.post(
   '/multiple',
   validateRequest({ body: createMultipleTicketsSchema.body }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(ticketsControllers.createMultipleTickets)
 )
 
@@ -44,11 +46,12 @@ ticketsRouter.patch(
     params: updateTicketSchema.params,
     body: updateTicketSchema.body
   }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(ticketsControllers.updateTicket)
 )
 
 // Delete ticket
-ticketsRouter.delete('/:ticketId', asyncHandler(ticketsControllers.deleteTicket))
+ticketsRouter.delete('/:ticketId', authorizeRoles(UserRole.ADMIN), asyncHandler(ticketsControllers.deleteTicket))
 
 // Get ticket by ID
 ticketsRouter.get(
@@ -61,6 +64,7 @@ ticketsRouter.get(
 ticketsRouter.get(
   '/',
   validateRequest({ query: searchTicketsSchema.query }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(ticketsControllers.searchTickets)
 )
 
@@ -89,6 +93,7 @@ ticketsRouter.get(
 ticketsRouter.get(
   '/stats/:flightId',
   validateRequest({ params: getTicketStatsSchema.params }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(ticketsControllers.getTicketStats)
 )
 
@@ -103,6 +108,7 @@ ticketsRouter.get(
 ticketsRouter.get(
   '/booked-seats/:flightId',
   validateRequest({ params: getBookedSeatsSchema.params }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(ticketsControllers.getBookedSeats)
 )
 
@@ -117,6 +123,7 @@ ticketsRouter.get(
 ticketsRouter.get(
   '/passenger/:passengerEmail',
   validateRequest({ params: getPassengerTicketsSchema.params, query: getPassengerTicketsSchema.query }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(ticketsControllers.getPassengerTickets)
 )
 export default ticketsRouter

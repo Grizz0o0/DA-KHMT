@@ -1,6 +1,6 @@
 import app from './src/app'
 import { Server } from 'http'
-import { logger } from './src/utils/loggerUtils'
+import { logger } from './src/utils/logger.utils'
 const PORT = process.env.APP_PORT || 3000
 
 const server: Server = app.listen(PORT, () => {

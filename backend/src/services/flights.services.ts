@@ -1,8 +1,8 @@
 import { flightSchema } from '~/models/flights.model'
 import { BadRequestError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
-import { convertToObjectId, isValidObjectId } from '~/utils/mongoUtils'
-import { getSelectData, omitInfoData } from '~/utils/objectUtils'
+import { convertToObjectId, isValidObjectId } from '~/utils/mongo.utils'
+import { getSelectData, omitInfoData } from '~/utils/object.utils'
 import { createPagination } from '~/responses/success.response'
 import {
   createFlightTypeBody,
@@ -66,49 +66,78 @@ class FlightServices {
   static async deleteFlight(id: ObjectId) {
     const { id: validatedId } = deleteFlightSchema.params.parse({ id })
 
-    const del = await databaseService.flights.findOneAndDelete({ _id: validatedId })
+    const del = await databaseService.flights.findOneAndUpdate({ _id: validatedId }, { $set: { isActive: false } })
     if (!del) throw new BadRequestError('Delete Flight failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: del })
+    return del
   }
 
   static async searchFlight({
-    content,
+    departureAirport,
+    arrivalAirport,
+    departureTime,
+    arrivalTime,
+    passengerCount,
     page = 1,
     limit = 10,
     order = 'asc',
     sortBy = 'departureTime'
   }: searchFlightTypeQuery) {
-    const validatedQuery = searchFlightSchema.query.parse({
-      content,
-      page,
-      limit,
-      order,
-      sortBy
-    })
+    const skip = (page - 1) * limit
+    const sortField = sortBy
+    const sortOrder = order === 'asc' ? 1 : -1
 
-    if (!validatedQuery.content || validatedQuery.content.trim() === '') {
-      return { flights: [], pagination: createPagination(1, 10, 0) }
+    const departureAirportId = await databaseService.airports.findOne({ code: departureAirport })
+    const arrivalAirportId = await databaseService.airports.findOne({ code: arrivalAirport })
+
+    // Tạo filter cho chuyến bay đi
+    const departureFilter = {
+      departureAirportId: departureAirportId?._id,
+      arrivalAirportId: arrivalAirportId?._id,
+      departureTime: {
+        $gte: new Date(departureTime),
+        $lt: new Date(new Date(departureTime).setDate(new Date(departureTime).getDate() + 1))
+      },
+      availableSeats: { $gte: passengerCount }
     }
 
-    const skip = (validatedQuery.page - 1) * validatedQuery.limit
-    const sortField = validatedQuery.sortBy
-    const sortOrder = validatedQuery.order === 'asc' ? 1 : -1
+    let returnFlights: any[] = []
+    if (arrivalTime) {
+      const returnFilter = {
+        departureAirportId: arrivalAirportId?._id,
+        arrivalAirportId: departureAirportId?._id,
+        departureTime: {
+          $gte: new Date(arrivalTime),
+          $lt: new Date(new Date(arrivalTime).setDate(new Date(arrivalTime).getDate() + 1))
+        },
+        availableSeats: { $gte: passengerCount }
+      }
 
-    const totalItems = await databaseService.flights.countDocuments({
-      $text: { $search: validatedQuery.content }
-    })
+      returnFlights = await databaseService.flights
+        .find(returnFilter)
+        .sort({ [sortField]: sortOrder })
+        .skip(skip)
+        .limit(limit)
+        .toArray()
+    }
 
-    const flights = await databaseService.flights
-      .find({ $text: { $search: validatedQuery.content } }, { projection: { score: { $meta: 'textScore' } } })
-      .sort({ [sortField]: sortOrder, score: { $meta: 'textScore' } })
+    const departureFlights = await databaseService.flights
+      .find(departureFilter)
+      .sort({ [sortField]: sortOrder })
       .skip(skip)
-      .limit(validatedQuery.limit)
+      .limit(limit)
       .toArray()
 
-    const pagination = createPagination(validatedQuery.page, validatedQuery.limit, totalItems)
+    const totalItems = await databaseService.flights.countDocuments(departureFilter)
+
+    const pagination = createPagination(page, limit, totalItems)
 
     return {
-      flights: flights.map((flight) => omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })),
+      flights: [...departureFlights, ...returnFlights].map((flight) =>
+        omitInfoData({
+          fields: ['createAt', 'updateAt'],
+          object: flight
+        })
+      ),
       pagination
     }
   }

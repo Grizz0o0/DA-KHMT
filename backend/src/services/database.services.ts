@@ -1,14 +1,16 @@
 import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
-import configMongodb from '~/config/config.mongodb'
+import configMongodb from '~/config/mongodb.config'
 import { UserType } from '~/models/users.model'
-import { RefreshTokenType } from '~/models/refreshToken.model'
+import { RefreshTokenType } from '~/models/refreshTokens.model'
 import { AirlineType } from '~/models/airlines.model'
 import { AirportType } from '~/models/airports.model'
 import { AircraftType } from '~/models/aircrafts.model'
 import { FlightType } from '~/models/flights.model'
 import { BookingType } from '~/models/bookings.model'
 import { TicketType } from '~/models/tickets.model'
+import { PaymentType } from '~/models/payments.model'
+import { PromoType } from '~/models/promoCodes.model'
 const { database } = configMongodb
 const { username, password, name } = database
 
@@ -38,6 +40,28 @@ class DatabaseService {
       console.error('Error Connect !!!', error)
       process.exit(1)
     }
+  }
+
+  public static getInstance(): DatabaseService {
+    if (!DatabaseService.instance) {
+      DatabaseService.instance = new DatabaseService()
+    }
+    return DatabaseService.instance
+  }
+
+  public async initIndexes() {
+    await Promise.all([
+      this.indexUsers(),
+      this.indexRefreshTokens(),
+      this.indexAirlines(),
+      this.indexAirports(),
+      this.indexAircrafts(),
+      this.indexFlights(),
+      this.indexBookings(),
+      this.indexTickets(),
+      this.indexPayments(),
+      this.indexPromocodes()
+    ])
   }
 
   public async indexUsers() {
@@ -123,15 +147,13 @@ class DatabaseService {
       'userId_1_createdAt_1',
       'flightId_1_departureTime_1',
       'status_1_paymentStatus_1',
-      'totalPrice_1_createdAt_1',
-      'bookingCode_1'
+      'totalPrice_1_createdAt_1'
     ])
     if (!existIndex) {
       await this.bookings.createIndex({ userId: 1, createdAt: 1 })
       await this.bookings.createIndex({ flightId: 1, departureTime: 1 })
       await this.bookings.createIndex({ status: 1, paymentStatus: 1 })
       await this.bookings.createIndex({ totalPrice: 1, createdAt: 1 })
-      await this.bookings.createIndex({ bookingCode: 1 }, { unique: true })
     }
   }
 
@@ -153,11 +175,40 @@ class DatabaseService {
     }
   }
 
-  public static getInstance(): DatabaseService {
-    if (!DatabaseService.instance) {
-      DatabaseService.instance = new DatabaseService()
+  public async indexPayments() {
+    const existIndex = await this.payments.indexExists([
+      'bookingId_1',
+      'userId_1',
+      'paymentDate_1',
+      'status_1',
+      'transactionId_1',
+      'orderId_1'
+    ])
+    if (!existIndex) {
+      await this.payments.createIndex({ bookingId: 1 })
+      await this.payments.createIndex({ userId: 1 })
+      await this.payments.createIndex({ orderId: 1 }, { unique: true })
+      await this.payments.createIndex({ paymentDate: 1 })
+      await this.payments.createIndex({ status: 1 })
+      await this.payments.createIndex(
+        { transactionId: 1 },
+        {
+          unique: true,
+          partialFilterExpression: {
+            transactionId: { $type: 'string' }
+          }
+        }
+      )
     }
-    return DatabaseService.instance
+  }
+
+  public async indexPromocodes() {
+    const existIndex = await this.promocodes.indexExists(['code_1', 'startDate_1', 'endDate_1'])
+    if (!existIndex) {
+      await this.promocodes.createIndex({ code: 1 }, { unique: true })
+      await this.promocodes.createIndex({ startDate: 1 })
+      await this.promocodes.createIndex({ endDate: 1 })
+    }
   }
 
   public async getDB() {
@@ -194,6 +245,14 @@ class DatabaseService {
 
   get tickets(): Collection<TicketType> {
     return this.db.collection('Tickets')
+  }
+
+  get payments(): Collection<PaymentType> {
+    return this.db.collection('Payments')
+  }
+
+  get promocodes(): Collection<PromoType> {
+    return this.db.collection('Promocodes')
   }
 }
 

@@ -1,8 +1,8 @@
 import { Response, Request, NextFunction } from 'express'
 import { HEADER } from '../constants/auth'
-import { NotFoundError, UnauthorizedError } from '../responses/error.response'
+import { ForbiddenError, NotFoundError, UnauthorizedError } from '../responses/error.response'
 import KeyService from '~/services/refreshToken.services'
-import { verifyToken } from '~/utils/jwtUtils'
+import { verifyToken } from '~/utils/jwt.utils'
 
 export const authentication = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -51,5 +51,15 @@ export const authenticationV2 = async (req: Request, res: Response, next: NextFu
   } catch (error) {
     console.error('Error in authenticationV2 middleware:', error)
     next(new UnauthorizedError('AuthenticationV2 failed'))
+  }
+}
+
+export const authorizeRoles = (...allowedRoles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const userRole = req.user?.role
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      return next(new ForbiddenError('Bạn không có quyền truy cập tài nguyên này'))
+    }
+    next()
   }
 }

@@ -17,8 +17,8 @@ import {
 import { airportSchema } from '~/models/airports.model'
 import { BadRequestError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
-import { convertToObjectId, isValidObjectId } from '~/utils/mongoUtils'
-import { getInfoData, getSelectData, omitInfoData, unSelectData } from '~/utils/objectUtils'
+import { convertToObjectId, isValidObjectId } from '~/utils/mongo.utils'
+import { getInfoData, getSelectData, omitInfoData, unSelectData } from '~/utils/object.utils'
 import { createPagination } from '~/responses/success.response'
 
 class AirportsService {

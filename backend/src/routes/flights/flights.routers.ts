@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import flightsControllers from '~/controllers/flights.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/auth.middlewares'
+import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import { authenticationSchema } from '~/requestSchemas/users.request'
 import {
@@ -18,7 +18,7 @@ import {
   searchFlightSchema,
   filterFlightSchema
 } from '~/requestSchemas/flights.request'
-
+import { UserRole } from '~/constants/users'
 const flightsRouter = Router()
 
 // Apply authentication middleware to all routes
@@ -49,6 +49,7 @@ flightsRouter.get(
 flightsRouter.post(
   '/',
   validateRequest({ body: createFlightSchema.body }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(flightsControllers.createFLight)
 )
 
@@ -56,6 +57,7 @@ flightsRouter.post(
 flightsRouter.patch(
   '/:id',
   validateRequest({ body: updateFlightSchema.body, params: updateFlightSchema.params }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(flightsControllers.updateFlight)
 )
 
@@ -63,6 +65,7 @@ flightsRouter.patch(
 flightsRouter.delete(
   '/:id',
   validateRequest({ params: deleteFlightSchema.params }),
+  authorizeRoles(UserRole.ADMIN),
   asyncHandler(flightsControllers.deleteFlight)
 )
 

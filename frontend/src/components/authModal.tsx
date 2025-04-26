@@ -18,8 +18,9 @@ export default function AuthModal() {
 
     return (
         <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="ghost">Đăng nhập / Đăng ký</Button>
+            <DialogTrigger>
+                <Button variant="ghost">Đăng nhập </Button>
+                <Button variant="ghost">Đăng ký</Button>
             </DialogTrigger>
             <DialogContent className="max-w-md p-6 rounded-lg">
                 <DialogHeader>

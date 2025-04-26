@@ -1,9 +1,17 @@
 import { z } from 'zod'
 import { ObjectId } from 'mongodb'
 
+// ObjectId schema for MongoDB
+const objectIdSchema = z
+  .any()
+  .refine((val) => val instanceof ObjectId || ObjectId.isValid(val), {
+    message: 'Invalid ObjectId'
+  })
+  .transform((val) => (val instanceof ObjectId ? val : new ObjectId(val)))
+
 export const refreshTokenSchema = z.object({
-  _id: z.string().default(() => new ObjectId().toHexString()),
-  userId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
+  _id: objectIdSchema.default(() => new ObjectId()),
+  userId: objectIdSchema,
   refreshToken: z.string().optional(),
   refreshTokened: z.array(z.string()).optional().default([]),
   expiresAt: z

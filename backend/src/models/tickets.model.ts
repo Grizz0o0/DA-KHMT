@@ -23,8 +23,10 @@ const passengerSchema = z.object({
 
 export const ticketSchema = z.object({
   _id: objectIdSchema.default(() => new ObjectId()),
-  bookingId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
-  flightId: z.instanceof(ObjectId).transform((val) => new ObjectId(val)),
+  bookingId: objectIdSchema,
+  userId: objectIdSchema,
+  flightId: objectIdSchema,
+  seatClass: z.enum(['economy', 'business', 'firstClass']),
   seatNumber: z.string().min(1, 'Số ghế không được để trống'),
   passenger: passengerSchema,
   price: z.coerce.number().nonnegative('Giá vé phải lớn hơn hoặc bằng 0'),

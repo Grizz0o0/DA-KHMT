@@ -8,7 +8,7 @@ import {
   deleteByUserIdSchema
 } from '~/requestSchemas/refreshTokens.request'
 import databaseService from '~/services/database.services'
-import { convertToObjectId } from '../utils/mongoUtils'
+import { convertToObjectId } from '../utils/mongo.utils'
 import { ObjectId } from 'mongodb'
 
 class RefreshTokenService {

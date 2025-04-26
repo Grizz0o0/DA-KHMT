@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import aircraftsControllers from '~/controllers/aircrafts.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/auth.middlewares'
+import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import { authenticationSchema } from '~/requestSchemas/users.request'
 import {
@@ -16,6 +16,7 @@ import {
   getListAircraftSchema,
   filterAircraftSchema
 } from '~/requestSchemas/aircrafts.request'
+import { UserRole } from '~/constants/users'
 
 const aircraftRouter = Router()
 
@@ -57,7 +58,7 @@ aircraftRouter.get(
 )
 
 // Protected routes
-aircraftRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
+aircraftRouter.use(validateRequest({ headers: authenticationSchema }), authentication, authorizeRoles(UserRole.ADMIN))
 aircraftRouter.post(
   '/',
   validateRequest({ body: createAircraftSchema.body }),

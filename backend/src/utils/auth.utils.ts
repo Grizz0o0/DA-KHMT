@@ -1,5 +1,5 @@
 import { sign } from 'jsonwebtoken'
-import { CreateTokenPairParams } from '~/types/auth'
+import { CreateTokenPairParams } from '~/types/auths.types'
 
 export const createAccessToken = async ({ payload, secretKey }: CreateTokenPairParams) => {
   try {

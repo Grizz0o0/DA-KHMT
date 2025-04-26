@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import airlinesControllers from '~/controllers/airlines.controllers'
 import { asyncHandler } from '~/helper/asyncHandler'
-import { authentication } from '~/middlewares/auth.middlewares'
+import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import { authenticationSchema } from '~/requestSchemas/users.request'
 import {
@@ -10,7 +10,7 @@ import {
   getAirlineByCodeSchema,
   getAirlineByIdSchema
 } from '~/requestSchemas/airlines.request'
-
+import { UserRole } from '~/constants/users'
 const airlinesRouter = Router()
 
 airlinesRouter.get(
@@ -34,7 +34,7 @@ airlinesRouter.get(
   asyncHandler(airlinesControllers.getAirlineById)
 )
 
-airlinesRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
+airlinesRouter.use(validateRequest({ headers: authenticationSchema }), authentication, authorizeRoles(UserRole.ADMIN))
 airlinesRouter.post('/', asyncHandler(airlinesControllers.createAirline))
 airlinesRouter.patch('/:airlineId', asyncHandler(airlinesControllers.updateAirline))
 airlinesRouter.delete('/:airlineId', asyncHandler(airlinesControllers.deleteAirline))

@@ -22,7 +22,8 @@ class BookingsController {
     next: NextFunction
   ) => {
     try {
-      const bookingResult = await BookingsService.createBooking(req.body)
+      const validatedData = createBookingSchema.body.parse(req.body)
+      const bookingResult = await BookingsService.createBooking(validatedData)
       new Created({
         message: 'Tạo đặt vé thành công',
         metadata: { booking: bookingResult }

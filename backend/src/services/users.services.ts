@@ -5,7 +5,7 @@ import {
   createRefreshToken,
   createForgotPasswordToken,
   createVerifyEmailToken
-} from '~/utils/authUtils'
+} from '~/utils/auth.utils'
 import {
   registerReqBodyType,
   loginReqBodyType,
@@ -26,13 +26,13 @@ import { userSchema } from '~/models/users.model'
 import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
 import RefreshTokenService from '~/services/refreshToken.services'
-import { getInfoData, omitInfoData } from '~/utils/objectUtils'
-import { verifyToken } from '~/utils/jwtUtils'
-import { convertToObjectId } from '~/utils/mongoUtils'
-import { UserAuthProvider, UserVerifyStatus, UserGender } from '~/constants/users'
+import { getInfoData, omitInfoData } from '~/utils/object.utils'
+import { verifyToken } from '~/utils/jwt.utils'
+import { convertToObjectId } from '~/utils/mongo.utils'
+import { UserAuthProvider, UserVerifyStatus, UserGender, UserRole } from '~/constants/users'
 import axios from 'axios'
-import { generateRandomPassword } from '~/utils/cryptoUtils'
-import { GoogleTokenBody, GoogleUserInfo } from '~/types/auth'
+import { generateRandomPassword } from '~/utils/crypto.utils'
+import { GoogleTokenBody, GoogleUserInfo } from '~/types/auths.types'
 
 class UserService {
   static getUserByEmail = async (email: string) => {
@@ -93,16 +93,16 @@ class UserService {
     const foundUser = await databaseService.users.findOne({ email: validatedData.email })
     if (!foundUser) throw new NotFoundError('Not found email')
 
-    const match = await bcrypt.compare(validatedData.password, foundUser.password)
-    if (!match) throw new BadRequestError('Password is not match')
+    const isPasswordMatch = await bcrypt.compare(validatedData.password, foundUser.password)
+    if (!isPasswordMatch) throw new BadRequestError('Password is not match')
 
     const [accessToken, refreshToken] = await Promise.all([
       createAccessToken({
-        payload: { userId: foundUser._id.toString(), email: foundUser.email },
+        payload: { userId: foundUser._id.toString(), email: foundUser.email, role: foundUser.role },
         secretKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
       }),
       createRefreshToken({
-        payload: { userId: foundUser._id.toString(), email: foundUser.email },
+        payload: { userId: foundUser._id.toString(), email: foundUser.email, role: foundUser.role },
         secretKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
       })
     ])
@@ -139,7 +139,7 @@ class UserService {
       // Mã hóa mật khẩu
       const passwordHash = bcrypt.hashSync(validatedData.password, 10)
 
-      const parseUser = userSchema.parse({ ...validatedData, password: passwordHash })
+      const parseUser = userSchema.parse({ ...validatedData, password: passwordHash, role: UserRole.USER })
       const newUser = await databaseService.users.insertOne(parseUser)
 
       const foundUser = await databaseService.users.findOne({ _id: newUser.insertedId })
@@ -148,11 +148,11 @@ class UserService {
       // Tạo token
       const [accessToken, refreshToken] = await Promise.all([
         createAccessToken({
-          payload: { userId: foundUser._id.toString(), email: foundUser.email },
+          payload: { userId: foundUser._id.toString(), email: foundUser.email, role: foundUser.role },
           secretKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
         }),
         createRefreshToken({
-          payload: { userId: foundUser._id.toString(), email: foundUser.email },
+          payload: { userId: foundUser._id.toString(), email: foundUser.email, role: foundUser.role },
           secretKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
         })
       ])
@@ -239,11 +239,21 @@ class UserService {
       if (foundUser?.email) {
         ;[accessToken, refreshToken] = await Promise.all([
           createAccessToken({
-            payload: { userId: foundUser._id.toString(), email: foundUser.email, verify: 1 },
+            payload: {
+              userId: foundUser._id.toString(),
+              email: foundUser.email,
+              role: foundUser.role,
+              verify: UserVerifyStatus.Verified
+            },
             secretKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
           }),
           createRefreshToken({
-            payload: { userId: foundUser._id.toString(), email: foundUser.email, verify: 1 },
+            payload: {
+              userId: foundUser._id.toString(),
+              email: foundUser.email,
+              role: foundUser.role,
+              verify: UserVerifyStatus.Verified
+            },
             secretKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
           })
         ])
@@ -283,14 +293,14 @@ class UserService {
 
   static logout = async (keyStore: any) => {
     const del = await RefreshTokenService.deleteByUserId(keyStore.userId)
-    return getInfoData({ fields: ['_id', 'user', 'refreshToken', 'refreshTokenUsed'], object: del })
+    return getInfoData({ fields: ['_id', 'user'], object: del })
   }
 
   static handlerRefreshToken = async (refreshToken: string) => {
     // Kiểm tra refreshToken hết hạn chưa. Nếu hết hạn thì buộc logout
     const foundToken = await RefreshTokenService.findByRefreshTokenUsed(refreshToken)
     if (foundToken) {
-      const { userId, email } = await verifyToken(refreshToken, process.env.JWT_SECRET_REFRESH_TOKEN as string)
+      const { userId, email, role } = await verifyToken(refreshToken, process.env.JWT_SECRET_REFRESH_TOKEN as string)
 
       await RefreshTokenService.deleteByUserId(userId.toString())
       throw new BadRequestError('Something wrong happen !! pls relogin')
@@ -299,15 +309,15 @@ class UserService {
     // RefreshToken chưa hết hạn
     const holderToken = await RefreshTokenService.findByRefreshToken(refreshToken)
     if (!holderToken) throw new UnauthorizedError('User not registered')
-    const { userId, email } = await verifyToken(refreshToken, process.env.JWT_SECRET_REFRESH_TOKEN as string)
+    const { userId, email, role } = await verifyToken(refreshToken, process.env.JWT_SECRET_REFRESH_TOKEN as string)
 
     const [accessToken, newRefreshToken] = await Promise.all([
       createAccessToken({
-        payload: { userId, email },
+        payload: { userId, email, role },
         secretKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
       }),
       createRefreshToken({
-        payload: { userId, email },
+        payload: { userId, email, role },
         secretKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
       })
     ])
@@ -333,7 +343,7 @@ class UserService {
     })
 
     return {
-      user: { userId, email },
+      user: { userId, email, role },
       tokens: getInfoData({ fields: ['refreshToken', 'refreshTokenUsed'], object: newTokens })
     }
   }
@@ -351,7 +361,12 @@ class UserService {
     if (!foundUser) throw new NotFoundError('Email not registered')
     const secretKey = process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
     const forgotPasswordToken = await createForgotPasswordToken({
-      payload: { userId: foundUser._id.toString(), email: foundUser.email, type: 'forgot-password' },
+      payload: {
+        userId: foundUser._id.toString(),
+        email: foundUser.email,
+        role: foundUser.role,
+        type: 'forgot-password'
+      },
       secretKey
     })
 
@@ -416,12 +431,11 @@ class UserService {
         }
       },
       {
-        upsert: true,
         returnDocument: 'after'
       }
     )
     return {
-      user: getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber'], object: result })
+      user: getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber', 'role'], object: result })
     }
   }
 
@@ -437,16 +451,16 @@ class UserService {
     const foundUser = await databaseService.users.findOne({ _id: convertToObjectId(userId) })
     if (!foundUser) throw new NotFoundError('Not found user')
 
-    const match = await bcrypt.compare(validatedData.password, foundUser.password)
-    if (!match) throw new BadRequestError('Password is not match')
+    const isPasswordMatch = await bcrypt.compare(validatedData.password, foundUser.password)
+    if (!isPasswordMatch) throw new BadRequestError('Password is not match')
 
     const passwordHash = bcrypt.hashSync(validatedData.newPassword, 10)
     const result = await databaseService.users.findOneAndUpdate(
       { _id: foundUser._id },
       { $set: { password: passwordHash }, $currentDate: { updatedAt: true } },
-      { upsert: true, returnDocument: 'after' }
+      { returnDocument: 'after' }
     )
-    return getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber'], object: result })
+    return getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber', 'role'], object: result })
   }
 
   static deleteUser = async (userId: string) => {
@@ -478,7 +492,7 @@ class UserService {
       { returnDocument: 'after' }
     )
     return omitInfoData({
-      fields: ['verify', 'authProvider', 'verifyEmailToken', 'forgotPasswordToken', 'password'],
+      fields: ['verify', 'authProvider', 'verifyEmailToken', 'forgotPasswordToken', 'password', 'role'],
       object: result
     })
   }
