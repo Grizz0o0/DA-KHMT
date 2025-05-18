@@ -19,6 +19,7 @@ export const searchFlights = async (searchParams: {
     departureDate: string;
     returnDate?: string;
     passengers: number;
+    seatClass: string;
 }) => {
     const res = await fetch(`${API_URL}/flights/search`, {
         method: 'POST',

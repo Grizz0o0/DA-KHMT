@@ -8,6 +8,14 @@ const objectIdSchema = z
   })
   .transform((val) => (val instanceof ObjectId ? val : new ObjectId(val)))
 
+export const PaginationParams = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().default(10),
+  order: z.enum(['asc', 'desc']).default('asc'),
+  sortBy: z.enum(['departureTime', 'arrivalTime', 'price', 'availableSeats']).default('departureTime')
+})
+export type PaginationParamsType = z.infer<typeof PaginationParams>
+
 const seatClassConfigSchema = z.object({
   rows: z
     .number({ required_error: 'Số hàng ghế không được để trống' })
@@ -57,6 +65,9 @@ export const updateAircraftSchema = {
         firstClass: seatClassConfigSchema.optional()
       })
       .optional(),
+    airlineId: objectIdSchema.optional(),
+    status: z.enum([AircraftStatus.Active, AircraftStatus.Maintenance, AircraftStatus.Retired]).optional(),
+    aircraftCode: z.string().trim().min(1, 'Mã máy bay không được seksi trONGL').optional(),
     capacity: z.number().int('Sức chứa phải là số nguyên').positive('Sức chứa phải > 0').optional()
   }),
   params: z.object({
@@ -113,6 +124,16 @@ export const getAircraftByAircraftCodeSchema = {
 
 export type getAircraftByAircraftCodeTypeParams = z.infer<typeof getAircraftByAircraftCodeSchema.params>
 
+export const getAircraftByAirlineIdSchema = {
+  query: z.object({
+    airlineId: objectIdSchema.optional(),
+    page: z.coerce.number().int('Số trang phải là số nguyên').positive('Số trang phải > 0').optional(),
+    limit: z.coerce.number().int('Giới hạn phải là số nguyên').positive('Giới hạn phải > 0').optional()
+  })
+}
+
+export type getAircraftByAirlineIdTypeQuery = z.infer<typeof getAircraftByAirlineIdSchema.query>
+
 export const getAircraftByModelSchema = {
   query: z.object({
     model: z
@@ -149,7 +170,7 @@ export const filterAircraftSchema = {
     status: z.enum([AircraftStatus.Active, AircraftStatus.Maintenance, AircraftStatus.Retired]).optional(),
     limit: z.coerce.number().int('Giới hạn phải là số nguyên').positive('Giới hạn phải > 0').optional(),
     page: z.coerce.number().int('Số trang phải là số nguyên').positive('Số trang phải > 0').optional(),
-    order: z.string().optional(),
+    order: z.enum(['asc', 'desc']).optional(),
     select: z.array(z.string()).optional()
   })
 }

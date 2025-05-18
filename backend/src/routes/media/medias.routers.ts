@@ -7,13 +7,12 @@ import { authenticationSchema } from '~/requestSchemas/users.request'
 import { authentication } from '~/middlewares/auth.middlewares'
 
 const mediasRouter = Router()
-
-mediasRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
-mediasRouter.post('/upload-image', asyncHandler(mediasControllers.uploadImage))
 mediasRouter.get(
   '/static/image/:name',
   validateRequest({ params: staticImageSchema.params }),
   asyncHandler(mediasControllers.staticImage)
 )
+mediasRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
+mediasRouter.post('/upload-image', asyncHandler(mediasControllers.uploadImage))
 
 export default mediasRouter

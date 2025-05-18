@@ -14,7 +14,8 @@ import {
   getAircraftByManufacturerSchema,
   searchAircraftSchema,
   getListAircraftSchema,
-  filterAircraftSchema
+  filterAircraftSchema,
+  getAircraftByAirlineIdSchema
 } from '~/requestSchemas/aircrafts.request'
 import { UserRole } from '~/constants/users'
 
@@ -45,6 +46,11 @@ aircraftRouter.get(
   '/model',
   validateRequest({ query: getAircraftByModelSchema.query }),
   asyncHandler(aircraftsControllers.getAircraftByModel)
+)
+aircraftRouter.get(
+  '/airline',
+  validateRequest({ query: getAircraftByAirlineIdSchema.query }),
+  asyncHandler(aircraftsControllers.getAircraftByAirlineId)
 )
 aircraftRouter.get(
   '/code/:code',

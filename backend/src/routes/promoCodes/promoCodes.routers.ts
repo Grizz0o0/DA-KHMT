@@ -9,7 +9,8 @@ import {
   updatePromoCodeSchema,
   validatePromoCodeSchema,
   usePromoCodeSchema,
-  deactivatePromoCodeSchema
+  deactivatePromoCodeSchema,
+  activatePromoCodeSchema
 } from '~/requestSchemas/promoCodes.request'
 import { authenticationSchema } from '~/requestSchemas/users.request'
 import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
@@ -30,6 +31,8 @@ promoCodesRouter.post(
 )
 
 promoCodesRouter.use(authorizeRoles(UserRole.ADMIN))
+promoCodesRouter.get('/', asyncHandler(PromoCodesController.getListPromoCodes))
+
 promoCodesRouter.post(
   '/',
   validateRequest({ body: createPromoCodeSchema.body }),
@@ -46,6 +49,12 @@ promoCodesRouter.delete(
   '/:id',
   validateRequest({ params: deactivatePromoCodeSchema.params }),
   asyncHandler(PromoCodesController.deactivatePromoCode)
+)
+
+promoCodesRouter.post(
+  '/activate/:id',
+  validateRequest({ params: activatePromoCodeSchema.params }),
+  asyncHandler(PromoCodesController.activatePromoCode)
 )
 
 promoCodesRouter.get(

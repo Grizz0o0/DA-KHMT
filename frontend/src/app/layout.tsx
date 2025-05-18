@@ -2,8 +2,11 @@ import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import Header from '@/components/header';
-import Footer from '@/components/footer';
+import { Toaster } from 'sonner';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import AppProvider from '@/components/AppProvider';
+import TokenAutoRefresh from '@/components/auth/AutoRefreshToken';
 
 const roboto = Roboto({
     subsets: ['vietnamese'],
@@ -21,16 +24,20 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" suppressHydrationWarning className="min-h-screen">
             <body
                 className={cn(
-                    'min-h-screen bg-background font-sans antialiased',
+                    'min-h-screen bg-background font-sans antialiased flex flex-col',
                     roboto.className
                 )}
             >
-                <Header />
-                <main>{children}</main>
-                <Footer />
+                <AppProvider>
+                    <TokenAutoRefresh />
+                    <Header />
+                    <main className="flex-1">{children}</main>
+                    <Footer />
+                    <Toaster richColors position="top-right" />
+                </AppProvider>
             </body>
         </html>
     );

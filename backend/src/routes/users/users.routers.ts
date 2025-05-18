@@ -6,7 +6,6 @@ import { validateRequest } from '~/middlewares/validate.middleware'
 import {
   loginSchema,
   registerSchema,
-  logoutSchema,
   authenticationV2Schema,
   authenticationSchema,
   changePasswordSchema,
@@ -45,11 +44,17 @@ userRouter.post(
   asyncHandler(userController.handlerRefreshToken)
 )
 userRouter.get('', asyncHandler(userController.getAllUsers))
+userRouter.get(
+  '/me',
+  validateRequest({ headers: authenticationSchema }),
+  authentication,
+  asyncHandler(userController.getMe)
+)
 userRouter.get('/:id', validateRequest({ params: getUserByIdSchema.params }), asyncHandler(userController.getUserById))
 
 userRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
 
-userRouter.post('/logout', validateRequest({ headers: logoutSchema.headers }), asyncHandler(userController.logout))
+userRouter.post('/logout', asyncHandler(userController.logout))
 userRouter.post(
   '/change-password',
   validateRequest({ body: changePasswordSchema.body }),
@@ -57,14 +62,10 @@ userRouter.post(
 )
 userRouter.delete(
   '/:id',
-  validateRequest({ headers: deleteUserSchema.headers, params: deleteUserSchema.params }),
+  validateRequest({ params: deleteUserSchema.params }),
   authorizeRoles(UserRole.ADMIN),
   asyncHandler(userController.deleteUser)
 )
-userRouter.patch(
-  '/:id',
-  validateRequest({ body: updateMeSchema.body, params: updateMeSchema.params }),
-  asyncHandler(userController.updateMe)
-)
+userRouter.patch('/', validateRequest({ body: updateMeSchema.body }), asyncHandler(userController.updateMe))
 
 export default userRouter

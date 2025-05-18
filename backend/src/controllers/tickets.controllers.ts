@@ -15,7 +15,8 @@ import {
   getBookedSeatsSchema,
   canCancelTicketSchema,
   getPassengerTicketsSchema,
-  deleteTicketSchema
+  deleteTicketSchema,
+  getListTicketSchema
 } from '~/requestSchemas/tickets.request'
 
 class TicketsController {
@@ -76,6 +77,22 @@ class TicketsController {
     try {
       const query = searchTicketsSchema.query.parse(req.query)
       const result = await TicketsServices.searchTickets(query)
+      new OK({
+        message: 'Get tickets successfully',
+        metadata: {
+          tickets: result.tickets,
+          pagination: result.pagination
+        }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getListTickets = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const query = getListTicketSchema.query.parse(req.query)
+      const result = await TicketsServices.getListTicket(query)
       new OK({
         message: 'Get tickets successfully',
         metadata: {

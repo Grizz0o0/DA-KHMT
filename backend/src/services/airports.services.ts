@@ -58,7 +58,7 @@ class AirportsService {
       { upsert: true, returnDocument: 'after' }
     )
     if (!updatedAirport) throw new BadRequestError('Update Airport failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: updatedAirport })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: updatedAirport })
   }
 
   static async deleteAirport(id: string) {
@@ -66,7 +66,7 @@ class AirportsService {
 
     const del = await databaseService.airports.findOneAndDelete({ _id: airportId })
     if (!del) throw new BadRequestError('Delete Airport failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: del })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: del })
   }
 
   static async searchAirport({
@@ -111,7 +111,7 @@ class AirportsService {
     limit = 10,
     page = 1,
     order = 'asc',
-    select = ['name', 'code', 'city', 'country', 'terminal', 'createdAt', 'updatedAt']
+    select = ['name', 'code', 'address', 'city', 'country']
   }: getListAirportTypeQuery) {
     const validatedQuery = getListAirportSchema.query.parse({
       limit,
@@ -189,14 +189,14 @@ class AirportsService {
     const { airportId } = getAirportByIdSchema.params.parse({ airportId: id })
 
     const airport = await databaseService.airports.findOne({ _id: airportId })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: airport })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: airport })
   }
 
   static async getAirportByCode(code: string) {
     const { code: validatedCode } = getAirportByCodeSchema.params.parse({ code })
 
     const airport = await databaseService.airports.findOne({ code: validatedCode })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: airport })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: airport })
   }
 }
 

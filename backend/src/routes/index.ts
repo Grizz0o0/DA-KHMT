@@ -25,5 +25,5 @@ router.use('/v1/api/flights', flightsRouter)
 router.use('/v1/api/bookings', bookingsRouter)
 router.use('/v1/api/tickets', ticketsRouter)
 router.use('/v1/api/payments', paymentsRouter)
-router.use('/v1/api/promoCodes', promoCodesRouter)
+router.use('/v1/api/promo-codes', promoCodesRouter)
 export default router

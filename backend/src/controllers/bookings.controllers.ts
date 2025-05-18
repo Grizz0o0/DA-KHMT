@@ -12,7 +12,8 @@ import {
   searchBookingsSchema,
   SearchBookingsTypeQuery,
   getBookingByIdSchema,
-  GetBookingByIdTypeParams
+  GetBookingByIdTypeParams,
+  getListBookingSchema
 } from '~/requestSchemas/bookings.request'
 
 class BookingsController {
@@ -79,6 +80,19 @@ class BookingsController {
       new OK({
         message: 'Tìm kiếm booking thành công',
         metadata: result
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getListBooking = async (req: Request<any, any, GetBookingByIdTypeParams>, res: Response, next: NextFunction) => {
+    try {
+      const { page, limit, order, select } = getListBookingSchema.query.parse(req.query)
+      const { bookings, pagination } = await BookingsService.getListBooking({ page, limit, order, select })
+      new OK({
+        message: 'Lấy danh sách booking thành công',
+        metadata: { bookings, pagination }
       }).send(res)
     } catch (error) {
       next(error)

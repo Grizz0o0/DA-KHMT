@@ -5,7 +5,7 @@ export const createAccessToken = async ({ payload, secretKey }: CreateTokenPairP
   try {
     return await sign(payload, secretKey, {
       algorithm: 'HS256',
-      expiresIn: '2 days'
+      expiresIn: '2days'
     })
   } catch (error) {
     console.error('Error creating access token:', error)
@@ -17,7 +17,7 @@ export const createRefreshToken = async ({ payload, secretKey }: CreateTokenPair
   try {
     return await sign(payload, secretKey, {
       algorithm: 'HS256',
-      expiresIn: '7 days'
+      expiresIn: '7days'
     })
   } catch (error) {
     console.error('Error creating refresh token:', error)

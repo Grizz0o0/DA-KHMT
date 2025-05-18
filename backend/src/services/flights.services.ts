@@ -60,7 +60,7 @@ class FlightServices {
       { returnDocument: 'after' }
     )
     if (!updatedFlight) throw new BadRequestError('Update Flight failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: updatedFlight })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: updatedFlight })
   }
 
   static async deleteFlight(id: ObjectId) {
@@ -134,7 +134,7 @@ class FlightServices {
     return {
       flights: [...departureFlights, ...returnFlights].map((flight) =>
         omitInfoData({
-          fields: ['createAt', 'updateAt'],
+          fields: ['createdAt', 'updatedAt'],
           object: flight
         })
       ),
@@ -159,19 +159,18 @@ class FlightServices {
     const sortField = validatedQuery.sortBy
     const sortOrder = validatedQuery.order === 'asc' ? 1 : -1
 
-    const totalItems = await databaseService.flights.countDocuments({})
+    const totalItems = await databaseService.flights.countDocuments({ isActive: { $ne: false } })
 
     const flights = await databaseService.flights
-      .find()
+      .find({ isActive: { $ne: false } })
       .sort({ [sortField]: sortOrder })
       .skip(skip)
       .limit(validatedQuery.limit)
       .toArray()
 
     const pagination = createPagination(validatedQuery.page, validatedQuery.limit, totalItems)
-
     return {
-      flights: flights.map((flight) => omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })),
+      flights: await this.populateFlights(flights),
       pagination
     }
   }
@@ -245,7 +244,7 @@ class FlightServices {
     const pagination = createPagination(validatedQuery.page, validatedQuery.limit, totalItems)
 
     return {
-      flights: flights.map((flight) => omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })),
+      flights: flights.map((flight) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight })),
       pagination
     }
   }
@@ -254,14 +253,14 @@ class FlightServices {
     const { id: validatedId } = getFlightByIdSchema.params.parse({ id })
 
     const flight = await databaseService.flights.findOne({ _id: validatedId })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight })
   }
 
   static async getFlightByFlightNumber(flightNumber: string) {
     const { flightNumber: validatedFlightNumber } = getFlightByFlightNumberSchema.params.parse({ flightNumber })
 
     const flight = await databaseService.flights.findOne({ flightNumber: validatedFlightNumber })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight })
   }
 
   static async getFlightByAirlineId(airlineId: ObjectId, query: getFlightByAirlineIdTypeQuery) {
@@ -284,7 +283,7 @@ class FlightServices {
     const pagination = createPagination(validatedQuery.page, validatedQuery.limit, totalItems)
 
     return {
-      flights: flights.map((flight) => omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })),
+      flights: flights.map((flight) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight })),
       pagination
     }
   }
@@ -309,7 +308,7 @@ class FlightServices {
     const pagination = createPagination(validatedQuery.page, validatedQuery.limit, totalItems)
 
     return {
-      flights: flights.map((flight) => omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })),
+      flights: flights.map((flight) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight })),
       pagination
     }
   }
@@ -339,7 +338,7 @@ class FlightServices {
     const pagination = createPagination(validatedQuery.page, validatedQuery.limit, totalItems)
 
     return {
-      flights: flights.map((flight) => omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })),
+      flights: flights.map((flight) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight })),
       pagination
     }
   }
@@ -366,9 +365,79 @@ class FlightServices {
     const pagination = createPagination(validatedQuery.page, validatedQuery.limit, totalItems)
 
     return {
-      flights: flights.map((flight) => omitInfoData({ fields: ['createAt', 'updateAt'], object: flight })),
+      flights: flights.map((flight) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight })),
       pagination
     }
+  }
+
+  static async populateFlights(flights: any[]) {
+    const airlineIds = [...new Set(flights.map((f) => f.airlineId.toString()))]
+    const aircraftIds = [...new Set(flights.map((f) => f.aircraftId.toString()))]
+    const airportIds = [
+      ...new Set(flights.flatMap((f) => [f.departureAirportId.toString(), f.arrivalAirportId.toString()]))
+    ]
+
+    const [airlines, airports, aircrafts] = await Promise.all([
+      databaseService.airlines.find({ _id: { $in: airlineIds.map(convertToObjectId) } }).toArray(),
+      databaseService.airports.find({ _id: { $in: airportIds.map(convertToObjectId) } }).toArray(),
+      databaseService.aircrafts.find({ _id: { $in: aircraftIds.map(convertToObjectId) } }).toArray()
+    ])
+
+    const airlineMap = Object.fromEntries(airlines.map((a) => [a._id.toString(), a]))
+    const airportMap = Object.fromEntries(airports.map((a) => [a._id.toString(), a]))
+    const aircraftMap = Object.fromEntries(aircrafts.map((a) => [a._id.toString(), a]))
+
+    return flights.map((flight) => {
+      const airline = airlineMap[flight.airlineId.toString()]
+      const departureAirport = airportMap[flight.departureAirportId.toString()]
+      const arrivalAirport = airportMap[flight.arrivalAirportId.toString()]
+      const aircraft = aircraftMap[flight.aircraftId.toString()]
+
+      return {
+        _id: flight._id,
+        flightNumber: flight.flightNumber,
+        departureTime: flight.departureTime,
+        arrivalTime: flight.arrivalTime,
+        duration: flight.duration,
+        price: flight.price,
+        availableSeats: flight.availableSeats,
+        isActive: flight.isActive,
+        airline: airline
+          ? {
+              _id: airline._id,
+              name: airline.name,
+              code: airline.code
+            }
+          : null,
+        aircraft: aircraft
+          ? {
+              _id: aircraft._id,
+              model: aircraft.model,
+              manufacturer: aircraft.manufacturer,
+              aircraftCode: aircraft.aircraftCode,
+              seatConfiguration: aircraft.seatConfiguration,
+              capacity: aircraft.capacity,
+              status: aircraft.status
+            }
+          : null,
+        departureAirport: departureAirport
+          ? {
+              _id: departureAirport._id,
+              name: departureAirport.name,
+              code: departureAirport.code,
+              city: departureAirport.city
+            }
+          : null,
+        arrivalAirport: arrivalAirport
+          ? {
+              _id: arrivalAirport._id,
+              name: arrivalAirport.name,
+              code: arrivalAirport.code,
+              city: arrivalAirport.city
+            }
+          : null
+      }
+    })
   }
 }
 

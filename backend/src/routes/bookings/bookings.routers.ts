@@ -8,7 +8,8 @@ import {
   deleteBookingSchema,
   updateBookingSchema,
   searchBookingsSchema,
-  getBookingByIdSchema
+  getBookingByIdSchema,
+  getListBookingSchema
 } from '~/requestSchemas/bookings.request'
 import { authenticationSchema } from '~/requestSchemas/users.request'
 import { UserRole } from '~/constants/users'
@@ -20,6 +21,12 @@ bookingsRouter.post(
   '/',
   validateRequest({ body: createBookingSchema.body }),
   asyncHandler(bookingsControllers.createBooking)
+)
+
+bookingsRouter.get(
+  '/',
+  validateRequest({ query: getListBookingSchema.query }),
+  asyncHandler(bookingsControllers.getListBooking)
 )
 
 // Update booking

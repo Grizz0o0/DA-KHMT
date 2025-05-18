@@ -9,7 +9,9 @@ import {
   getListAircraftTypeQuery,
   filterAircraftTypeQuery,
   getAircraftByManufacturerTypeQuery,
-  getAircraftByModelTypeQuery
+  getAircraftByModelTypeQuery,
+  getAircraftByAircraftCodeTypeParams,
+  getAircraftByAirlineIdTypeQuery
 } from '~/requestSchemas/aircrafts.request'
 
 class AircraftController {
@@ -93,6 +95,20 @@ class AircraftController {
     }
   }
 
+  getAircraftByAirlineId = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const { aircrafts, pagination } = await AircraftsService.getAircraftByAirlineId(
+        req.query as getAircraftByAirlineIdTypeQuery
+      )
+      new OK({
+        message: 'Get Aircraft By Model success',
+        metadata: { aircrafts, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
   getAircraftByModel = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     try {
       const { aircrafts, pagination } = await AircraftsService.getAircraftByModel(
@@ -121,7 +137,6 @@ class AircraftController {
 
   getAircraftByManufacturer = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     try {
-      console.log(req.query)
       const { aircrafts, pagination } = await AircraftsService.getAircraftByManufacturer(
         req.query as getAircraftByManufacturerTypeQuery
       )

@@ -132,22 +132,22 @@ function Footer() {
                         </p>
                         <div className="flex space-x-4 mt-4 md:mt-0">
                             <a
-                                href="#"
+                                href="https://www.facebook.com/"
                                 className="text-gray-400 hover:text-white transition-colors"
                             >
                                 Facebook
                             </a>
                             <a
-                                href="#"
+                                href="https://www.instagram.com/"
                                 className="text-gray-400 hover:text-white transition-colors"
                             >
                                 Instagram
                             </a>
                             <a
-                                href="#"
+                                href="https://x.com/?lang=vi"
                                 className="text-gray-400 hover:text-white transition-colors"
                             >
-                                Twitter
+                                X
                             </a>
                         </div>
                     </div>

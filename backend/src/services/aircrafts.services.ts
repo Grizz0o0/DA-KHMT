@@ -6,7 +6,9 @@ import {
   getListAircraftTypeQuery,
   filterAircraftTypeQuery,
   getAircraftByManufacturerTypeQuery,
-  getAircraftByModelTypeQuery
+  getAircraftByModelTypeQuery,
+  getAircraftByAirlineIdTypeQuery,
+  getAircraftByAirlineIdSchema
 } from '~/requestSchemas/aircrafts.request'
 import {
   createAircraftSchema,
@@ -66,7 +68,7 @@ class AircraftService {
       { upsert: true, returnDocument: 'after' }
     )
     if (!updatedAircraft) throw new BadRequestError('Update Aircraft failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: updatedAircraft })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: updatedAircraft })
   }
 
   static async deleteAircraft(id: string) {
@@ -74,7 +76,7 @@ class AircraftService {
 
     const del = await databaseService.aircrafts.findOneAndDelete({ _id: aircraftId })
     if (!del) throw new BadRequestError('Delete Aircraft failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: del })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: del })
   }
 
   static async searchAircraft({
@@ -120,7 +122,7 @@ class AircraftService {
     limit = 10,
     page = 1,
     order = 'asc',
-    select = ['model', 'manufacturer', 'seatConfiguration', 'capacity', 'aircraftCode', 'status']
+    select = ['model', 'manufacturer', 'airlineId', 'seatConfiguration', 'capacity', 'aircraftCode', 'status']
   }: getListAircraftTypeQuery) {
     const validatedQuery = getListAircraftSchema.query.parse({
       limit,
@@ -168,7 +170,7 @@ class AircraftService {
 
     const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
     return {
-      aircrafts: aircrafts.map((aircraft) => omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })),
+      aircrafts: aircrafts.map((aircraft) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: aircraft })),
       pagination
     }
   }
@@ -177,7 +179,30 @@ class AircraftService {
     const { aircraftId } = getAircraftByIdSchema.params.parse({ aircraftId: id })
 
     const aircraft = await databaseService.aircrafts.findOne({ _id: aircraftId })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: aircraft })
+  }
+
+  static async getAircraftByAirlineId({ airlineId, page = 1, limit = 10 }: getAircraftByAirlineIdTypeQuery) {
+    const validatedQuery = getAircraftByAirlineIdSchema.query.parse({ airlineId, page, limit })
+
+    if (!validatedQuery.airlineId) {
+      return { aircrafts: [], pagination: createPagination(1, 10, 0) }
+    }
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+    const totalItems = await databaseService.aircrafts.countDocuments({ airlineId: validatedQuery.airlineId })
+
+    const aircrafts = await databaseService.aircrafts
+      .find({ airlineId: validatedQuery.airlineId })
+      .skip(skip)
+      .limit(validatedQuery.limit ?? 10)
+      .toArray()
+
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+    return {
+      aircrafts: aircrafts.map((aircraft) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: aircraft })),
+      pagination
+    }
   }
 
   static async getAircraftByModel({ model, page = 1, limit = 10 }: getAircraftByModelTypeQuery) {
@@ -198,7 +223,7 @@ class AircraftService {
 
     const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
     return {
-      aircrafts: aircrafts.map((aircraft) => omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })),
+      aircrafts: aircrafts.map((aircraft) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: aircraft })),
       pagination
     }
   }
@@ -207,7 +232,7 @@ class AircraftService {
     const { code } = getAircraftByAircraftCodeSchema.params.parse({ code: aircraftCode })
 
     const aircraft = await databaseService.aircrafts.findOne({ aircraftCode: code })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: aircraft })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: aircraft })
   }
 
   static async filterAircraft({

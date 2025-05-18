@@ -198,3 +198,13 @@ export const updateMultipleTicketsStatusSchema = {
   })
 }
 export type updateMultipleTicketsStatusTypeBody = z.infer<typeof updateMultipleTicketsStatusSchema.body>
+
+export const getListTicketSchema = {
+  query: z.object({
+    limit: z.coerce.number().int('Giới hạn phải là số nguyên').positive('Giới hạn phải > 0').optional(),
+    page: z.coerce.number().int('Số trang phải là số nguyên').positive('Số trang phải > 0').optional(),
+    order: z.enum(['asc', 'desc']).optional(),
+    select: z.array(z.string()).optional()
+  })
+}
+export type getListTicketTypeQuery = z.infer<typeof getListTicketSchema.query>

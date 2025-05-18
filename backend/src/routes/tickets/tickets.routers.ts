@@ -31,6 +31,9 @@ ticketsRouter.post(
   asyncHandler(ticketsControllers.createTicket)
 )
 
+// Get ticket
+ticketsRouter.get('/', authorizeRoles(UserRole.ADMIN), asyncHandler(ticketsControllers.getListTickets))
+
 // Create multiple tickets
 ticketsRouter.post(
   '/multiple',

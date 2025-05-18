@@ -10,6 +10,16 @@ const objectIdSchema = z
   })
   .transform((val) => (val instanceof ObjectId ? val : new ObjectId(val)))
 
+export const getListBookingSchema = {
+  query: z.object({
+    limit: z.coerce.number().int('Giới hạn phải là số nguyên').positive('Giới hạn phải > 0').optional(),
+    page: z.coerce.number().int('Số trang phải là số nguyên').positive('Số trang phải > 0').optional(),
+    order: z.enum(['asc', 'desc']).optional(),
+    select: z.array(z.string()).optional()
+  })
+}
+export type getListBookingTypeQuery = z.infer<typeof getListBookingSchema.query>
+
 export const createBookingSchema = {
   body: z.object({
     userId: objectIdSchema,

@@ -92,7 +92,7 @@ class AirlinesService {
       { upsert: true, returnDocument: 'after' }
     )
     if (!updatedAirline) throw new BadRequestError('Update Airline failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: updatedAirline })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: updatedAirline })
   }
 
   static async deleteAirline(id: string) {
@@ -100,7 +100,7 @@ class AirlinesService {
 
     const del = await databaseService.airlines.findOneAndDelete({ _id: airlineId })
     if (!del) throw new BadRequestError('Delete Airline failed')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: del })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: del })
   }
 
   static async searchAirline({
@@ -174,14 +174,14 @@ class AirlinesService {
     const { airlineId } = getAirlineByIdSchema.params.parse({ airlineId: id })
 
     const airline = await databaseService.airlines.findOne({ _id: airlineId })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: airline })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: airline })
   }
 
   static async getAirlineByCode(code: string) {
     const { airlineCode } = getAirlineByCodeSchema.params.parse({ airlineCode: code })
 
     const airline = await databaseService.airlines.findOne({ code: airlineCode })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: airline })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: airline })
   }
 }
 

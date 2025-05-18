@@ -6,13 +6,16 @@ import {
   CreateBookingTypeBody,
   UpdateBookingTypeBody,
   searchBookingsSchema,
-  SearchBookingsTypeQuery
+  SearchBookingsTypeQuery,
+  getListBookingTypeQuery,
+  getListBookingSchema
 } from '~/requestSchemas/bookings.request'
-import { omitInfoData } from '~/utils/object.utils'
+import { getSelectData, omitInfoData } from '~/utils/object.utils'
 import { BookingStatus } from '~/constants/bookings'
 import { ObjectId } from 'mongodb'
 import { Sort } from 'mongodb'
 import { PaymentStatus } from '~/constants/payments'
+import { createPagination } from '~/responses/success.response'
 class BookingsService {
   static async createBooking(payload: CreateBookingTypeBody) {
     const user = await databaseService.users.findOne({ _id: payload.userId })
@@ -26,9 +29,14 @@ class BookingsService {
     const booking = await databaseService.bookings.insertOne(parsedBooking)
     if (!booking.insertedId) throw new BadRequestError('Tạo booking thất bại')
 
-    await databaseService.flights.updateOne({ _id: payload.flightId }, { $inc: { availableSeats: -1 } })
+    const updateResult = await databaseService.flights.updateOne(
+      { _id: payload.flightId, availableSeats: { $gte: payload.quantity } },
+      { $inc: { availableSeats: -payload.quantity } }
+    )
+    if (updateResult.modifiedCount === 0) throw new BadRequestError('Không thể cập nhật số ghế, vui lòng thử lại')
+
     const createdBooking = await databaseService.bookings.findOne({ _id: booking.insertedId })
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: createdBooking })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: createdBooking })
   }
 
   static async updateBooking(bookingId: ObjectId, payload: UpdateBookingTypeBody) {
@@ -36,16 +44,14 @@ class BookingsService {
     if (!booking) throw new BadRequestError('Booking không tồn tại')
 
     // Nếu booking đã xác nhận hoặc đã hủy, không cho phép update
-    if (booking.status === BookingStatus.Confirmed || booking.status === BookingStatus.Cancelled) {
+    if (booking.status === BookingStatus.Confirmed || booking.status === BookingStatus.Cancelled)
       throw new BadRequestError('Không thể cập nhật booking đã xác nhận hoặc đã hủy')
-    }
 
     // Nếu đang update status thành Confirmed hoặc Cancelled
     if (payload.status === BookingStatus.Confirmed || payload.status === BookingStatus.Cancelled) {
       // Nếu chưa thanh toán, không cho phép xác nhận
-      if (booking.paymentStatus !== PaymentStatus.SUCCESS) {
+      if (booking.paymentStatus !== PaymentStatus.SUCCESS)
         throw new BadRequestError('Phải thanh toán trước khi xác nhận booking')
-      }
     }
 
     const updatedBooking = await databaseService.bookings.findOneAndUpdate(
@@ -56,7 +62,7 @@ class BookingsService {
 
     if (!updatedBooking) throw new BadRequestError('Cập nhật booking thất bại')
 
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: updatedBooking })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: updatedBooking })
   }
 
   static async deleteBooking(bookingId: ObjectId) {
@@ -64,20 +70,18 @@ class BookingsService {
     if (!booking) throw new BadRequestError('Booking không tồn tại')
 
     // Nếu booking đã xác nhận hoặc đã hủy, không cho phép xóa
-    if (booking.status === BookingStatus.Confirmed || booking.status === BookingStatus.Cancelled) {
+    if (booking.status === BookingStatus.Confirmed || booking.status === BookingStatus.Cancelled)
       throw new BadRequestError('Không thể xóa booking đã xác nhận hoặc đã hủy')
-    }
 
     // Nếu đã thanh toán, không cho phép xóa
-    if (booking.paymentStatus === PaymentStatus.SUCCESS) {
+    if (booking.paymentStatus === PaymentStatus.SUCCESS)
       throw new BadRequestError('Không thể xóa booking đã thanh toán')
-    }
 
     const result = await databaseService.bookings.deleteOne({ _id: bookingId })
     if (result.deletedCount === 0) throw new BadRequestError('Xóa booking thất bại')
 
     // Hoàn lại ghế cho chuyến bay
-    await databaseService.flights.updateOne({ _id: booking.flightId }, { $inc: { availableSeats: 1 } })
+    await databaseService.flights.updateOne({ _id: booking.flightId }, { $inc: { availableSeats: booking.quantity } })
     return { message: 'Xóa booking thành công' }
   }
 
@@ -123,7 +127,7 @@ class BookingsService {
     ])
 
     return {
-      bookings: bookings.map((booking) => omitInfoData({ fields: ['createAt', 'updateAt'], object: booking })),
+      bookings: bookings.map((booking) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: booking })),
       pagination: {
         page,
         limit,
@@ -131,6 +135,40 @@ class BookingsService {
         totalPages: Math.ceil(total / limit)
       }
     }
+  }
+
+  static async getListBooking({
+    limit = 10,
+    page = 1,
+    order = 'asc',
+    select = ['status', 'seatClass', 'quantity', 'totalPrice', 'bookingTime', 'paymentStatus', 'createdAt']
+  }: getListBookingTypeQuery) {
+    const validatedQuery = getListBookingSchema.query.parse({
+      limit,
+      page,
+      order,
+      select
+    })
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+
+    const sortField = 'totalPrice'
+    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: validatedQuery.order === 'asc' ? 1 : -1 }
+
+    const projection = getSelectData(validatedQuery.select ?? [])
+    const totalItems = await databaseService.bookings.countDocuments({})
+
+    const bookings = await databaseService.bookings
+      .find({})
+      .sort(sortBy)
+      .skip(skip)
+      .project(projection)
+      .limit(validatedQuery.limit ?? 10)
+      .toArray()
+
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+
+    return { bookings, pagination }
   }
 
   static async getBookingById(bookingId: ObjectId) {
@@ -144,9 +182,23 @@ class BookingsService {
     ])
 
     return {
-      ...omitInfoData({ fields: ['createAt', 'updateAt'], object: booking }),
-      user: user ? omitInfoData({ fields: ['password', 'createAt', 'updateAt'], object: user }) : null,
-      flight: flight ? omitInfoData({ fields: ['createAt', 'updateAt'], object: flight }) : null
+      booking: { ...omitInfoData({ fields: ['createdAt', 'updatedAt'], object: booking }) },
+      user: user
+        ? omitInfoData({
+            fields: [
+              'password',
+              'createdAt',
+              'updatedAt',
+              'role',
+              'verify',
+              'authProvider',
+              'verifyEmailToken',
+              'forgotPasswordToken'
+            ],
+            object: user
+          })
+        : null,
+      flight: flight ? omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight }) : null
     }
   }
 
@@ -156,8 +208,9 @@ class BookingsService {
       confirmedBookings,
       cancelledBookings,
       pendingBookings,
-      paidBookings,
-      unpaidBookings,
+      successPayment,
+      pendingPayment,
+      failedPayment,
       totalRevenue
     ] = await Promise.all([
       databaseService.bookings.countDocuments({}),
@@ -166,6 +219,7 @@ class BookingsService {
       databaseService.bookings.countDocuments({ status: BookingStatus.Pending }),
       databaseService.bookings.countDocuments({ paymentStatus: PaymentStatus.SUCCESS }),
       databaseService.bookings.countDocuments({ paymentStatus: PaymentStatus.PENDING }),
+      databaseService.bookings.countDocuments({ paymentStatus: PaymentStatus.FAILED }),
       databaseService.bookings
         .aggregate([
           { $match: { paymentStatus: PaymentStatus.SUCCESS } },
@@ -182,8 +236,9 @@ class BookingsService {
         pending: pendingBookings
       },
       paymentStats: {
-        paid: paidBookings,
-        unpaid: unpaidBookings
+        pending: pendingPayment,
+        success: successPayment,
+        failed: failedPayment
       },
       totalRevenue: totalRevenue[0]?.total || 0
     }

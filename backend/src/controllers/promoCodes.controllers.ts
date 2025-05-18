@@ -1,5 +1,5 @@
 import { ParamsDictionary } from 'express-serve-static-core'
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { OK, Created } from '~/responses/success.response'
 import PromoCodesService from '~/services/promoCodes.services'
 import {
@@ -10,7 +10,9 @@ import {
   getPromoCodeByCodeSchema,
   usePromoCodeSchema,
   validatePromoCodeSchema,
-  deactivatePromoCodeSchema
+  deactivatePromoCodeSchema,
+  getListPromoCodeSchema,
+  activatePromoCodeSchema
 } from '~/requestSchemas/promoCodes.request'
 
 class PromoCodesController {
@@ -40,6 +42,28 @@ class PromoCodesController {
       message: 'Tắt mã ưu đãi thành công',
       metadata: result
     }).send(res)
+  }
+
+  public static async activatePromoCode(req: Request, res: Response) {
+    const { id } = activatePromoCodeSchema.params.parse(req.params)
+    const result = await PromoCodesService.activatePromoCode(id)
+    new OK({
+      message: 'Bật mã ưu đãi thành công',
+      metadata: result
+    }).send(res)
+  }
+
+  public static async getListPromoCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { page, limit, order, sortBy } = getListPromoCodeSchema.query.parse(req.query)
+      const { promocodes, pagination } = await PromoCodesService.getListPromoCode({ page, limit, order, sortBy })
+      new OK({
+        message: 'Get list promo codes successfully',
+        metadata: { promocodes, pagination }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
   }
 
   public static async getPromoCodeById(req: Request, res: Response) {

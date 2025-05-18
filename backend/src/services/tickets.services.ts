@@ -9,6 +9,8 @@ import {
   createMultipleTicketsTypeBody,
   createTicketTypeBody,
   deleteTicketSchema,
+  getListTicketSchema,
+  getListTicketTypeQuery,
   getTicketsByBookingIdTypeQuery,
   getTicketsByFlightIdTypeQuery,
   searchTicketsTypeQuery,
@@ -63,7 +65,6 @@ class TicketsServices {
       flightId: payload.flightId,
       status: { $ne: TicketStatus.Cancelled }
     })
-
     if (totalBooked + payload.tickets.length > flight.availableSeats)
       throw new BadRequestError(
         `Not enough available seats (Available: ${flight.availableSeats - totalBooked}, Requested: ${payload.tickets.length})`
@@ -73,7 +74,13 @@ class TicketsServices {
     if (invalidTickets.length > 0) throw new BadRequestError('Invalid ticket price: Price must be greater than 0')
 
     const tickets = payload.tickets.map((t) =>
-      ticketSchema.parse({ ...t, bookingId: payload.bookingId, flightId: payload.flightId })
+      ticketSchema.parse({
+        ...t,
+        seatClass: payload.seatClass,
+        userId: payload.userId,
+        bookingId: payload.bookingId,
+        flightId: payload.flightId
+      })
     )
 
     const result = await databaseService.tickets.insertMany(tickets)
@@ -146,15 +153,61 @@ class TicketsServices {
     const pagination = createPagination(query.page, query.limit, total)
 
     return {
-      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createAt', 'updateAt'], object: ticket })),
+      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: ticket })),
       pagination
     }
+  }
+
+  static async getListTicket({
+    limit = 10,
+    page = 1,
+    order = 'asc',
+    select = [
+      '_id',
+      'bookingId',
+      'flightId',
+      'seatNumber',
+      'seatClass',
+      'passenger',
+      'price',
+      'status',
+      'createdAt',
+      'updatedAt'
+    ]
+  }: getListTicketTypeQuery) {
+    const validatedQuery = getListTicketSchema.query.parse({
+      limit,
+      page,
+      order,
+      select
+    })
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+
+    const sortField = 'seatNumber'
+    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: validatedQuery.order === 'asc' ? 1 : -1 }
+
+    const projection = getSelectData(validatedQuery.select ?? [])
+
+    const totalItems = await databaseService.tickets.countDocuments({})
+
+    const tickets = await databaseService.tickets
+      .find({})
+      .sort(sortBy)
+      .skip(skip)
+      .project(projection)
+      .limit(validatedQuery.limit ?? 10)
+      .toArray()
+
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+
+    return { tickets, pagination }
   }
 
   static async getTicketById(ticketId: ObjectId) {
     const ticket = await databaseService.tickets.findOne({ _id: ticketId })
     if (!ticket) throw new BadRequestError('Ticket not found')
-    return omitInfoData({ fields: ['createAt', 'updateAt'], object: ticket })
+    return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: ticket })
   }
 
   static async getTicketsByBookingId(bookingId: ObjectId, query: getTicketsByBookingIdTypeQuery) {
@@ -174,7 +227,7 @@ class TicketsServices {
 
     const pagination = createPagination(query.page, query.limit, total)
     return {
-      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createAt', 'updateAt'], object: ticket })),
+      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: ticket })),
       pagination
     }
   }
@@ -196,7 +249,7 @@ class TicketsServices {
 
     const pagination = createPagination(query.page, query.limit, total)
     return {
-      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createAt', 'updateAt'], object: ticket })),
+      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: ticket })),
       pagination
     }
   }
@@ -292,7 +345,7 @@ class TicketsServices {
 
     const pagination = createPagination(query.page, query.limit, total)
     return {
-      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createAt', 'updateAt'], object: ticket })),
+      tickets: tickets.map((ticket) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: ticket })),
       pagination
     }
   }

@@ -4,6 +4,7 @@ import {
   changePasswordReqBodyType,
   deleteUserReqParamsType,
   forgotPasswordReqBodyType,
+  getListUserSchema,
   getUserByIdReqParamsType,
   loginReqBodyType,
   registerReqBodyType,
@@ -165,10 +166,7 @@ class UserController {
   updateMe = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?.userId
-
-      if (!userId) {
-        throw new UnauthorizedError('User authentication required')
-      }
+      if (!userId) throw new UnauthorizedError('User authentication required')
 
       const result = await userService.updateMe(userId, req.body)
 
@@ -197,12 +195,27 @@ class UserController {
     }
   }
 
+  getMe = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      console.log(`user:::${req.user?.userId}`)
+      const user = await userService.getUserById(req.user?.userId)
+      new OK({
+        message: 'Get me profile success',
+        metadata: { user }
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
   getAllUsers = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     try {
-      const users = await userService.getAllUsers()
+      const { page, limit, order, select } = getListUserSchema.query.parse(req.query)
+
+      const users = await userService.getAllUsers({ page, limit, order, select })
       new OK({
         message: 'Get all users success',
-        metadata: { users }
+        metadata: users
       }).send(res)
     } catch (error) {
       next(error)

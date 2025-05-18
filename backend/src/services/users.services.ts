@@ -20,19 +20,22 @@ import {
   verifyForgotPasswordSchema,
   resetPasswordSchema,
   changePasswordSchema,
-  updateMeSchema
+  updateMeSchema,
+  getListUserTypeQuery,
+  getListUserSchema
 } from '~/requestSchemas/users.request'
 import { userSchema } from '~/models/users.model'
 import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
 import RefreshTokenService from '~/services/refreshToken.services'
-import { getInfoData, omitInfoData } from '~/utils/object.utils'
+import { getInfoData, getSelectData, omitInfoData } from '~/utils/object.utils'
 import { verifyToken } from '~/utils/jwt.utils'
 import { convertToObjectId } from '~/utils/mongo.utils'
 import { UserAuthProvider, UserVerifyStatus, UserGender, UserRole } from '~/constants/users'
 import axios from 'axios'
 import { generateRandomPassword } from '~/utils/crypto.utils'
 import { GoogleTokenBody, GoogleUserInfo } from '~/types/auths.types'
+import { createPagination } from '~/responses/success.response'
 
 class UserService {
   static getUserByEmail = async (email: string) => {
@@ -63,24 +66,40 @@ class UserService {
     })
   }
 
-  static getAllUsers = async () => {
+  static getAllUsers = async ({
+    limit = 10,
+    page = 1,
+    order = 'asc',
+    select = ['username', 'email', 'phoneNumber', 'dateOfBirth', 'gender', 'address', 'avatar']
+  }: getListUserTypeQuery) => {
+    const validatedQuery = getListUserSchema.query.parse({
+      limit,
+      page,
+      order,
+      select
+    })
+
+    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+
+    const sortField = 'username'
+    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: validatedQuery.order === 'asc' ? 1 : -1 }
+
     const foundUsers = await databaseService.users.find({}).toArray()
     if (!foundUsers.length) throw new NotFoundError('Not found users')
 
-    return foundUsers.map((user) =>
-      omitInfoData({
-        fields: [
-          'verify',
-          'authProvider',
-          'verifyEmailToken',
-          'forgotPasswordToken',
-          'password',
-          'createdAt',
-          'updatedAt'
-        ],
-        object: user
-      })
-    )
+    const totalItems = await databaseService.users.countDocuments({})
+
+    const users = await databaseService.users
+      .find()
+      .sort(sortBy)
+      .skip(skip)
+      .project(getSelectData(validatedQuery.select ?? []))
+      .limit(validatedQuery.limit ?? 10)
+      .toArray()
+
+    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+
+    return { users, pagination }
   }
 
   static login = async (payload: loginReqBodyType) => {
@@ -115,7 +134,7 @@ class UserService {
       expiresAt: new Date((decodeRefreshToken.exp as number) * 1000)
     })
     return {
-      user: getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber'], object: foundUser }),
+      user: getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber', 'role'], object: foundUser }),
       tokens: { accessToken, refreshToken }
     }
   }
@@ -167,7 +186,7 @@ class UserService {
       })
 
       return {
-        user: getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber'], object: foundUser }),
+        user: getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber', 'role'], object: foundUser }),
         tokens: { accessToken, refreshToken }
       }
     } catch (error) {
@@ -344,7 +363,7 @@ class UserService {
 
     return {
       user: { userId, email, role },
-      tokens: getInfoData({ fields: ['refreshToken', 'refreshTokenUsed'], object: newTokens })
+      tokens: { accessToken, ...getInfoData({ fields: ['refreshToken', 'refreshTokenUsed'], object: newTokens }) }
     }
   }
 
@@ -460,7 +479,7 @@ class UserService {
       { $set: { password: passwordHash }, $currentDate: { updatedAt: true } },
       { returnDocument: 'after' }
     )
-    return getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber', 'role'], object: result })
+    return getInfoData({ fields: ['_id', 'username', 'email', 'phoneNumber'], object: result })
   }
 
   static deleteUser = async (userId: string) => {
@@ -492,7 +511,7 @@ class UserService {
       { returnDocument: 'after' }
     )
     return omitInfoData({
-      fields: ['verify', 'authProvider', 'verifyEmailToken', 'forgotPasswordToken', 'password', 'role'],
+      fields: ['verify', 'authProvider', 'verifyEmailToken', 'forgotPasswordToken', 'password'],
       object: result
     })
   }

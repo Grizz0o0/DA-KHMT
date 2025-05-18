@@ -11,6 +11,14 @@ const strongPasswordSchema = z
     message: 'Mật khẩu phải có ít nhất 1 chữ cái viết thường, 1 chữ cái viết hoa, 1 ký tự đặc biệt'
   })
 
+export const PaginationParams = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().default(10),
+  order: z.enum(['asc', 'desc']).default('asc'),
+  sortBy: z.enum(['departureTime', 'arrivalTime', 'price', 'availableSeats']).default('departureTime')
+})
+export type PaginationParamsType = z.infer<typeof PaginationParams>
+
 export const loginSchema = {
   body: z.object({
     email: z
@@ -61,22 +69,6 @@ export const registerSchema = {
     })
 }
 export type registerReqBodyType = z.infer<typeof registerSchema.body>
-
-export const logoutSchema = {
-  headers: z.object({
-    [HEADER.AUTHORIZATION]: z
-      .string({
-        required_error: `Headers[${HEADER.AUTHORIZATION}] không được để trống`
-      })
-      .trim(),
-    [HEADER.CLIENT_ID]: z
-      .string({
-        required_error: `Headers[${HEADER.CLIENT_ID}] không được để trống`
-      })
-      .trim()
-  })
-}
-export type logoutReqHeadersType = z.infer<typeof logoutSchema.headers>
 
 export const forgotPasswordSchema = {
   body: z.object({
@@ -166,20 +158,6 @@ export const changePasswordSchema = {
 export type changePasswordReqBodyType = z.infer<typeof changePasswordSchema.body>
 
 export const deleteUserSchema = {
-  headers: z.object({
-    [HEADER.AUTHORIZATION]: z
-      .string()
-      .trim()
-      .min(1, {
-        message: `Headers[${HEADER.AUTHORIZATION}] không được để trống`
-      }),
-    [HEADER.CLIENT_ID]: z
-      .string()
-      .trim()
-      .min(1, {
-        message: `Headers[${HEADER.CLIENT_ID}] không được để trống`
-      })
-  }),
   params: z.object({
     id: z.string().trim().min(1, {
       message: 'Id không được để trống'
@@ -259,3 +237,14 @@ export const authenticationSchema = z.object({
     })
     .trim()
 })
+
+export const getListUserSchema = {
+  query: z.object({
+    limit: z.coerce.number().int('Giới hạn phải là số nguyên').positive('Giới hạn phải > 0').optional(),
+    page: z.coerce.number().int('Số trang phải là số nguyên').positive('Số trang phải > 0').optional(),
+    order: z.string().optional(),
+    select: z.array(z.string()).optional()
+  })
+}
+
+export type getListUserTypeQuery = z.infer<typeof getListUserSchema.query>

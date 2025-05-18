@@ -1,89 +1,62 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { searchFlights } from '@/lib/api';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import Image from 'next/image';
 
-type Flight = {
-    _id: string;
-    flightNumber: string;
-    departureAirport: {
-        code: string;
-        city: string;
+import { Button } from '@/components/ui/button';
+import {
+    SearchFlightReqSchema,
+    type FlightDetailType,
+} from '@/schemaValidations/flights.schema';
+import flightApiRequest from '@/app/apiRequests/flight';
+
+const parseSearchParams = (params: URLSearchParams) => {
+    const obj = {
+        departureAirport: params.get('from') || '',
+        arrivalAirport: params.get('to') || '',
+        departureTime: params.get('departureDate') || '',
+        arrivalTime: params.get('returnDate') || '',
+        passengerCount: params.get('passengers') || '1',
     };
-    arrivalAirport: {
-        code: string;
-        city: string;
-    };
-    departureTime: string;
-    arrivalTime: string;
-    price: number;
-    availableSeats: number;
-    airline: {
-        name: string;
-        logo: string;
-    };
+
+    const result = SearchFlightReqSchema.safeParse(obj);
+    if (!result.success) {
+        throw new Error('Thông tin tìm kiếm không hợp lệ');
+    }
+    return result.data;
 };
 
-type SearchParams = {
-    from: string;
-    to: string;
-    departureDate: string;
-    returnDate?: string;
-    passengers: number;
+const useSearchFlights = (params: URLSearchParams) => {
+    return useQuery({
+        queryKey: ['flights', params.toString()],
+        queryFn: async () => {
+            const query = parseSearchParams(params);
+            const res = await flightApiRequest.getFlights(query); // gọi /search phía backend
+            return res.metadata.flights as FlightDetailType[];
+        },
+        enabled: !!params,
+        staleTime: 5 * 60 * 1000,
+        onError: () => {
+            toast.error('Không thể tìm kiếm chuyến bay. Vui lòng thử lại.');
+        },
+    });
 };
 
-function FlightsPage() {
+export default function FlightsPage() {
     const params = useSearchParams();
-    const [flights, setFlights] = useState<Flight[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const {
+        data: flights,
+        isLoading,
+        isError,
+        error,
+    } = useSearchFlights(params);
 
-    useEffect(() => {
-        const fetchFlights = async () => {
-            try {
-                setLoading(true);
-                const from = params.get('from');
-                const to = params.get('to');
-                const departureDate = params.get('departureDate');
-                const returnDate = params.get('returnDate');
-                const passengers = params.get('passengers');
-
-                if (!from || !to || !departureDate || !passengers) {
-                    throw new Error('Thiếu thông tin tìm kiếm');
-                }
-
-                const searchParams: SearchParams = {
-                    from,
-                    to,
-                    departureDate,
-                    returnDate: returnDate || undefined,
-                    passengers: parseInt(passengers),
-                };
-
-                const data = await searchFlights(searchParams);
-                setFlights(data);
-            } catch (err) {
-                console.error('Lỗi khi tìm kiếm chuyến bay:', err);
-                setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
-                toast.error(
-                    'Không thể tìm kiếm chuyến bay. Vui lòng thử lại sau.'
-                );
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFlights();
-    }, [params]);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
@@ -91,42 +64,32 @@ function FlightsPage() {
         );
     }
 
-    if (error) {
+    if (isError || !flights) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold text-red-500 mb-4">
-                        Lỗi
-                    </h2>
-                    <p className="text-gray-600">{error}</p>
-                    <Button
-                        className="mt-4"
-                        onClick={() => window.history.back()}
-                    >
-                        Quay lại
-                    </Button>
-                </div>
+            <div className="min-h-screen flex flex-col items-center justify-center text-center">
+                <h2 className="text-2xl font-bold text-red-500 mb-2">Lỗi</h2>
+                <p className="text-gray-600">
+                    {(error as Error)?.message || 'Đã xảy ra lỗi'}
+                </p>
+                <Button className="mt-4" onClick={() => window.history.back()}>
+                    Quay lại
+                </Button>
             </div>
         );
     }
 
     if (flights.length === 0) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                        Không tìm thấy chuyến bay phù hợp
-                    </h2>
-                    <p className="text-gray-600 mb-4">
-                        Vui lòng thử lại với các tiêu chí khác
-                    </p>
-                    <Button
-                        className="mt-4"
-                        onClick={() => window.history.back()}
-                    >
-                        Quay lại
-                    </Button>
-                </div>
+            <div className="min-h-screen flex flex-col items-center justify-center text-center">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    Không tìm thấy chuyến bay phù hợp
+                </h2>
+                <p className="text-gray-600">
+                    Vui lòng thử lại với các tiêu chí khác
+                </p>
+                <Button className="mt-4" onClick={() => window.history.back()}>
+                    Quay lại
+                </Button>
             </div>
         );
     }
@@ -134,41 +97,37 @@ function FlightsPage() {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold">
                         Kết quả tìm kiếm chuyến bay
                     </h1>
-                    <p className="mt-2 text-gray-600">
-                        Từ {flights[0].departureAirport.city} (
-                        {flights[0].departureAirport.code}) đến{' '}
-                        {flights[0].arrivalAirport.city} (
-                        {flights[0].arrivalAirport.code})
-                    </p>
                 </div>
 
                 <div className="space-y-4">
                     {flights.map((flight) => (
                         <div
                             key={flight._id}
-                            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
                         >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-4">
                                     <Image
-                                        src={flight.airline.logo}
-                                        alt={flight.airline.name}
-                                        className="h-12 w-12 object-contain"
+                                        src="/placeholder-airline-logo.png" // nếu chưa có logo thực
+                                        alt="Airline"
+                                        width={48}
+                                        height={48}
+                                        className="object-contain"
                                     />
                                     <div>
-                                        <h3 className="text-lg font-semibold">
-                                            {flight.airline.name}
-                                        </h3>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-lg font-semibold">
                                             {flight.flightNumber}
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            {flight.departureAirportId} →{' '}
+                                            {flight.arrivalAirportId}
                                         </p>
                                     </div>
                                 </div>
-
                                 <div className="text-right">
                                     <p className="text-2xl font-bold text-orange-500">
                                         {flight.price.toLocaleString('vi-VN')}{' '}
@@ -180,8 +139,8 @@ function FlightsPage() {
                                 </div>
                             </div>
 
-                            <div className="mt-6 flex items-center justify-between">
-                                <div className="text-center">
+                            <div className="mt-4 flex justify-between items-center text-center">
+                                <div>
                                     <p className="text-lg font-semibold">
                                         {format(
                                             new Date(flight.departureTime),
@@ -191,40 +150,15 @@ function FlightsPage() {
                                     <p className="text-sm text-gray-500">
                                         {format(
                                             new Date(flight.departureTime),
-                                            'EEEE, dd/MM/yyyy',
-                                            {
-                                                locale: vi,
-                                            }
+                                            'dd/MM/yyyy',
+                                            { locale: vi }
                                         )}
                                     </p>
-                                    <p className="text-sm font-medium">
-                                        {flight.departureAirport.code}
-                                    </p>
                                 </div>
-
-                                <div className="flex-1 px-4">
-                                    <div className="relative">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <div className="w-full border-t border-gray-300"></div>
-                                        </div>
-                                        <div className="relative flex justify-center">
-                                            <span className="bg-white px-2 text-sm text-gray-500">
-                                                {Math.floor(
-                                                    (new Date(
-                                                        flight.arrivalTime
-                                                    ).getTime() -
-                                                        new Date(
-                                                            flight.departureTime
-                                                        ).getTime()) /
-                                                        (1000 * 60 * 60)
-                                                )}{' '}
-                                                giờ
-                                            </span>
-                                        </div>
-                                    </div>
+                                <div className="text-sm text-gray-500">
+                                    ~ {flight.duration} giờ
                                 </div>
-
-                                <div className="text-center">
+                                <div>
                                     <p className="text-lg font-semibold">
                                         {format(
                                             new Date(flight.arrivalTime),
@@ -234,14 +168,9 @@ function FlightsPage() {
                                     <p className="text-sm text-gray-500">
                                         {format(
                                             new Date(flight.arrivalTime),
-                                            'EEEE, dd/MM/yyyy',
-                                            {
-                                                locale: vi,
-                                            }
+                                            'dd/MM/yyyy',
+                                            { locale: vi }
                                         )}
-                                    </p>
-                                    <p className="text-sm font-medium">
-                                        {flight.arrivalAirport.code}
                                     </p>
                                 </div>
                             </div>
@@ -249,10 +178,9 @@ function FlightsPage() {
                             <div className="mt-6 text-center">
                                 <Button
                                     className="bg-orange-500 hover:bg-orange-600 text-white"
-                                    onClick={() => {
-                                        // Xử lý đặt vé
-                                        console.log('Đặt vé:', flight._id);
-                                    }}
+                                    onClick={() =>
+                                        console.log('Đặt vé', flight._id)
+                                    }
                                 >
                                     Đặt vé
                                 </Button>
@@ -264,5 +192,3 @@ function FlightsPage() {
         </div>
     );
 }
-
-export default FlightsPage;
