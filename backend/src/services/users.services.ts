@@ -22,7 +22,9 @@ import {
   changePasswordSchema,
   updateMeSchema,
   getListUserTypeQuery,
-  getListUserSchema
+  getListUserSchema,
+  registerGoogleReqBodyType,
+  registerGoogleSchema
 } from '~/requestSchemas/users.request'
 import { userSchema } from '~/models/users.model'
 import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from '~/responses/error.response'
@@ -139,13 +141,17 @@ class UserService {
     }
   }
 
-  static register = async (payload: registerReqBodyType) => {
-    const parseResult = await registerSchema.body.safeParseAsync(payload)
+  static register = async (payload: registerReqBodyType | registerGoogleReqBodyType, isGoogle = false) => {
+    let parseResult
+    if (isGoogle) {
+      parseResult = await registerGoogleSchema.safeParseAsync(payload)
+    } else {
+      parseResult = await registerSchema.body.safeParseAsync(payload)
+    }
     if (!parseResult.success) {
       throw new BadRequestError('Invalid registration data: ' + JSON.stringify(parseResult.error.flatten().fieldErrors))
     }
     const validatedData = parseResult.data
-
     // Kiểm tra email đã tồn tại chưa
     const holderUser = await databaseService.users.findOne({ email: validatedData.email })
     if (holderUser) throw new BadRequestError('Email already registered !')
@@ -252,8 +258,7 @@ class UserService {
       }
 
       const foundUser = await databaseService.users.findOne({ email: userInfo.email })
-      let accessToken, refreshToken, userId
-
+      let accessToken, refreshToken, userId, role
       // Nếu tài khoản đã được tạo trước đấy rồi
       if (foundUser?.email) {
         ;[accessToken, refreshToken] = await Promise.all([
@@ -286,6 +291,7 @@ class UserService {
         })
         userId = foundUser._id
       }
+
       // Nếu tài khoản chưa được tạo trước đấy => Tạo tài khoản mới
       else {
         const password = generateRandomPassword()
@@ -299,12 +305,13 @@ class UserService {
           avatar: userInfo.picture,
           authProvider: UserAuthProvider.Google
         }
-        const metadata = await this.register(payload)
+        const metadata = await this.register(payload, true)
         accessToken = metadata?.tokens.accessToken
         refreshToken = metadata?.tokens.refreshToken
         userId = metadata?.user._id
+        role = metadata?.user.role
       }
-      return { userId, accessToken, refreshToken }
+      return { userId, accessToken, refreshToken, role }
     } catch (error) {
       throw new UnauthorizedError(`Google OAuth failed`)
     }

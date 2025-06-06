@@ -17,19 +17,56 @@ import {
   updateTicketTypeBody
 } from '~/requestSchemas/tickets.request'
 import { ticketSchema } from '~/models/tickets.model'
+import { FlightType } from '~/models/flights.model'
 class TicketsServices {
-  private static async checkFlightAndBookingExist(bookingId: ObjectId, flightId: ObjectId) {
+  private static getTotalCapacity(flight: FlightType) {
+    return flight.fareOptions.reduce((sum, option) => sum + (option.availableSeats ?? 0), 0)
+  }
+
+  private static async assignSeatNumber(flightId: ObjectId): Promise<string> {
+    const flight = await databaseService.flights.findOne({ _id: flightId })
+    if (!flight) throw new BadRequestError('Flight not found')
+
+    const totalCapacity = this.getTotalCapacity(flight)
+    const bookedSeats = await databaseService.tickets
+      .find({
+        flightId,
+        status: { $ne: TicketStatus.Cancelled }
+      })
+      .toArray()
+
+    const bookedNumbers = bookedSeats.map((t) => t.seatNumber)
+    for (let i = 1; i <= totalCapacity; i++) {
+      const candidate = `AUTO-${i}`
+      if (!bookedNumbers.includes(candidate)) {
+        return candidate
+      }
+    }
+
+    throw new BadRequestError('No available seats')
+  }
+
+  private static async checkBookingAndGoFlightExist(bookingId: ObjectId, flightId: ObjectId) {
     const [booking, flight] = await Promise.all([
       databaseService.bookings.findOne({ _id: bookingId }),
       databaseService.flights.findOne({ _id: flightId })
     ])
+
     if (!booking) throw new BadRequestError('Booking not found')
-    if (!flight) throw new BadRequestError('Flight not found')
+    if (!flight) throw new BadRequestError('Go Flight not found')
+
     return { booking, flight }
   }
 
+  private static async checkReturnFlightExist(returnFlightId?: ObjectId) {
+    if (!returnFlightId) return null
+    const returnFlight = await databaseService.flights.findOne({ _id: returnFlightId })
+    if (!returnFlight) throw new BadRequestError('Return Flight not found')
+    return returnFlight
+  }
+
   private static async validateSeatAvailability(flightId: ObjectId, seatNumbers: string[]) {
-    const existing = await databaseService.tickets
+    const existingTickets = await databaseService.tickets
       .find({
         flightId,
         seatNumber: { $in: seatNumbers },
@@ -37,51 +74,82 @@ class TicketsServices {
       })
       .toArray()
 
-    if (existing.length > 0) {
-      const booked = existing.map((t) => t.seatNumber).join(', ')
-      throw new BadRequestError(`Seats already booked: ${booked}`)
+    if (existingTickets.length > 0) {
+      const bookedSeats = existingTickets.map((t) => t.seatNumber).join(', ')
+      throw new BadRequestError(`Seats already booked: ${bookedSeats}`)
     }
   }
 
   static async createTicket(payload: createTicketTypeBody) {
-    await this.checkFlightAndBookingExist(payload.bookingId, payload.flightId)
-    await this.validateSeatAvailability(payload.flightId, [payload.seatNumber])
+    const { booking, flight } = await this.checkBookingAndGoFlightExist(payload.bookingId, payload.flightId)
 
-    const ticket = ticketSchema.parse(payload)
-    const result = await databaseService.tickets.insertOne(ticket)
-    return result
-  }
-
-  static async createMultipleTickets(payload: createMultipleTicketsTypeBody) {
-    const { flight } = await this.checkFlightAndBookingExist(payload.bookingId, payload.flightId)
-
-    const seatNumbers = payload.tickets.map((t) => t.seatNumber)
-    const uniqueSeatNumbers = new Set(seatNumbers)
-    if (uniqueSeatNumbers.size !== seatNumbers.length) throw new BadRequestError('Duplicate seat numbers in request')
-
-    await this.validateSeatAvailability(payload.flightId, seatNumbers)
-
+    const totalCapacity = this.getTotalCapacity(flight)
     const totalBooked = await databaseService.tickets.countDocuments({
       flightId: payload.flightId,
       status: { $ne: TicketStatus.Cancelled }
     })
-    if (totalBooked + payload.tickets.length > flight.availableSeats)
+    if (totalCapacity - totalBooked <= 0) throw new BadRequestError('No available seats')
+
+    const seatNumber = await this.assignSeatNumber(payload.flightId)
+    const ticket = ticketSchema.parse({
+      ...payload,
+      seatNumber
+    })
+    const result = await databaseService.tickets.insertOne(ticket)
+
+    return result
+  }
+
+  static async createMultipleTickets(payload: createMultipleTicketsTypeBody) {
+    const { booking, flight } = await this.checkBookingAndGoFlightExist(payload.bookingId, payload.flightId)
+
+    if (booking.returnFlightId) {
+      await this.checkReturnFlightExist(booking.returnFlightId)
+    }
+
+    // Validate số lượng ghế còn lại
+    const totalCapacity = this.getTotalCapacity(flight)
+    const totalBooked = await databaseService.tickets.countDocuments({
+      flightId: payload.flightId,
+      status: { $ne: TicketStatus.Cancelled }
+    })
+    const remainingSeats = totalCapacity - totalBooked
+    if (payload.tickets.length > remainingSeats) {
       throw new BadRequestError(
-        `Not enough available seats (Available: ${flight.availableSeats - totalBooked}, Requested: ${payload.tickets.length})`
+        `Not enough available seats (Available: ${remainingSeats}, Requested: ${payload.tickets.length})`
       )
+    }
 
-    const invalidTickets = payload.tickets.filter((t) => t.price <= 0)
-    if (invalidTickets.length > 0) throw new BadRequestError('Invalid ticket price: Price must be greater than 0')
-
-    const tickets = payload.tickets.map((t) =>
-      ticketSchema.parse({
-        ...t,
-        seatClass: payload.seatClass,
-        userId: payload.userId,
-        bookingId: payload.bookingId,
-        flightId: payload.flightId
+    // Tự động gán ghế cho từng vé
+    const bookedSeats = await databaseService.tickets
+      .find({
+        flightId: payload.flightId,
+        status: { $ne: TicketStatus.Cancelled }
       })
-    )
+      .toArray()
+    const bookedNumbers = bookedSeats.map((t) => t.seatNumber)
+
+    const tickets = []
+    let seatIndex = 1
+    for (const t of payload.tickets) {
+      while (bookedNumbers.includes(`AUTO-${seatIndex}`)) {
+        seatIndex++
+      }
+      const seatNumber = `AUTO-${seatIndex}`
+      bookedNumbers.push(seatNumber)
+
+      tickets.push(
+        ticketSchema.parse({
+          ...t,
+          seatNumber,
+          seatClass: payload.seatClass,
+          userId: payload.userId,
+          bookingId: payload.bookingId,
+          flightId: payload.flightId
+        })
+      )
+      seatIndex++
+    }
 
     const result = await databaseService.tickets.insertMany(tickets)
     return { insertedCount: result.insertedCount, tickets }
@@ -288,7 +356,7 @@ class TicketsServices {
       .toArray()
 
     const bookedSeatNumbers = bookedSeats.map((ticket) => ticket.seatNumber)
-    return flight.availableSeats - bookedSeatNumbers.length
+    return this.getTotalCapacity(flight) - bookedSeatNumbers.length
   }
 
   //Lấy danh sách ghế đã đặt:

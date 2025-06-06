@@ -58,7 +58,7 @@ export default function ManagePaymentsPage() {
                     <Button
                         variant="ghost"
                         onClick={() => router.push('/manage')}
-                        className="px-2 text-sm"
+                        className="px-2 text-sm cursor-pointer"
                     >
                         ← Quay lại
                     </Button>
@@ -168,6 +168,7 @@ export default function ManagePaymentsPage() {
                                                               payment.status ===
                                                               target
                                                           }
+                                                          className="cursor-pointer"
                                                           onClick={() =>
                                                               updateStatusMutation.mutate(
                                                                   {
@@ -232,6 +233,7 @@ export default function ManagePaymentsPage() {
                                         <PaginationLink
                                             isActive={page === i + 1}
                                             onClick={() => setPage(i + 1)}
+                                            className="cursor-pointer"
                                         >
                                             {i + 1}
                                         </PaginationLink>

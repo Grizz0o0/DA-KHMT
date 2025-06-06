@@ -2,7 +2,6 @@ import { BadRequestError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
 import { bookingSchema } from '~/models/bookings.model'
 import {
-  createBookingSchema,
   CreateBookingTypeBody,
   UpdateBookingTypeBody,
   searchBookingsSchema,
@@ -16,24 +15,63 @@ import { ObjectId } from 'mongodb'
 import { Sort } from 'mongodb'
 import { PaymentStatus } from '~/constants/payments'
 import { createPagination } from '~/responses/success.response'
+import { convertToObjectId } from '~/utils/mongo.utils'
 class BookingsService {
   static async createBooking(payload: CreateBookingTypeBody) {
     const user = await databaseService.users.findOne({ _id: payload.userId })
     if (!user) throw new BadRequestError('Người dùng không tồn tại')
 
-    const flight = await databaseService.flights.findOne({ _id: payload.flightId })
-    if (!flight) throw new BadRequestError('Chuyến bay không tồn tại')
-    if (flight.availableSeats < payload.quantity) throw new BadRequestError('Số ghế còn lại không đủ')
+    // Fetch go flight
+    const goFlight = await databaseService.flights.findOne({ _id: payload.goFlightId })
+    if (!goFlight) throw new BadRequestError('Chuyến bay chiều đi không tồn tại')
 
+    const goFareOption = goFlight.fareOptions.find((option) => option.class === payload.seatClassGo)
+    if (!goFareOption) throw new BadRequestError('Hạng ghế chiều đi không tồn tại')
+    if (goFareOption.availableSeats < payload.quantity) throw new BadRequestError('Số ghế chiều đi không đủ')
+
+    // Fetch return flight (optional)
+    let returnFareOption = null
+    if (payload.returnFlightId && payload.seatClassReturn) {
+      const returnFlight = await databaseService.flights.findOne({ _id: payload.returnFlightId })
+      if (!returnFlight) throw new BadRequestError('Chuyến bay chiều về không tồn tại')
+
+      returnFareOption = returnFlight.fareOptions.find((option) => option.class === payload.seatClassReturn)
+      if (!returnFareOption) throw new BadRequestError('Hạng ghế chiều về không tồn tại')
+      if (returnFareOption.availableSeats < payload.quantity) throw new BadRequestError('Số ghế chiều về không đủ')
+    }
+
+    // Insert Booking
     const parsedBooking = bookingSchema.parse(payload)
     const booking = await databaseService.bookings.insertOne(parsedBooking)
     if (!booking.insertedId) throw new BadRequestError('Tạo booking thất bại')
 
-    const updateResult = await databaseService.flights.updateOne(
-      { _id: payload.flightId, availableSeats: { $gte: payload.quantity } },
-      { $inc: { availableSeats: -payload.quantity } }
+    // Update seats GO flight
+    const updateGoFlight = await databaseService.flights.updateOne(
+      {
+        _id: payload.goFlightId,
+        'fareOptions.class': payload.seatClassGo,
+        'fareOptions.availableSeats': { $gte: payload.quantity }
+      },
+      {
+        $inc: { 'fareOptions.$.availableSeats': -payload.quantity }
+      }
     )
-    if (updateResult.modifiedCount === 0) throw new BadRequestError('Không thể cập nhật số ghế, vui lòng thử lại')
+    if (updateGoFlight.modifiedCount === 0) throw new BadRequestError('Không thể cập nhật số ghế chiều đi')
+
+    // Update seats RETURN flight
+    if (payload.returnFlightId && payload.seatClassReturn) {
+      const updateReturnFlight = await databaseService.flights.updateOne(
+        {
+          _id: payload.returnFlightId,
+          'fareOptions.class': payload.seatClassReturn,
+          'fareOptions.availableSeats': { $gte: payload.quantity }
+        },
+        {
+          $inc: { 'fareOptions.$.availableSeats': -payload.quantity }
+        }
+      )
+      if (updateReturnFlight.modifiedCount === 0) throw new BadRequestError('Không thể cập nhật số ghế chiều về')
+    }
 
     const createdBooking = await databaseService.bookings.findOne({ _id: booking.insertedId })
     return omitInfoData({ fields: ['createdAt', 'updatedAt'], object: createdBooking })
@@ -69,19 +107,37 @@ class BookingsService {
     const booking = await databaseService.bookings.findOne({ _id: bookingId })
     if (!booking) throw new BadRequestError('Booking không tồn tại')
 
-    // Nếu booking đã xác nhận hoặc đã hủy, không cho phép xóa
-    if (booking.status === BookingStatus.Confirmed || booking.status === BookingStatus.Cancelled)
+    // Nếu booking đã confirmed hoặc cancelled, không cho phép xóa
+    if (booking.status === BookingStatus.Confirmed || booking.status === BookingStatus.Cancelled) {
       throw new BadRequestError('Không thể xóa booking đã xác nhận hoặc đã hủy')
+    }
 
-    // Nếu đã thanh toán, không cho phép xóa
-    if (booking.paymentStatus === PaymentStatus.SUCCESS)
+    // Nếu đã thanh toán thành công, không cho phép xóa
+    if (booking.paymentStatus === PaymentStatus.SUCCESS) {
       throw new BadRequestError('Không thể xóa booking đã thanh toán')
+    }
 
     const result = await databaseService.bookings.deleteOne({ _id: bookingId })
-    if (result.deletedCount === 0) throw new BadRequestError('Xóa booking thất bại')
+    if (result.deletedCount === 0) {
+      throw new BadRequestError('Xóa booking thất bại')
+    }
 
-    // Hoàn lại ghế cho chuyến bay
-    await databaseService.flights.updateOne({ _id: booking.flightId }, { $inc: { availableSeats: booking.quantity } })
+    // Hoàn lại ghế cho chuyến bay chiều đi
+    if (booking.goFlightId) {
+      await databaseService.flights.updateOne(
+        { _id: booking.goFlightId },
+        { $inc: { availableSeats: booking.quantity } }
+      )
+    }
+
+    // Hoàn lại ghế cho chuyến bay chiều về (nếu có)
+    if (booking.returnFlightId) {
+      await databaseService.flights.updateOne(
+        { _id: booking.returnFlightId },
+        { $inc: { availableSeats: booking.quantity } }
+      )
+    }
+
     return { message: 'Xóa booking thành công' }
   }
 
@@ -143,19 +199,12 @@ class BookingsService {
     order = 'asc',
     select = ['status', 'seatClass', 'quantity', 'totalPrice', 'bookingTime', 'paymentStatus', 'createdAt']
   }: getListBookingTypeQuery) {
-    const validatedQuery = getListBookingSchema.query.parse({
-      limit,
-      page,
-      order,
-      select
-    })
-
-    const skip = ((validatedQuery.page ?? 1) - 1) * (validatedQuery.limit ?? 10)
+    const skip = ((page ?? 1) - 1) * (limit ?? 10)
 
     const sortField = 'totalPrice'
-    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: validatedQuery.order === 'asc' ? 1 : -1 }
+    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: order === 'asc' ? 1 : -1 }
 
-    const projection = getSelectData(validatedQuery.select ?? [])
+    const projection = getSelectData(select ?? [])
     const totalItems = await databaseService.bookings.countDocuments({})
 
     const bookings = await databaseService.bookings
@@ -163,26 +212,75 @@ class BookingsService {
       .sort(sortBy)
       .skip(skip)
       .project(projection)
-      .limit(validatedQuery.limit ?? 10)
+      .limit(limit ?? 10)
       .toArray()
 
-    const pagination = createPagination(validatedQuery.page ?? 1, validatedQuery.limit ?? 10, totalItems)
+    const pagination = createPagination(page ?? 1, limit ?? 10, totalItems)
 
     return { bookings, pagination }
+  }
+
+  static async getBookingByUserId(
+    userId: string,
+    {
+      limit = 10,
+      page = 1,
+      order = 'asc',
+      select = ['status', 'seatClass', 'quantity', 'totalPrice', 'bookingTime', 'paymentStatus', 'createdAt']
+    }
+  ) {
+    const skip = ((page ?? 1) - 1) * (limit ?? 10)
+
+    const sortField = 'totalPrice'
+    const sortBy: { [key: string]: 1 | -1 } = { [sortField]: order === 'asc' ? 1 : -1 }
+
+    const projection = getSelectData(select ?? [])
+
+    const filter = { userId: convertToObjectId(userId) }
+    const totalItems = await databaseService.bookings.countDocuments(filter)
+
+    const bookings = await databaseService.bookings
+      .find(filter)
+      .sort(sortBy)
+      .skip(skip)
+      .project(projection)
+      .limit(limit ?? 10)
+      .toArray()
+
+    const pagination = createPagination(page ?? 1, limit ?? 10, totalItems)
+
+    return {
+      bookings: bookings.map((booking) => omitInfoData({ fields: ['createdAt', 'updatedAt'], object: booking })),
+      pagination
+    }
   }
 
   static async getBookingById(bookingId: ObjectId) {
     const booking = await databaseService.bookings.findOne({ _id: bookingId })
     if (!booking) throw new BadRequestError('Booking không tồn tại')
 
-    // Lấy thông tin user và flight
-    const [user, flight] = await Promise.all([
-      databaseService.users.findOne({ _id: booking.userId }),
-      databaseService.flights.findOne({ _id: booking.flightId })
-    ])
+    // Lấy thông tin user
+    const userPromise = databaseService.users.findOne({ _id: booking.userId })
+
+    // Lấy thông tin flight chiều đi
+    const goFlightPromise = booking.goFlightId
+      ? databaseService.flights.findOne({ _id: booking.goFlightId })
+      : Promise.resolve(null)
+
+    // Lấy thông tin flight chiều về (nếu có)
+    const returnFlightPromise = booking.returnFlightId
+      ? databaseService.flights.findOne({ _id: booking.returnFlightId })
+      : Promise.resolve(null)
+
+    const [user, goFlight, returnFlight] = await Promise.all([userPromise, goFlightPromise, returnFlightPromise])
 
     return {
-      booking: { ...omitInfoData({ fields: ['createdAt', 'updatedAt'], object: booking }) },
+      booking: {
+        ...omitInfoData({
+          fields: ['createdAt', 'updatedAt'],
+          object: booking
+        })
+      },
       user: user
         ? omitInfoData({
             fields: [
@@ -198,7 +296,13 @@ class BookingsService {
             object: user
           })
         : null,
-      flight: flight ? omitInfoData({ fields: ['createdAt', 'updatedAt'], object: flight }) : null
+      goFlight: goFlight ? omitInfoData({ fields: ['createdAt', 'updatedAt'], object: goFlight }) : null,
+      returnFlight: returnFlight
+        ? omitInfoData({
+            fields: ['createdAt', 'updatedAt'],
+            object: returnFlight
+          })
+        : null
     }
   }
 

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,28 +20,33 @@ import {
 
 import { FormSelectField } from '@/components/form/FormSelectField';
 import {
-    CreateTicketTypeBody,
-    CreateTicketSchema,
+    CreateTicketFormType,
+    CreateTicketSchemaWithoutUser,
 } from '@/schemaValidations/tickets.schema';
+
 import { useFlights } from '@/queries/useFlight';
 import { useCreateTicketMutation } from '@/queries/useTicket';
 import { TicketStatus } from '@/constants/tickets';
+import { AircraftClass } from '@/constants/aircrafts';
 import { UserGender } from '@/constants/users';
 
 export default function CreateTicketPage() {
     const router = useRouter();
 
-    const form = useForm<CreateTicketTypeBody>({
-        resolver: zodResolver(CreateTicketSchema),
+    const form = useForm<CreateTicketFormType>({
+        resolver: zodResolver(CreateTicketSchemaWithoutUser),
         defaultValues: {
+            bookingId: '',
+            flightId: '',
             seatNumber: '',
+            seatClass: AircraftClass.Economy,
             price: 0,
             status: TicketStatus.Unused,
             passenger: {
                 name: '',
                 email: '',
                 phone: '',
-                dateOfBirth: '',
+                dateOfBirth: undefined,
                 gender: UserGender.Other,
                 nationality: '',
                 passportNumber: '',
@@ -54,17 +60,32 @@ export default function CreateTicketPage() {
 
     const flights = flightData?.payload?.metadata.flights || [];
 
-    const onSubmit = (data: CreateTicketTypeBody) => {
-        createTicket(data, {
-            onSuccess: () => {
-                toast.success('Tạo vé thành công');
-                router.push('/manage/tickets');
-            },
-            onError: (err: any) => {
-                console.error(err);
-                toast.error('Tạo vé thất bại');
-            },
+    const onSubmit = (data: CreateTicketFormType) => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            toast.error('Không tìm thấy thông tin người dùng');
+            return;
+        }
+        console.log({
+            ...data,
+            userId,
         });
+        createTicket(
+            {
+                ...data,
+                userId,
+            },
+            {
+                onSuccess: () => {
+                    toast.success('Tạo vé thành công');
+                    router.push('/manage/tickets');
+                },
+                onError: (err) => {
+                    console.error(err);
+                    toast.error('Tạo vé thất bại');
+                },
+            }
+        );
     };
 
     return (
@@ -76,7 +97,9 @@ export default function CreateTicketPage() {
                 <CardContent>
                     <Form {...form}>
                         <form
-                            onSubmit={form.handleSubmit(onSubmit)}
+                            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+                                console.log('❌ Form không hợp lệ:', errors);
+                            })}
                             className="space-y-6"
                         >
                             {/* CHUYẾN BAY */}
@@ -93,7 +116,25 @@ export default function CreateTicketPage() {
                                 }))}
                             />
 
-                            {/* SỐ GHẾ VÀ GIÁ */}
+                            {/* BOOKING ID */}
+                            <FormField
+                                control={form.control}
+                                name="bookingId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Mã Booking</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Booking ID"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* SỐ GHẾ + GIÁ */}
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
@@ -120,7 +161,6 @@ export default function CreateTicketPage() {
                                             <FormControl>
                                                 <Input
                                                     type="number"
-                                                    placeholder="1000000"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -130,15 +170,45 @@ export default function CreateTicketPage() {
                                 />
                             </div>
 
+                            {/* HẠNG GHẾ */}
+                            <FormSelectField
+                                name="seatClass"
+                                control={form.control}
+                                label="Hạng ghế"
+                                options={[
+                                    {
+                                        label: 'Phổ thông',
+                                        value: AircraftClass.Economy,
+                                    },
+                                    {
+                                        label: 'Thương gia',
+                                        value: AircraftClass.Business,
+                                    },
+                                    {
+                                        label: 'Hạng nhất',
+                                        value: AircraftClass.FirstClass,
+                                    },
+                                ]}
+                            />
+
                             {/* TRẠNG THÁI */}
                             <FormSelectField
                                 name="status"
                                 control={form.control}
                                 label="Trạng thái"
                                 options={[
-                                    { label: 'Chưa dùng', value: 'unused' },
-                                    { label: 'Đã dùng', value: 'used' },
-                                    { label: 'Đã hủy', value: 'cancelled' },
+                                    {
+                                        label: 'Chưa dùng',
+                                        value: TicketStatus.Unused,
+                                    },
+                                    {
+                                        label: 'Đã dùng',
+                                        value: TicketStatus.Used,
+                                    },
+                                    {
+                                        label: 'Đã hủy',
+                                        value: TicketStatus.Cancelled,
+                                    },
                                 ]}
                             />
 
@@ -203,7 +273,26 @@ export default function CreateTicketPage() {
                                         <FormItem>
                                             <FormLabel>Ngày sinh</FormLabel>
                                             <FormControl>
-                                                <Input type="date" {...field} />
+                                                <Input
+                                                    type="date"
+                                                    value={
+                                                        field.value
+                                                            ? format(
+                                                                  field.value,
+                                                                  'yyyy-MM-dd'
+                                                              )
+                                                            : ''
+                                                    }
+                                                    onChange={(e) =>
+                                                        field.onChange(
+                                                            e.target.value
+                                                                ? new Date(
+                                                                      e.target.value
+                                                                  )
+                                                                : undefined
+                                                        )
+                                                    }
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -295,6 +384,7 @@ export default function CreateTicketPage() {
                                 <Button
                                     variant="outline"
                                     type="button"
+                                    className="cursor-pointer"
                                     onClick={() => router.back()}
                                 >
                                     Hủy

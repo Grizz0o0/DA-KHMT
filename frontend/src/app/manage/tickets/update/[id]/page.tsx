@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,7 +44,7 @@ export default function UpdateTicketPage() {
                 name: '',
                 email: '',
                 phone: '',
-                dateOfBirth: '',
+                dateOfBirth: undefined,
                 gender: UserGender.Other,
                 nationality: '',
                 passportNumber: '',
@@ -59,19 +60,23 @@ export default function UpdateTicketPage() {
 
     useEffect(() => {
         const ticket = ticketDetail?.payload?.metadata?.ticket;
+        if (!ticketDetail) return;
         if (ticket) {
             form.reset({
                 ...ticket,
                 seatNumber: ticket.seatNumber,
                 price: ticket.price,
-                status: ticket.status as TicketStatus,
-                seatClass: ticket.seatClass as AircraftClass,
+                status: (ticket.status as TicketStatus) || TicketStatus.Unused,
+                seatClass:
+                    (ticket.seatClass as AircraftClass) ||
+                    AircraftClass.Economy,
                 passenger: {
                     name: ticket.passenger?.name || '',
                     email: ticket.passenger?.email || '',
                     phone: ticket.passenger?.phone || '',
-                    dateOfBirth:
-                        ticket.passenger?.dateOfBirth?.slice(0, 10) || '',
+                    dateOfBirth: ticket.passenger?.dateOfBirth
+                        ? new Date(ticket.passenger.dateOfBirth)
+                        : new Date(),
                     gender: ticket.passenger?.gender || UserGender.Other,
                     nationality: ticket.passenger?.nationality || '',
                     passportNumber: ticket.passenger?.passportNumber || '',
@@ -79,7 +84,7 @@ export default function UpdateTicketPage() {
                 },
             });
         }
-    }, [ticketDetail, form.reset]);
+    }, [ticketDetail]);
     const onSubmit = (data: UpdateTicketTypeBody) => {
         updateMutation.mutate(
             {
@@ -153,8 +158,10 @@ export default function UpdateTicketPage() {
 
                             {/* Trạng thái */}
                             <FormSelectField
+                                key={form.watch('status')}
                                 name="status"
                                 control={form.control}
+                                placeholder="Chọn trạng thái"
                                 label="Trạng thái"
                                 options={[
                                     {
@@ -173,26 +180,33 @@ export default function UpdateTicketPage() {
                             />
 
                             {/* Loại ghế */}
-                            <FormSelectField
+                            <FormField
+                                key={form.getValues('seatClass')}
                                 name="seatClass"
                                 control={form.control}
-                                label="Hạng ghế"
-                                options={[
-                                    {
-                                        label: 'Phổ thông',
-                                        value: AircraftClass.Economy,
-                                    },
-                                    {
-                                        label: 'Thương gia',
-                                        value: AircraftClass.Business,
-                                    },
-                                    {
-                                        label: 'Hạng nhất',
-                                        value: AircraftClass.FirstClass,
-                                    },
-                                ]}
+                                render={() => (
+                                    <FormSelectField
+                                        name="seatClass"
+                                        label="Hạng ghế"
+                                        placeholder="Chọn hạng ghế"
+                                        control={form.control}
+                                        options={[
+                                            {
+                                                label: 'Phổ thông',
+                                                value: AircraftClass.Economy,
+                                            },
+                                            {
+                                                label: 'Thương gia',
+                                                value: AircraftClass.Business,
+                                            },
+                                            {
+                                                label: 'Hạng nhất',
+                                                value: AircraftClass.FirstClass,
+                                            },
+                                        ]}
+                                    />
+                                )}
                             />
-
                             {/* Hành khách */}
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
@@ -246,14 +260,36 @@ export default function UpdateTicketPage() {
                                         </FormItem>
                                     )}
                                 />
+
                                 <FormField
-                                    control={form.control}
                                     name="passenger.dateOfBirth"
+                                    control={form.control}
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Ngày sinh</FormLabel>
                                             <FormControl>
-                                                <Input type="date" {...field} />
+                                                <Input
+                                                    type="date"
+                                                    value={
+                                                        field.value
+                                                            ? format(
+                                                                  new Date(
+                                                                      field.value
+                                                                  ),
+                                                                  'yyyy-MM-dd'
+                                                              )
+                                                            : ''
+                                                    }
+                                                    onChange={(e) =>
+                                                        field.onChange(
+                                                            e.target.value
+                                                                ? new Date(
+                                                                      e.target.value
+                                                                  )
+                                                                : undefined
+                                                        )
+                                                    }
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -353,6 +389,7 @@ export default function UpdateTicketPage() {
                                 <Button
                                     type="button"
                                     variant="outline"
+                                    className="cursor-pointer"
                                     onClick={() =>
                                         router.replace('/manage/tickets')
                                     }

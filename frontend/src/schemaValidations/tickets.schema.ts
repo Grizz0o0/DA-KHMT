@@ -36,28 +36,48 @@ export const PaginationSchema = z.object({
 });
 
 // Schema for passenger information
-const PassengerSchema = z.object({
+export const PassengerSchema = z.object({
     name: z.string().min(1, 'Passenger name is required'),
     email: z.string().email('Invalid email format'),
     phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-    dateOfBirth: z.string().datetime(),
+    dateOfBirth: z.coerce
+        .string()
+        .datetime()
+        .refine((val) => new Date(val) <= new Date(), {
+            message: 'Ngày sinh không được ở tương lai',
+        }),
     gender: z.nativeEnum(UserGender),
     nationality: z.string().min(1, 'Nationality is required'),
     passportNumber: z.string(),
     idNumber: z.string(),
 });
+export type PassengerType = z.infer<typeof PassengerSchema>;
+
+export const passengerFormSchema = z.object({
+    passengers: z.array(PassengerSchema),
+});
+
+export type PassengerFormType = z.infer<typeof passengerFormSchema>;
 
 // Schema for creating a ticket
-export const CreateTicketSchema = z.object({
-    userId: objectIdStringSchema,
+export const CreateTicketSchemaWithoutUser = z.object({
     bookingId: objectIdStringSchema,
     flightId: objectIdStringSchema,
     seatNumber: z.string().min(1, 'Seat number is required'),
     seatClass: z.nativeEnum(AircraftClass),
     passenger: PassengerSchema,
-    price: z.number().min(0, 'Price must be non-negative'),
+    price: z.coerce.number().min(0, 'Price must be non-negative'),
     status: z.nativeEnum(TicketStatus).default(TicketStatus.Unused).optional(),
 });
+
+export type CreateTicketFormType = z.infer<
+    typeof CreateTicketSchemaWithoutUser
+>;
+
+export const CreateTicketSchema = CreateTicketSchemaWithoutUser.extend({
+    userId: objectIdStringSchema,
+});
+
 export type CreateTicketTypeBody = z.infer<typeof CreateTicketSchema>;
 
 // Schema for creating multiple tickets
@@ -70,8 +90,11 @@ export const CreateMultipleTicketsSchema = z.object({
         z.object({
             seatNumber: z.string().min(1, 'Seat number is required'),
             passenger: PassengerSchema,
-            price: z.number().min(0, 'Price must be non-negative'),
-            status: z.nativeEnum(TicketStatus).default(TicketStatus.Unused),
+            price: z.coerce.number().min(0, 'Price must be non-negative'),
+            status: z
+                .nativeEnum(TicketStatus)
+                .default(TicketStatus.Unused)
+                .optional(),
         })
     ),
 });
@@ -93,7 +116,7 @@ export const UpdateTicketSchema = z.object({
     seatClass: z.nativeEnum(AircraftClass).optional(),
     seatNumber: z.string().min(1, 'Seat number is required').optional(),
     passenger: PassengerSchema.optional(),
-    price: z.number().min(0, 'Price must be non-negative').optional(),
+    price: z.coerce.number().min(0, 'Price must be non-negative').optional(),
     status: z.nativeEnum(TicketStatus).default(TicketStatus.Unused).optional(),
 });
 export type UpdateTicketTypeBody = z.infer<typeof UpdateTicketSchema>;
@@ -155,16 +178,7 @@ export const TicketDetailSchema = z.object({
     flightId: objectIdStringSchema,
     seatClass: z.nativeEnum(AircraftClass),
     seatNumber: z.string(),
-    passenger: z.object({
-        name: z.string(),
-        email: z.string(),
-        phone: z.string(),
-        dateOfBirth: z.string(),
-        gender: z.nativeEnum(UserGender),
-        nationality: z.string(),
-        passportNumber: z.string(),
-        idNumber: z.string(),
-    }),
+    passenger: PassengerSchema,
     price: z.number(),
     status: z.nativeEnum(TicketStatus).default(TicketStatus.Unused),
 });

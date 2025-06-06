@@ -58,7 +58,11 @@ export default function CreateAircraftPage() {
     return (
         <div className="max-w-xl mx-auto p-6">
             <div className="flex items-center gap-3 mb-4">
-                <Button variant="ghost" onClick={() => router.back()}>
+                <Button
+                    className="cursor-pointer"
+                    variant="ghost"
+                    onClick={() => router.back()}
+                >
                     <ArrowLeft className="w-4 h-4 mr-1" /> Quay lại
                 </Button>
                 <h1 className="text-2xl font-bold">Thêm máy bay</h1>
@@ -172,7 +176,7 @@ export default function CreateAircraftPage() {
                     <Button
                         type="submit"
                         disabled={mutation.isPending}
-                        className="w-full"
+                        className="w-full cursor-pointer"
                     >
                         {mutation.isPending && (
                             <Loader2 className="w-4 h-4 animate-spin mr-2" />

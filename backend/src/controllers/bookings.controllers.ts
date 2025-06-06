@@ -99,6 +99,19 @@ class BookingsController {
     }
   }
 
+  getBookingByUserId = async (req: Request<any, any, GetBookingByIdTypeParams>, res: Response, next: NextFunction) => {
+    try {
+      const { page, limit, order, select } = getListBookingSchema.query.parse(req.query)
+      const result = await BookingsService.getBookingByUserId(req.user?.userId, { page, limit, order, select })
+      new OK({
+        message: 'Lấy lịch sử đặt vé thành công',
+        metadata: result
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
   getBookingById = async (req: Request<any, any, GetBookingByIdTypeParams>, res: Response, next: NextFunction) => {
     try {
       const { bookingId } = getBookingByIdSchema.params.parse(req.params)

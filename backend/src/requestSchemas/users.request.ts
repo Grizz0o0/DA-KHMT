@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { HEADER } from '~/constants/auth'
-import { UserGender } from '~/constants/users'
+import { UserAuthProvider, UserGender, UserVerifyStatus } from '~/constants/users'
 import databaseService from '~/services/database.services'
 
 const strongPasswordSchema = z
@@ -45,17 +45,7 @@ export const registerSchema = {
         .trim()
         .min(1, 'Tên người dùng phải có từ 1 đến 255 ký tự')
         .max(255),
-      email: z
-        .string({ required_error: 'Email không được để trống' })
-        .trim()
-        .email('Email không hợp lệ')
-        .refine(
-          async (email) => {
-            const isExist = await databaseService.users.findOne({ email })
-            return !isExist
-          },
-          { message: 'Email đã tồn tại' }
-        ),
+      email: z.string({ required_error: 'Email không được để trống' }).trim().email('Email không hợp lệ'),
       phoneNumber: z
         .string({ required_error: 'Số điện thoại không được để trống' })
         .trim()
@@ -69,6 +59,16 @@ export const registerSchema = {
     })
 }
 export type registerReqBodyType = z.infer<typeof registerSchema.body>
+
+export const registerGoogleSchema = z.object({
+  username: z.string().min(1).max(255),
+  email: z.string().trim().email('Email không hợp lệ'),
+  password: strongPasswordSchema,
+  avatar: z.string().optional(),
+  authProvider: z.enum([UserAuthProvider.Google, UserAuthProvider.Facebook]), // Enum từ constants
+  verify: z.nativeEnum(UserVerifyStatus)
+})
+export type registerGoogleReqBodyType = z.infer<typeof registerGoogleSchema>
 
 export const forgotPasswordSchema = {
   body: z.object({

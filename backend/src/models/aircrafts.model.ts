@@ -9,11 +9,20 @@ const seatClassConfigSchema = z.object({
 })
 
 // Định nghĩa schema cho seatConfiguration
-const seatConfigurationSchema = z.object({
-  economy: seatClassConfigSchema.optional(),
-  business: seatClassConfigSchema.optional(),
-  firstClass: seatClassConfigSchema.optional()
-})
+const seatConfigurationSchema = z
+  .object({
+    economy: seatClassConfigSchema.optional(),
+    business: seatClassConfigSchema.optional(),
+    firstClass: seatClassConfigSchema.optional()
+  })
+  .refine(
+    (data) => {
+      return data.economy || data.business || data.firstClass
+    },
+    {
+      message: 'Phải có ít nhất một hạng ghế trong cấu hình'
+    }
+  )
 
 const objectIdSchema = z
   .any()

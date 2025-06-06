@@ -70,6 +70,13 @@ const StrongPasswordSchema = z
         }
     );
 
+export const LoginOAuthSchemaBody = z.object({
+    accessToken: z.string(),
+    refreshToken: z.string(),
+    userId: z.string(),
+    role: z.nativeEnum(UserRole),
+});
+export type LoginOAuthReqBodyType = z.infer<typeof LoginOAuthSchemaBody>;
 export const LoginSchemaBody = z.object({
     email: z
         .string({ required_error: 'Email không được để trống' })

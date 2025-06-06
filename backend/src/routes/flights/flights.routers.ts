@@ -21,9 +21,6 @@ import {
 import { UserRole } from '~/constants/users'
 const flightsRouter = Router()
 
-// Apply authentication middleware to all routes
-flightsRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
-
 // Get list flights with pagination and sorting
 flightsRouter.get(
   '/',
@@ -44,6 +41,15 @@ flightsRouter.get(
   validateRequest({ query: filterFlightSchema.query }),
   asyncHandler(flightsControllers.filterFlights)
 )
+
+// Get flight by ID
+flightsRouter.get(
+  '/:id',
+  validateRequest({ params: getFlightByIdSchema.params }),
+  asyncHandler(flightsControllers.getFlightById)
+)
+
+flightsRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
 
 // Create new flight
 flightsRouter.post(
@@ -67,13 +73,6 @@ flightsRouter.delete(
   validateRequest({ params: deleteFlightSchema.params }),
   authorizeRoles(UserRole.ADMIN),
   asyncHandler(flightsControllers.deleteFlight)
-)
-
-// Get flight by ID
-flightsRouter.get(
-  '/:id',
-  validateRequest({ params: getFlightByIdSchema.params }),
-  asyncHandler(flightsControllers.getFlightById)
 )
 
 // Get flight by flight number

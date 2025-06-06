@@ -1,5 +1,6 @@
 import http from '@/lib/http';
 import {
+    LoginOAuthReqBodyType,
     LoginReqBodyType,
     LoginResType,
     RefreshTokenResBodyType,
@@ -10,6 +11,10 @@ import {
 const authApiRequest = {
     sLogin: (body: LoginReqBodyType) =>
         http.post<LoginResType>('/v1/api/users/login', body),
+    loginOAuth: (body: LoginOAuthReqBodyType) =>
+        http.post<LoginResType>('/api/auth/login-oauth', body, {
+            baseUrl: '',
+        }),
     login: (body: LoginReqBodyType) =>
         http.post<LoginResType>('/api/auth/login', body, {
             baseUrl: '',

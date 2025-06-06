@@ -51,7 +51,7 @@ export function FormSelectField({
                         disabled={disabled}
                     >
                         <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="cursor-pointer">
                                 <SelectValue
                                     placeholder={placeholder}
                                     defaultValue={field.value}
@@ -60,7 +60,11 @@ export function FormSelectField({
                         </FormControl>
                         <SelectContent>
                             {options.map((opt) => (
-                                <SelectItem key={opt.value} value={opt.value}>
+                                <SelectItem
+                                    key={opt.value}
+                                    value={opt.value}
+                                    className="cursor-pointer"
+                                >
                                     {opt.label}
                                 </SelectItem>
                             ))}

@@ -23,7 +23,7 @@ export const useValidatePromoCodeMutation = () =>
     });
 
 // Sử dụng mã giảm giá
-export const useUsePromoCodeMutation = () =>
+export const useApplyPromoCodeMutation = () =>
     useMutation({
         mutationFn: (code: string) => promoCodeApiRequest.usePromoCode(code),
     });

@@ -14,11 +14,11 @@ import { UserRole } from '~/constants/users'
 
 const paymentsRouter = express.Router()
 
-// Authenticated routes
-paymentsRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
-
 // Public route - IPN callback từ MoMo
 paymentsRouter.post('/momo/ipn', asyncHandler(paymentsController.paymentMoMoIpn))
+
+// Authenticated routes
+paymentsRouter.use(validateRequest({ headers: authenticationSchema }), authentication)
 
 // Tạo thanh toán qua MoMo
 paymentsRouter.post('/momo', validateRequest({ body: paymentMoMoSchema }), asyncHandler(paymentsController.paymentMoMo))

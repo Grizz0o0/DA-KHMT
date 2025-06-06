@@ -11,16 +11,17 @@ import {
     GetTicketResType,
     UpdateTicketResType,
 } from '@/schemaValidations/tickets.schema';
+import { get } from 'http';
 
 const ticketApiRequest = {
     // Tạo vé đơn
     createTicket: (data: CreateTicketTypeBody) =>
-        http.post<CreateTicketResType>('/v1/api/ticket', data),
+        http.post<CreateTicketResType>('/v1/api/tickets', data),
 
     // Tạo nhiều vé cùng lúc
     createMultipleTickets: (data: CreateMultipleTicketsTypeBody) =>
         http.post<CreateMultipleTicketsResType>(
-            '/v1/api/ticket/multiple',
+            '/v1/api/tickets/multiple',
             data
         ),
 
@@ -28,6 +29,13 @@ const ticketApiRequest = {
     getTickets: (query?: PaginationParamsType) =>
         http.get<GetListTicketResType>(
             `/v1/api/tickets?${query ? toQueryString(query) : ''}`
+        ),
+
+    getTicketsByBookingId: (bookingId: string, query?: PaginationParamsType) =>
+        http.get<GetListTicketResType>(
+            `/v1/api/tickets/booking/${bookingId}?${
+                query ? toQueryString(query) : ''
+            }`
         ),
 
     // Lấy vé theo ID

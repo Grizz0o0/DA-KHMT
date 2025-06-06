@@ -93,13 +93,16 @@ export default function ManageBookingsPage() {
                     <Button
                         variant="ghost"
                         onClick={() => router.push('/manage')}
-                        className="px-2 text-sm"
+                        className="px-2 text-sm cursor-pointer"
                     >
                         ← Quay lại
                     </Button>
                     <h1 className="text-2xl font-bold">Quản lý đặt chỗ</h1>
                 </div>
-                <Button onClick={() => router.push('/manage/bookings/create')}>
+                <Button
+                    className="cursor-pointer"
+                    onClick={() => router.push('/manage/bookings/create')}
+                >
                     + Thêm đặt chỗ
                 </Button>
             </div>
@@ -203,6 +206,7 @@ export default function ManageBookingsPage() {
                                                                   booking.status
                                                               )
                                                           }
+                                                          className="cursor-pointer"
                                                           onClick={() =>
                                                               handleStatusUpdate(
                                                                   booking,
@@ -254,6 +258,7 @@ export default function ManageBookingsPage() {
                                         <PaginationLink
                                             isActive={page === i + 1}
                                             onClick={() => setPage(i + 1)}
+                                            className="cursor-pointer"
                                         >
                                             {i + 1}
                                         </PaginationLink>

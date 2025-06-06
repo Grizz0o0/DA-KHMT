@@ -44,6 +44,7 @@ function Header() {
                         <div className="hidden md:flex gap-2">
                             <Button
                                 variant="ghost"
+                                className="cursor-pointer"
                                 onClick={() => {
                                     setIsLogin(true);
                                     setAuthOpen(true);
@@ -52,7 +53,7 @@ function Header() {
                                 Đăng nhập
                             </Button>
                             <Button
-                                className="bg-blue-500 text-white hover:bg-blue-600"
+                                className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
                                 onClick={() => {
                                     setIsLogin(false);
                                     setAuthOpen(true);

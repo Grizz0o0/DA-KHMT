@@ -31,10 +31,10 @@ class UserController {
 
   oAuthGoogle = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     try {
-      const { userId, accessToken, refreshToken } = await userService.oAuthGoogle(req.query.code as string)
+      const { userId, accessToken, refreshToken, role } = await userService.oAuthGoogle(req.query.code as string)
       // Chuyển hướng về client với accessToken và refreshToken
       return res.redirect(
-        ` http://localhost:3052/login/oauth?userId=${userId}&access_token=${accessToken}&refresh_token=${refreshToken}`
+        `http://localhost:3000/login/oauth?userId=${userId}&role=${role}&access_token=${accessToken}&refresh_token=${refreshToken}`
       )
     } catch (error) {
       next(error)

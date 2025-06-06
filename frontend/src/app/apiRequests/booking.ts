@@ -1,6 +1,7 @@
 import http from '@/lib/http';
 import { toQueryString } from '@/lib/utils';
 import {
+    BookingDetailResType,
     CreateBookingResType,
     CreateBookingTypeBody,
     DeleteBookingResType,
@@ -16,6 +17,13 @@ const bookingApiRequest = {
     getBookings: (query?: PaginationParamsType) =>
         http.get<GetListBookingResType>(
             `/v1/api/bookings?${query ? `${toQueryString(query)}` : ''}`
+        ),
+
+    getBookingHistory: (query?: PaginationParamsType) =>
+        http.get<BookingDetailResType>(
+            `/v1/api/bookings/booking-history?${
+                query ? `${toQueryString(query)}` : ''
+            }`
         ),
 
     // Lấy chi tiết booking theo ID

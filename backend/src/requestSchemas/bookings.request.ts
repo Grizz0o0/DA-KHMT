@@ -23,13 +23,14 @@ export type getListBookingTypeQuery = z.infer<typeof getListBookingSchema.query>
 export const createBookingSchema = {
   body: z.object({
     userId: objectIdSchema,
-    flightId: objectIdSchema,
-    seatClass: z.nativeEnum(AircraftClass),
-    quantity: z.number().int().min(1, 'Phải đặt ít nhất 1 vé'),
+    goFlightId: objectIdSchema,
+    returnFlightId: objectIdSchema.optional(),
+    seatClassGo: z.nativeEnum(AircraftClass),
+    seatClassReturn: z.nativeEnum(AircraftClass).optional(),
+    quantity: z.coerce.number().int().min(1, 'Phải đặt ít nhất 1 vé'),
     totalPrice: z.coerce.number().nonnegative('Tổng tiền phải lớn hơn hoặc bằng 0')
   })
 }
-
 export type CreateBookingTypeBody = z.infer<typeof createBookingSchema.body>
 
 export const updateBookingSchema = {

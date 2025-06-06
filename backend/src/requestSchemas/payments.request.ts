@@ -27,8 +27,11 @@ export type PaginationParamsType = z.infer<typeof PaginationParams>
 
 export const paymentMoMoSchema = z.object({
   bookingId: objectIdSchema,
-  userId: objectIdSchema,
-  amount: z.number().min(1000, 'Số tiền phải lớn hơn 1000').max(20000000, 'Số tiền phải nhỏ hơn 20000000').optional(),
+  amount: z.coerce
+    .number()
+    .min(1000, 'Số tiền phải lớn hơn 1000')
+    .max(20000000, 'Số tiền phải nhỏ hơn 20000000')
+    .optional(),
   orderId: z.string().min(1, 'Mã đơn hàng không được để trống').optional(),
   orderInfo: z
     .string()

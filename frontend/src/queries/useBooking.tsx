@@ -6,6 +6,7 @@ import {
     UpdateBookingTypeBody,
     PaginationParamsType,
 } from '@/schemaValidations/bookings.schema';
+import { toast } from 'sonner';
 
 export const useBookings = (query?: PaginationParamsType) =>
     useQuery({
@@ -21,6 +22,12 @@ export const useBookingDetail = (bookingId?: string) =>
                 ? bookingApiRequest.getBookingDetail(bookingId)
                 : Promise.reject('No bookingId'),
         enabled: !!bookingId,
+    });
+
+export const useBookingHistory = (query?: PaginationParamsType) =>
+    useQuery({
+        queryKey: ['booking-history', query],
+        queryFn: () => bookingApiRequest.getBookingHistory(query),
     });
 
 export const useCreateBookingMutation = () => {
@@ -62,7 +69,12 @@ export const useDeleteBookingMutation = () => {
         mutationFn: (bookingId: string) =>
             bookingApiRequest.deleteBooking(bookingId),
         onSuccess: () => {
+            toast.success('Hủy booking thành công.');
             queryClient.invalidateQueries({ queryKey: ['bookings'] });
+            queryClient.invalidateQueries({ queryKey: ['booking-history'] });
+        },
+        onError: () => {
+            toast.error('Hủy booking thất bại. Vui lòng thử lại.');
         },
     });
 };

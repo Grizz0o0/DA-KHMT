@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { ObjectId } from 'mongodb'
+import { AircraftClass } from '~/constants/aircrafts'
 
 const objectIdSchema = z
   .custom<ObjectId>((val) => val instanceof ObjectId || ObjectId.isValid(val), {
@@ -7,7 +8,21 @@ const objectIdSchema = z
   })
   .transform((val) => (val instanceof ObjectId ? val : new ObjectId(val)))
 
-// Common pagination and sorting parameters
+export const FareOptionSchema = z.object({
+  class: z.nativeEnum(AircraftClass).default(AircraftClass.Economy),
+  price: z.coerce.number().nonnegative('Giá vé phải lớn hơn hoặc bằng 0'),
+  availableSeats: z.coerce.number().int('Số ghế phải là số nguyên').nonnegative('Số ghế phải >= 0'),
+  perks: z.array(z.string()).default([])
+})
+
+export const FareOptionFilterSchema = z.object({
+  class: z.nativeEnum(AircraftClass).optional(),
+  minPrice: z.coerce.number().nonnegative().optional(),
+  maxPrice: z.coerce.number().nonnegative().optional(),
+  minAvailableSeats: z.coerce.number().int().nonnegative().optional(),
+  maxAvailableSeats: z.coerce.number().int().nonnegative().optional()
+})
+
 const paginationParams = {
   page: z.coerce.number().int('Số trang phải là số nguyên').positive('Số trang phải > 0').default(1),
   limit: z.coerce.number().int('Giới hạn phải là số nguyên').positive('Giới hạn phải > 0').default(10),
@@ -17,10 +32,7 @@ const paginationParams = {
 
 export const createFlightSchema = {
   body: z.object({
-    flightNumber: z
-      .string({ required_error: 'Số hiệu chuyến bay không được để trống' })
-      .trim()
-      .min(1, 'Số hiệu chuyến bay không được để trống'),
+    flightNumber: z.string().trim().min(1, 'Số hiệu chuyến bay không được để trống'),
     airlineId: objectIdSchema,
     aircraftId: objectIdSchema,
     departureAirportId: objectIdSchema,
@@ -30,13 +42,7 @@ export const createFlightSchema = {
     duration: z.coerce
       .number({ required_error: 'Thời gian bay không được để trống' })
       .positive('Thời gian bay phải là số dương'),
-    price: z.coerce
-      .number({ required_error: 'Giá vé không được để trống' })
-      .nonnegative('Giá vé phải lớn hơn hoặc bằng 0'),
-    availableSeats: z.coerce
-      .number({ required_error: 'Số ghế còn trống không được để trống' })
-      .int('Số ghế phải là số nguyên')
-      .nonnegative('Số ghế phải >= 0')
+    fareOptions: z.array(FareOptionSchema).min(1)
   })
 }
 export type createFlightTypeBody = z.infer<typeof createFlightSchema.body>
@@ -51,8 +57,7 @@ export const updateFlightSchema = {
     departureTime: z.coerce.date().optional(),
     arrivalTime: z.coerce.date().optional(),
     duration: z.coerce.number().positive('Thời gian bay phải là số dương').optional(),
-    price: z.coerce.number().nonnegative('Giá vé phải lớn hơn hoặc bằng 0').optional(),
-    availableSeats: z.coerce.number().int('Số ghế phải là số nguyên').nonnegative('Số ghế phải >= 0').optional()
+    fareOptions: z.array(FareOptionSchema).optional()
   }),
   params: z.object({
     id: objectIdSchema
@@ -75,19 +80,30 @@ export const getFlightByIdSchema = {
 export type getFlightByIdTypeParams = z.infer<typeof getFlightByIdSchema.params>
 
 export const filterFlightSchema = {
-  query: z.object({
-    flightNumber: z.string().optional(),
-    airlineId: objectIdSchema.optional(),
-    aircraftId: objectIdSchema.optional(),
-    departureAirportId: objectIdSchema.optional(),
-    arrivalAirportId: objectIdSchema.optional(),
-    departureTime: z.coerce.date().optional(),
-    arrivalTime: z.coerce.date().optional(),
-    duration: z.coerce.number().positive('Thời gian bay phải là số dương').optional(),
-    price: z.coerce.number().nonnegative('Giá vé phải lớn hơn hoặc bằng 0').optional(),
-    availableSeats: z.coerce.number().int('Số ghế phải là số nguyên').nonnegative('Số ghế phải >= 0').optional(),
-    ...paginationParams
-  })
+  query: z
+    .object({
+      flightNumber: z.string().optional(),
+      airlineIds: z.union([z.string().nonempty(), z.array(z.string().nonempty())]).optional(),
+      departureAirportId: objectIdSchema.optional(),
+      arrivalAirportId: objectIdSchema.optional(),
+      type: z.enum(['khu-hoi', 'mot-chieu']).default('mot-chieu'),
+      departureTime: z.coerce.date().optional(),
+      returnTime: z
+        .any()
+        .optional()
+        .refine((val) => !val || !isNaN(Date.parse(val)), {
+          message: 'Ngày đến không hợp lệ'
+        })
+        .transform((val) => (val ? new Date(val) : undefined)),
+      departureAirportCode: z.string().optional(),
+      arrivalAirportCode: z.string().optional(),
+      passengerCount: z.coerce.number().optional(),
+      duration: z.coerce.number().positive().optional(),
+      minHour: z.coerce.number().min(0).max(23).optional(),
+      maxHour: z.coerce.number().min(0).max(23).optional(),
+      ...paginationParams
+    })
+    .merge(FareOptionFilterSchema)
 }
 export type filterFlightTypeQuery = z.infer<typeof filterFlightSchema.query>
 
@@ -98,10 +114,21 @@ export type getListFlightTypeQuery = z.infer<typeof getListFlightSchema.query>
 
 export const searchFlightSchema = {
   query: z.object({
-    departureAirport: z.string().trim().min(1, 'Điểm đi là bắt buộc'),
-    arrivalAirport: z.string().trim().min(1, 'Điểm đến là bắt buộc'),
-    departureTime: z.coerce.date({ required_error: 'Ngày khởi hành là bắt buộc' }),
-    arrivalTime: z.coerce.date({ required_error: 'Ngày đến là bắt buộc' }),
+    departureAirport: z.string().trim().min(1, 'Điểm đi là bắt buộc').optional(),
+    arrivalAirport: z.string().trim().min(1, 'Điểm đến là bắt buộc').optional(),
+    departureTime: z
+      .string()
+      .refine((val) => !val || !isNaN(Date.parse(val)), {
+        message: 'Ngày khởi hành không hợp lệ'
+      })
+      .optional(),
+
+    arrivalTime: z
+      .string()
+      .refine((val) => !val || !isNaN(Date.parse(val)), {
+        message: 'Ngày đến không hợp lệ'
+      })
+      .optional(),
     passengerCount: z.coerce.number().int().min(1).default(1),
     ...paginationParams
   })

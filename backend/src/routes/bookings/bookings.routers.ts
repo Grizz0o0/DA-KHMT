@@ -4,12 +4,12 @@ import { asyncHandler } from '~/helper/asyncHandler'
 import { authentication, authorizeRoles } from '~/middlewares/auth.middlewares'
 import { validateRequest } from '~/middlewares/validate.middleware'
 import {
-  createBookingSchema,
   deleteBookingSchema,
   updateBookingSchema,
   searchBookingsSchema,
   getBookingByIdSchema,
-  getListBookingSchema
+  getListBookingSchema,
+  createBookingSchema
 } from '~/requestSchemas/bookings.request'
 import { authenticationSchema } from '~/requestSchemas/users.request'
 import { UserRole } from '~/constants/users'
@@ -28,6 +28,8 @@ bookingsRouter.get(
   validateRequest({ query: getListBookingSchema.query }),
   asyncHandler(bookingsControllers.getListBooking)
 )
+
+bookingsRouter.get('/booking-history', asyncHandler(bookingsControllers.getBookingByUserId))
 
 // Update booking
 bookingsRouter.patch(

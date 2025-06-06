@@ -42,16 +42,19 @@ const UserDropdown = ({ variant = 'desktop' }: Props) => {
 
     const renderMenuItems = () => (
         <>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
                 <Link href="/profile">Trang cá nhân</Link>
             </DropdownMenuItem>
             {isAdmin && (
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="cursor-pointer">
                     <Link href="/manage">Quản lý</Link>
                 </DropdownMenuItem>
             )}
+            <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/booking">Lịch sử đặt vé</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                 Đăng xuất
             </DropdownMenuItem>
         </>

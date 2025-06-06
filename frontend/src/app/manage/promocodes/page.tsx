@@ -74,13 +74,14 @@ export default function ManagePromoCodesPage() {
                     <Button
                         variant="ghost"
                         onClick={() => router.push('/manage')}
-                        className="px-2 text-sm"
+                        className="px-2 text-sm cursor-pointer"
                     >
                         ← Quay lại
                     </Button>
                     <h1 className="text-2xl font-bold">Quản lý mã giảm giá</h1>
                 </div>
                 <Button
+                    className="cursor-pointer"
                     onClick={() => router.push('/manage/promocodes/create')}
                 >
                     + Thêm mã mới
@@ -184,6 +185,7 @@ export default function ManagePromoCodesPage() {
                                             <Button
                                                 variant="secondary"
                                                 size="icon"
+                                                className="cursor-pointer"
                                                 onClick={() =>
                                                     router.push(
                                                         `/manage/promocodes/update/${promo._id}`
@@ -197,6 +199,7 @@ export default function ManagePromoCodesPage() {
                                                 <Button
                                                     variant="destructive"
                                                     size="icon"
+                                                    className="cursor-pointer"
                                                     onClick={() =>
                                                         handleDelete(promo._id)
                                                     }
@@ -205,7 +208,7 @@ export default function ManagePromoCodesPage() {
                                                 </Button>
                                             ) : (
                                                 <Button
-                                                    className="bg-green-400 hover:bg-green-500 text-white"
+                                                    className="bg-green-400 hover:bg-green-500 text-white cursor-pointer"
                                                     size="icon"
                                                     onClick={() =>
                                                         handleActive(promo._id)
@@ -245,6 +248,7 @@ export default function ManagePromoCodesPage() {
                                     <PaginationLink
                                         isActive={page === i + 1}
                                         onClick={() => setPage(i + 1)}
+                                        className="cursor-pointer"
                                     >
                                         {i + 1}
                                     </PaginationLink>

@@ -29,9 +29,9 @@ promoCodesRouter.post(
   validateRequest({ params: usePromoCodeSchema.params }),
   asyncHandler(PromoCodesController.usePromoCode)
 )
+promoCodesRouter.get('/', asyncHandler(PromoCodesController.getListPromoCodes))
 
 promoCodesRouter.use(authorizeRoles(UserRole.ADMIN))
-promoCodesRouter.get('/', asyncHandler(PromoCodesController.getListPromoCodes))
 
 promoCodesRouter.post(
   '/',

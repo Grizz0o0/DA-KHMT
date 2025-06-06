@@ -27,7 +27,7 @@ export const ticketSchema = z.object({
   userId: objectIdSchema,
   flightId: objectIdSchema,
   seatClass: z.enum(['economy', 'business', 'firstClass']),
-  seatNumber: z.string().min(1, 'Số ghế không được để trống'),
+  seatNumber: z.string().min(1, 'Số ghế không được để trống').optional(),
   passenger: passengerSchema,
   price: z.coerce.number().nonnegative('Giá vé phải lớn hơn hoặc bằng 0'),
   status: z.nativeEnum(TicketStatus).default(TicketStatus.Unused),

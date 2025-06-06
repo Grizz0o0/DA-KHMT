@@ -2,42 +2,34 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { NextFunction, Request, Response } from 'express'
 import { Created, OK } from '~/responses/success.response'
 import FlightServices from '~/services/flights.services'
-import { z } from 'zod'
 import { BadRequestError } from '~/responses/error.response'
 import {
   deleteFlightSchema,
   deleteFlightTypeParams,
   getFlightByAircraftIdSchema,
   getFlightByAircraftIdTypeParams,
-  getFlightByAircraftIdTypeQuery,
   getFlightByAirlineIdSchema,
   getFlightByAirlineIdTypeParams,
-  getFlightByAirlineIdTypeQuery,
   getFlightByArrivalAirportIdSchema,
   getFlightByArrivalAirportIdTypeParams,
-  getFlightByArrivalAirportIdTypeQuery,
   getFlightByDepartureAirportIdSchema,
   getFlightByDepartureAirportIdTypeParams,
-  getFlightByDepartureAirportIdTypeQuery,
   getFlightByFlightNumberSchema,
   getFlightByFlightNumberTypeParams,
   getFlightByIdSchema,
   getFlightByIdTypeParams,
-  updateFlightTypeBody,
-  getListFlightTypeQuery,
-  searchFlightTypeQuery,
-  filterFlightTypeQuery,
   getListFlightSchema,
   searchFlightSchema,
   filterFlightSchema,
-  updateFlightSchema
+  updateFlightSchema,
+  createFlightSchema
 } from '~/requestSchemas/flights.request'
-import { ObjectId } from 'mongodb'
 
 class FlightController {
   createFLight = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     try {
-      const newFlight = await FlightServices.createFlight(req.body)
+      const resultBody = createFlightSchema.body.parse(req.body)
+      const newFlight = await FlightServices.createFlight(resultBody)
       new Created({
         message: 'Create flight success',
         metadata: { flight: newFlight }
@@ -226,28 +218,8 @@ class FlightController {
 
   searchFlights = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
-        departureAirport,
-        arrivalAirport,
-        departureTime,
-        arrivalTime,
-        passengerCount,
-        page,
-        limit,
-        order,
-        sortBy
-      } = searchFlightSchema.query.parse(req.query)
-      const { flights, pagination } = await FlightServices.searchFlight({
-        departureAirport,
-        arrivalAirport,
-        departureTime,
-        arrivalTime,
-        passengerCount,
-        page,
-        limit,
-        order,
-        sortBy
-      })
+      const queryBody = searchFlightSchema.query.parse(req.query)
+      const { flights, pagination } = await FlightServices.searchFlight(queryBody)
       new OK({
         message: 'Search flights successfully',
         metadata: { flights, pagination }
@@ -260,10 +232,10 @@ class FlightController {
   filterFlights = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const filters = filterFlightSchema.query.parse(req.query)
-      const { flights, pagination } = await FlightServices.filterFlight(filters)
+      const result = await FlightServices.filterFlight(filters)
       new OK({
         message: 'Filter flights successfully',
-        metadata: { flights, pagination }
+        metadata: result
       }).send(res)
     } catch (error) {
       next(error)

@@ -12,13 +12,15 @@ import {
 import { PaymentStatus } from '~/constants/payments'
 import { generateOrderId } from '~/utils/payment.utils'
 import { PaymentMethod } from '~/constants/payments'
-import { NotFoundError } from '~/responses/error.response'
+import { NotFoundError, UnauthorizedError } from '~/responses/error.response'
 import databaseService from '~/services/database.services'
 import { convertToObjectId } from '~/utils/mongo.utils'
 class PaymentsController {
   paymentMoMo = async (req: Request, res: Response) => {
     const booking = await databaseService.bookings.findOne({ _id: convertToObjectId(req.body.bookingId) })
     if (!booking) throw new NotFoundError('Booking not found')
+    const userId = req.user?.userId
+    if (!userId) throw new UnauthorizedError('Missing userId in header')
 
     const orderId = generateOrderId()
     const paymentBody = paymentMoMoSchema.parse({
@@ -28,7 +30,7 @@ class PaymentsController {
       amount: booking.totalPrice
     })
 
-    await PaymentsService.createPayment(paymentBody)
+    await PaymentsService.createPayment({ payload: paymentBody, userId })
     const momoRes = await PaymentsService.paymentMoMo(paymentBody)
     new OK({
       message: 'MoMo payment link created',

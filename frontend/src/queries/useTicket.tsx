@@ -26,6 +26,19 @@ export const useTicketDetail = (ticketId?: string) =>
         enabled: !!ticketId,
     });
 
+export const useTicketByBooking = (
+    bookingId?: string,
+    query?: PaginationParamsType
+) =>
+    useQuery({
+        queryKey: ['ticket-by-booking', bookingId, query],
+        queryFn: () =>
+            bookingId
+                ? ticketApiRequest.getTicketsByBookingId(bookingId, query)
+                : Promise.reject('No bookingId'),
+        enabled: !!bookingId,
+    });
+
 export const useCreateTicketMutation = () => {
     const queryClient = useQueryClient();
 

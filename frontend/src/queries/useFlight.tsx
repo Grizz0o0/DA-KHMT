@@ -1,9 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+    useQuery,
+    UseQueryOptions,
+    useMutation,
+    useQueryClient,
+} from '@tanstack/react-query';
 import flightApiRequest from '@/app/apiRequests/flight';
 import {
     CreateFlightReqType,
     UpdateFlightReqType,
     PaginationParamsType,
+    SearchFlightReqType,
+    FilterFlightReqType,
 } from '@/schemaValidations/flights.schema';
 
 // Lấy danh sách chuyến bay có phân trang (query)
@@ -15,7 +22,11 @@ export const useFlights = (query?: PaginationParamsType) => {
 };
 
 // Lấy chi tiết chuyến bay theo ID
-export const useFlightDetail = (flightId?: string) => {
+
+export const useFlightDetail = (
+    flightId?: string,
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
+) => {
     return useQuery({
         queryKey: ['flight-detail', flightId],
         queryFn: () =>
@@ -23,6 +34,29 @@ export const useFlightDetail = (flightId?: string) => {
                 ? flightApiRequest.getFlightDetail(flightId)
                 : Promise.reject('No flightId'),
         enabled: !!flightId,
+        ...options,
+    });
+};
+
+export const useSearchFlights = (query?: SearchFlightReqType) => {
+    return useQuery({
+        queryKey: ['search-flights', query],
+        queryFn: () => {
+            if (!query) throw new Error('Query is required');
+            return flightApiRequest.searchFlights(query);
+        },
+        enabled: !!query,
+    });
+};
+
+export const useFilterFlights = (query?: FilterFlightReqType) => {
+    return useQuery({
+        queryKey: ['filter-flights', query],
+        queryFn: () => {
+            if (!query) throw new Error('Query is required');
+            return flightApiRequest.filterFlights(query);
+        },
+        enabled: !!query,
     });
 };
 

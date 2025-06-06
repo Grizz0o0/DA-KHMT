@@ -55,7 +55,11 @@ export default function CreatePromoCodePage() {
     return (
         <div className="max-w-xl mx-auto p-6">
             <div className="flex items-center gap-3 mb-4">
-                <Button variant="ghost" onClick={() => router.back()}>
+                <Button
+                    className="cursor-pointer"
+                    variant="ghost"
+                    onClick={() => router.back()}
+                >
                     <ArrowLeft className="w-4 h-4 mr-1" /> Quay lại
                 </Button>
                 <h1 className="text-2xl font-bold">Thêm mã giảm giá</h1>

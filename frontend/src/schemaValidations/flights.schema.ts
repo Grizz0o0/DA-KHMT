@@ -1,4 +1,6 @@
 // src/schemas/frontend/flights.schema.ts
+import { AircraftClass } from '@/constants/aircrafts';
+import { seatConfigurationSchema } from '@/schemaValidations/aircrafts.schema';
 import { z } from 'zod';
 
 export const objectIdStringSchema = z
@@ -17,6 +19,24 @@ export const PaginationParams = z.object({
         .optional(),
 });
 export type PaginationParamsType = z.infer<typeof PaginationParams>;
+
+export const FareOptionSchema = z.object({
+    class: z.nativeEnum(AircraftClass),
+    price: z.coerce.number().nonnegative('Giá vé phải lớn hơn hoặc bằng 0'),
+    availableSeats: z.coerce
+        .number()
+        .int('Số ghế phải là số nguyên')
+        .nonnegative('Số ghế phải >= 0'),
+    perks: z.array(z.string()),
+});
+
+export const FareOptionFilterSchema = z.object({
+    class: z.nativeEnum(AircraftClass).optional(),
+    minPrice: z.coerce.number().nonnegative().optional(),
+    maxPrice: z.coerce.number().nonnegative().optional(),
+    minAvailableSeats: z.coerce.number().int().nonnegative().optional(),
+    maxAvailableSeats: z.coerce.number().int().nonnegative().optional(),
+});
 
 const PaginationSchema = z.object({
     page: z.number(),
@@ -41,8 +61,7 @@ export const CreateFlightReqSchema = z.object({
     }),
     arrivalTime: z.coerce.date({ required_error: 'Chưa chọn thời gian đến' }),
     duration: z.coerce.number().min(1, 'Thời gian bay phải lớn hơn 0'),
-    price: z.coerce.number().min(0, 'Giá vé phải là số'),
-    availableSeats: z.coerce.number().min(1, 'Số ghế phải là số dương'),
+    fareOptions: z.array(FareOptionSchema),
 });
 export type CreateFlightReqType = z.infer<typeof CreateFlightReqSchema>;
 
@@ -51,33 +70,62 @@ export type UpdateFlightReqType = z.infer<typeof UpdateFlightReqSchema>;
 
 export const SearchFlightReqSchema = z
     .object({
-        departureAirport: z.string().trim().min(1, 'Điểm đi là bắt buộc'),
-        arrivalAirport: z.string().trim().min(1, 'Điểm đến là bắt buộc'),
+        departureAirport: z
+            .string()
+            .trim()
+            .min(1, 'Điểm đi là bắt buộc')
+            .optional(),
+        arrivalAirport: z
+            .string()
+            .trim()
+            .min(1, 'Điểm đến là bắt buộc')
+            .optional(),
         departureTime: z.string().refine((val) => !isNaN(Date.parse(val)), {
             message: 'Ngày khởi hành là bắt buộc',
         }),
-        arrivalTime: z.string().refine((val) => !isNaN(Date.parse(val)), {
-            message: 'Ngày đến là bắt buộc',
-        }),
+        arrivalTime: z
+            .string()
+            .optional()
+            .refine((val) => !val || !isNaN(Date.parse(val)), {
+                message: 'Ngày đến không hợp lệ',
+            }),
         passengerCount: z.coerce.number().int().min(1).default(1),
     })
-    .merge(PaginationSchema);
+    .merge(PaginationParams);
 export type SearchFlightReqType = z.infer<typeof SearchFlightReqSchema>;
 
 export const FilterFlightReqSchema = z
     .object({
         flightNumber: z.string().optional(),
         airlineId: objectIdStringSchema.optional(),
+        airlineIds: z.array(z.string()).optional(),
         aircraftId: objectIdStringSchema.optional(),
-        departureAirportId: objectIdStringSchema.optional(),
-        arrivalAirportId: objectIdStringSchema.optional(),
-        departureTime: z.string().optional(),
-        arrivalTime: z.string().optional(),
+
+        departureAirportCode: z.string().optional(),
+        arrivalAirportCode: z.string().optional(),
+
+        departureTime: z
+            .string()
+            .optional()
+            .refine((val) => !val || !isNaN(Date.parse(val)), {
+                message: 'Ngày khởi hành không hợp lệ',
+            }),
+
+        returnTime: z
+            .string()
+            .optional()
+            .refine((val) => !val || !isNaN(Date.parse(val)), {
+                message: 'Ngày về không hợp lệ',
+            }),
+
+        type: z.enum(['mot-chieu', 'khu-hoi']).optional(),
+
         duration: z.number().positive().optional(),
-        price: z.number().nonnegative().optional(),
-        availableSeats: z.number().int().nonnegative().optional(),
+        passengerCount: z.coerce.number().int().min(1).default(1),
     })
-    .merge(PaginationSchema);
+    .merge(PaginationParams)
+    .merge(FareOptionFilterSchema);
+
 export type FilterFlightReqType = z.infer<typeof FilterFlightReqSchema>;
 
 // ========== RESPONSE SCHEMAS ==========
@@ -99,17 +147,55 @@ export const FlightDetailSchema = z.object({
     departureTime: z.string(),
     arrivalTime: z.string(),
     duration: z.number(),
-    price: z.number(),
-    availableSeats: z.number(),
+    fareOptions: z.array(FareOptionSchema),
     isActive: z.boolean(),
-    createdAt: z.string().optional(),
-    updatedAt: z.string().optional(),
 });
 export type FlightDetailType = z.infer<typeof FlightDetailSchema>;
 
+export const FlightPopulatedSchema = z.object({
+    _id: z.string(),
+    flightNumber: z.string(),
+    departureTime: z.string(),
+    arrivalTime: z.string(),
+    duration: z.number(),
+    isActive: z.boolean(),
+    fareOptions: z.array(FareOptionSchema),
+    airline: z.object({
+        _id: z.string(),
+        name: z.string(),
+        code: z.string(),
+        logo: z.string(),
+    }),
+
+    aircraft: z.object({
+        _id: z.string(),
+        model: z.string(),
+        manufacturer: z.string(),
+        aircraftCode: z.string(),
+        seatConfiguration: seatConfigurationSchema,
+        capacity: z.number(),
+        status: z.enum(['active', 'inactive']),
+    }),
+
+    departureAirport: z.object({
+        _id: z.string(),
+        name: z.string(),
+        code: z.string(),
+        city: z.string(),
+    }),
+
+    arrivalAirport: z.object({
+        _id: z.string(),
+        name: z.string(),
+        code: z.string(),
+        city: z.string(),
+    }),
+});
+export type FlightPopulatedType = z.infer<typeof FlightPopulatedSchema>;
+
 export const GetListFlightResSchema = BaseResponseSchema.extend({
     metadata: z.object({
-        flights: z.array(FlightDetailSchema),
+        flights: z.array(FlightPopulatedSchema),
         pagination: PaginationSchema,
     }),
 });
@@ -153,3 +239,19 @@ export const DeleteFlightResSchema = BaseResponseSchema.extend({
     }),
 });
 export type DeleteFlightResType = z.infer<typeof DeleteFlightResSchema>;
+
+export const SearchFlightResSchema = BaseResponseSchema.extend({
+    metadata: z.object({
+        flights: z.array(FlightPopulatedSchema),
+        pagination: PaginationSchema,
+    }),
+});
+export type SearchFlightResType = z.infer<typeof SearchFlightResSchema>;
+
+export const FilterFlightResSchema = BaseResponseSchema.extend({
+    metadata: z.object({
+        flights: z.array(FlightPopulatedSchema),
+        pagination: PaginationSchema,
+    }),
+});
+export type FilterFlightResType = z.infer<typeof FilterFlightResSchema>;

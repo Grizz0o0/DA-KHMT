@@ -34,8 +34,10 @@ const PaginationSchema = z.object({
 export const CreateBookingSchema = {
     body: z.object({
         userId: objectIdStringSchema,
-        flightId: objectIdStringSchema,
-        seatClass: z.nativeEnum(AircraftClass),
+        goFlightId: objectIdStringSchema,
+        returnFlightId: objectIdStringSchema.optional(),
+        seatClassGo: z.nativeEnum(AircraftClass),
+        seatClassReturn: z.nativeEnum(AircraftClass).optional(),
         quantity: z.coerce.number().int().min(1, 'Phải đặt ít nhất 1 vé'),
         totalPrice: z.coerce
             .number()
@@ -147,6 +149,8 @@ export const BookingDetailSchema = z.object({
     userId: objectIdStringSchema,
     flightId: objectIdStringSchema,
     seatClass: z.nativeEnum(AircraftClass),
+    goFlightId: z.string().optional(),
+    seatClassGo: z.string().optional(),
     bookingTime: z.string(),
     quantity: z.number(),
     totalPrice: z.number(),
@@ -173,14 +177,16 @@ export type GetListBookingResType = z.infer<typeof GetListBookingResSchema>;
 
 export const GetBookingByIdResSchema = BaseResponseSchema.extend({
     metadata: z.object({
-        bookings: z.object({
+        booking: z.object({
             _id: objectIdStringSchema,
             userId: objectIdStringSchema,
-            flightId: objectIdStringSchema,
+            goFlightId: objectIdStringSchema.optional(),
+            returnFlightId: objectIdStringSchema.optional(),
             bookingTime: z.string(),
             status: z.nativeEnum(BookingStatus),
             totalPrice: z.number(),
             paymentStatus: z.nativeEnum(PaymentStatus),
+            quantity: z.number(),
         }),
         user: z.object({
             _id: objectIdStringSchema,
@@ -194,22 +200,39 @@ export const GetBookingByIdResSchema = BaseResponseSchema.extend({
             tickets: z.array(objectIdStringSchema),
             dateOfBirth: z.string(),
         }),
-        flight: z.object({
-            _id: objectIdStringSchema,
-            flightNumber: z.string(),
-            airlineId: objectIdStringSchema,
-            aircraftId: objectIdStringSchema,
-            departureAirportId: objectIdStringSchema,
-            arrivalAirportId: objectIdStringSchema,
-            departureTime: z.string(),
-            arrivalTime: z.string(),
-            duration: z.number(),
-            price: z.number(),
-            availableSeats: z.number(),
-        }),
-        pagination: PaginationSchema,
+        goFlight: z
+            .object({
+                _id: objectIdStringSchema,
+                flightNumber: z.string(),
+                airlineId: objectIdStringSchema,
+                aircraftId: objectIdStringSchema,
+                departureAirportId: objectIdStringSchema,
+                arrivalAirportId: objectIdStringSchema,
+                departureTime: z.string(),
+                arrivalTime: z.string(),
+                duration: z.number(),
+                price: z.number(),
+                availableSeats: z.number(),
+            })
+            .nullable(),
+        returnFlight: z
+            .object({
+                _id: objectIdStringSchema,
+                flightNumber: z.string(),
+                airlineId: objectIdStringSchema,
+                aircraftId: objectIdStringSchema,
+                departureAirportId: objectIdStringSchema,
+                arrivalAirportId: objectIdStringSchema,
+                departureTime: z.string(),
+                arrivalTime: z.string(),
+                duration: z.number(),
+                price: z.number(),
+                availableSeats: z.number(),
+            })
+            .nullable(),
     }),
 });
+
 export type GetBookingByIdResType = z.infer<typeof GetBookingByIdResSchema>;
 
 export const GetBookingStatisticResSchema = BaseResponseSchema.extend({
@@ -269,3 +292,11 @@ export const DeleteBookingResSchema = BaseResponseSchema.extend({
     }),
 });
 export type DeleteBookingResType = z.infer<typeof DeleteBookingResSchema>;
+
+export const BookingDetailResSchema = BaseResponseSchema.extend({
+    metadata: z.object({
+        bookings: z.array(BookingDetailSchema),
+        pagination: PaginationSchema,
+    }),
+});
+export type BookingDetailResType = z.infer<typeof BookingDetailResSchema>;

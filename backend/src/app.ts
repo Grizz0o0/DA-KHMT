@@ -27,6 +27,7 @@ app.use(
     allowedHeaders: ['Content-Type', 'x-api-key', 'authorization', 'x-client-id', 'x-rtoken-id']
   })
 )
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 

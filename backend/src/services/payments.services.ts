@@ -17,31 +17,30 @@ import { buildRawSignature } from '~/utils/payment.utils'
 import { paymentSchema } from '~/models/payments.model'
 import { getSelectData, omitInfoData } from '~/utils/object.utils'
 import { createPagination } from '~/responses/success.response'
+import { BookingStatus } from '~/constants/bookings'
 class PaymentsService {
-  static async createPayment(payload: paymentMoMoSchemaType) {
-    const parsedPayment = paymentSchema.parse(payload)
+  static async createPayment({ payload, userId }: { payload: paymentMoMoSchemaType; userId: ObjectId }) {
+    const parsedPayment = paymentSchema.parse({ ...payload, userId })
     const payment = await databaseService.payments.insertOne(parsedPayment)
     return payment
   }
 
   static async paymentMoMo(paymentBody: paymentMoMoSchemaType) {
-    const { accessKey, secretKey, partnerCode, redirectUrl, ipnUrl, hostname, path, partnerName, storeId } = momoConfig
+    const { accessKey, secretKey, partnerCode, ipnUrl, hostname, path, partnerName, storeId } = momoConfig
     const { amount, lang, orderId, orderInfo } = paymentBody
-
-    if (!accessKey || !secretKey) {
-      throw new NotFoundError('MOMO_ACCESS_KEY or MOMO_SECRET_KEY is not defined')
-    }
+    const redirectUrl = `${process.env.MOMO_REDIRECT_URI}/payment/success?bookingId=${paymentBody.bookingId}`
+    if (!accessKey || !secretKey) throw new NotFoundError('MOMO_ACCESS_KEY or MOMO_SECRET_KEY is not defined')
     const requestType = 'payWithMethod'
-    const requestId = orderId
+    const requestId = orderId ?? ''
     const extraData = ''
     const autoCapture = true
     const orderGroupId = ''
     const rawSignature = buildRawSignature({
       accessKey,
-      amount,
+      amount: amount ?? 0,
       extraData,
       ipnUrl,
-      orderId,
+      orderId: orderId ?? '',
       orderInfo,
       partnerCode,
       redirectUrl,
@@ -76,11 +75,12 @@ class PaymentsService {
   static async paymentMoMoIpn(body: MomoPaymentConfirmResponse) {
     const { orderId, resultCode, transId, responseTime, message } = body
     const newStatus = resultCode === 0 ? PaymentStatus.SUCCESS : PaymentStatus.FAILED
+    console.log('newStatus', newStatus)
 
     const payment = await databaseService.payments.findOne({ orderId })
     if (!payment) throw new NotFoundError('Payment not found')
 
-    const updated = await databaseService.payments.updateOne(
+    const updatedPayment = await databaseService.payments.updateOne(
       { orderId },
       {
         $set: {
@@ -91,8 +91,22 @@ class PaymentsService {
         $currentDate: { updatedAt: true }
       }
     )
+    console.log(`updatedPayment`, updatedPayment)
+    if (updatedPayment.modifiedCount === 0) throw new Error('Failed to update payment status')
 
-    if (updated.modifiedCount === 0) throw new Error('Failed to update payment status')
+    if (newStatus === PaymentStatus.SUCCESS) {
+      await databaseService.bookings.updateOne(
+        { _id: payment.bookingId },
+        {
+          $set: {
+            status: BookingStatus.Confirmed,
+            paymentStatus: PaymentStatus.SUCCESS,
+            paidAt: new Date(responseTime)
+          },
+          $currentDate: { updatedAt: true }
+        }
+      )
+    }
 
     return {
       message,

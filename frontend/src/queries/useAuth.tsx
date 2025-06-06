@@ -7,6 +7,18 @@ export const useLoginMutation = () => {
     });
 };
 
+export const useLoginOAuthMutation = () => {
+    return useMutation({
+        mutationFn: authApiRequest.loginOAuth,
+        onSuccess: (data) => {
+            console.log('Login thành công', data);
+        },
+        onError: (error) => {
+            console.error('Login thất bại', error);
+        },
+    });
+};
+
 export const useRegisterMutation = () => {
     return useMutation({
         mutationFn: authApiRequest.register,

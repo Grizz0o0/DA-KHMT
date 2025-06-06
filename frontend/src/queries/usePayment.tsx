@@ -27,7 +27,9 @@ export const usePaymentDetail = (paymentId?: string) =>
 export const usePaymentWithMomoMutation = () =>
     useMutation({
         mutationFn: (body: PaymentMoMoSchemaType) =>
-            paymentApiRequest.paymentWithMomo(body),
+            paymentApiRequest
+                .paymentWithMomo(body)
+                .then((res) => res.payload.metadata),
     });
 
 export const useUpdatePaymentStatusMutation = () => {

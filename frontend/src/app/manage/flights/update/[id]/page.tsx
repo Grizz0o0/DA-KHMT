@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useMemo, useRef } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { differenceInMinutes } from 'date-fns';
 import { toast } from 'sonner';
@@ -24,22 +24,22 @@ import { FormSelectField } from '@/components/form/FormSelectField';
 import { DateTimePickerField } from '@/components/form/DateTimePickerField';
 
 import {
-    CreateFlightReqSchema as UpdateFlightSchema,
-    CreateFlightReqType as UpdateFlightType,
+    UpdateFlightReqSchema,
+    UpdateFlightReqType,
 } from '@/schemaValidations/flights.schema';
 import { useFlightDetail, useUpdateFlightMutation } from '@/queries/useFlight';
 import { useAirlines } from '@/queries/useAirline';
 import { useAirports } from '@/queries/useAirport';
 import { useAircraftByAirlineId } from '@/queries/useAircraft';
+import { AircraftClass } from '@/constants/aircrafts';
 
 export default function UpdateFlightForm() {
     const { id } = useParams();
     const router = useRouter();
-
     const hasInitializedRef = useRef(false);
 
-    const form = useForm<UpdateFlightType>({
-        resolver: zodResolver(UpdateFlightSchema),
+    const form = useForm<UpdateFlightReqType>({
+        resolver: zodResolver(UpdateFlightReqSchema),
         defaultValues: {
             flightNumber: '',
             airlineId: '',
@@ -49,9 +49,20 @@ export default function UpdateFlightForm() {
             departureTime: undefined,
             arrivalTime: undefined,
             duration: 0,
-            price: 0,
-            availableSeats: 0,
+            fareOptions: [
+                {
+                    class: AircraftClass.Economy,
+                    price: 0,
+                    availableSeats: 0,
+                    perks: [],
+                },
+            ],
         },
+    });
+
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: 'fareOptions',
     });
 
     const airlineId = form.watch('airlineId');
@@ -59,41 +70,44 @@ export default function UpdateFlightForm() {
     const { data: airlines } = useAirlines();
     const { data: airports } = useAirports();
 
-    const selectedAirlineId = form.watch('airlineId');
+    const selectedAirlineId = airlineId;
     const defaultAirlineId = flightDetail?.payload?.metadata?.flight.airlineId;
     const airlineIdForAircraft = selectedAirlineId || defaultAirlineId;
-
     const { data: aircrafts } = useAircraftByAirlineId(airlineIdForAircraft, {
         page: 1,
         limit: 100,
     });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const airlineOptions = airlines?.payload?.metadata?.airlines || [];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const airportOptions = airports?.payload?.metadata?.airports || [];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const aircraftOptions = aircrafts?.payload.metadata.aircrafts || [];
+    const airlineOptions = useMemo(
+        () => airlines?.payload?.metadata?.airlines || [],
+        [airlines]
+    );
+    const airportOptions = useMemo(
+        () => airports?.payload?.metadata?.airports || [],
+        [airports]
+    );
+    const aircraftOptions = useMemo(
+        () => aircrafts?.payload?.metadata?.aircrafts || [],
+        [aircrafts]
+    );
 
     useEffect(() => {
         if (hasInitializedRef.current) return;
-
         const flight = flightDetail?.payload?.metadata?.flight;
 
         const ready =
             !!flight &&
-            airlines?.payload?.metadata?.airlines?.length &&
-            airports?.payload?.metadata?.airports?.length &&
-            aircrafts?.payload?.metadata?.aircrafts?.length;
+            airlineOptions.length &&
+            airportOptions.length &&
+            aircraftOptions.length;
 
         const isNotYetInitialized =
             form.getValues('flightNumber') === '' && !form.formState.isDirty;
 
         if (ready && isNotYetInitialized) {
             hasInitializedRef.current = true;
-
-            const resetData: UpdateFlightType = {
-                ...flight,
+            const resetData: UpdateFlightReqType = {
+                flightNumber: flight.flightNumber,
                 airlineId: String(flight.airlineId),
                 aircraftId: String(flight.aircraftId),
                 departureAirportId: String(flight.departureAirportId),
@@ -101,22 +115,22 @@ export default function UpdateFlightForm() {
                 departureTime: new Date(flight.departureTime),
                 arrivalTime: new Date(flight.arrivalTime),
                 duration: flight.duration,
-                price: flight.price,
-                availableSeats: flight.availableSeats,
+                fareOptions: (flight.fareOptions || []).map((fo: any) => ({
+                    class: fo.class ?? AircraftClass.Economy,
+                    price: fo.price ?? 0,
+                    availableSeats: fo.availableSeats ?? 0,
+                    perks: fo.perks ?? [],
+                })),
             };
-
             form.reset(resetData);
         }
-    }, [flightDetail, airlines, airports, aircrafts, form]);
+    }, [flightDetail, airlineOptions, airportOptions, aircraftOptions, form]);
 
-    // Reset aircraftId khi đổi airlineId
     useEffect(() => {
         if (!form.formState.isDirty) return;
-        // Nếu người dùng chọn sang hãng khác thì reset loại máy bay
         form.setValue('aircraftId', '');
-    }, [airlineId]);
+    }, [airlineId, form]);
 
-    // Tự động tính duration
     useEffect(() => {
         const subscription = form.watch((values) => {
             const { departureTime, arrivalTime, duration } = values;
@@ -139,7 +153,8 @@ export default function UpdateFlightForm() {
     }, [form]);
 
     const updateMutation = useUpdateFlightMutation();
-    const onSubmit = async (values: UpdateFlightType) => {
+
+    const onSubmit = async (values: UpdateFlightReqType) => {
         try {
             await updateMutation.mutateAsync({
                 flightId: id as string,
@@ -163,14 +178,13 @@ export default function UpdateFlightForm() {
                     <Button
                         variant="ghost"
                         onClick={() => router.back()}
-                        className="text-sm px-2"
+                        className="text-sm px-2 cursor-pointer"
                     >
                         ← Quay lại
                     </Button>
                     <CardTitle className="text-xl font-semibold text-center w-full">
                         ✈️ Cập nhật chuyến bay
                     </CardTitle>
-                    {/* chiếm chỗ để giữ căn giữa tiêu đề */}
                     <div className="w-[80px]" />
                 </div>
             </CardHeader>
@@ -282,32 +296,145 @@ export default function UpdateFlightForm() {
                                     </FormItem>
                                 )}
                             />
-                            <FormField
-                                name="price"
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Giá vé</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                name="availableSeats"
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Số ghế</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <h3 className="font-semibold">
+                                    Tuỳ chọn vé (Fare Options)
+                                </h3>
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    onClick={() =>
+                                        append({
+                                            class: AircraftClass.Economy,
+                                            price: 0,
+                                            availableSeats: 0,
+                                            perks: [],
+                                        })
+                                    }
+                                >
+                                    + Thêm tuỳ chọn vé
+                                </Button>
+                            </div>
+                            {fields.map((field, index) => (
+                                <div
+                                    key={field.id}
+                                    className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 border p-3 rounded"
+                                >
+                                    <FormField
+                                        name={`fareOptions.${index}.class`}
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Hạng vé</FormLabel>
+                                                <FormControl>
+                                                    <select
+                                                        {...field}
+                                                        className="w-full border p-2 rounded"
+                                                    >
+                                                        {Object.values(
+                                                            AircraftClass
+                                                        ).map((cls) => (
+                                                            <option
+                                                                key={cls}
+                                                                value={cls}
+                                                            >
+                                                                {cls}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        name={`fareOptions.${index}.price`}
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Giá vé</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        name={`fareOptions.${index}.availableSeats`}
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Số ghế</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        name={`fareOptions.${index}.perks`}
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem className="md:col-span-4">
+                                                <FormLabel>
+                                                    Ưu đãi (Perks)
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Nhập perks, ngăn cách bởi dấu phẩy"
+                                                        value={
+                                                            field.value?.join(
+                                                                ', '
+                                                            ) || ''
+                                                        }
+                                                        onChange={(e) => {
+                                                            const perksArray =
+                                                                e.target.value
+                                                                    .split(',')
+                                                                    .map(
+                                                                        (
+                                                                            perk
+                                                                        ) =>
+                                                                            perk.trim()
+                                                                    )
+                                                                    .filter(
+                                                                        Boolean
+                                                                    );
+                                                            field.onChange(
+                                                                perksArray
+                                                            );
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <div className="flex items-end">
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            onClick={() => remove(index)}
+                                        >
+                                            Xoá
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         <Button

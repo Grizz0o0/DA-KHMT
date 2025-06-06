@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 import { useChangePasswordMutation } from '@/queries/useAccount';
 import { handleErrorClient } from '@/lib/utils';
 import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 const ChangePasswordPage = () => {
     const router = useRouter();
@@ -60,6 +60,16 @@ const ChangePasswordPage = () => {
 
     return (
         <div className="container mx-auto max-w-md py-10">
+            {/* Nút Quay lại */}
+            <button
+                type="button"
+                className="flex items-center mb-4 text-gray-600 hover:text-gray-800 cursor-pointer"
+                onClick={() => router.back()}
+            >
+                <ArrowLeft className="mr-2" size={15} />
+                Quay lại
+            </button>
+
             <h1 className="text-2xl font-semibold mb-6 text-center">
                 Đổi mật khẩu
             </h1>
@@ -88,7 +98,7 @@ const ChangePasswordPage = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                             onClick={() =>
                                                 setShowPassword((prev) => !prev)
                                             }
@@ -126,7 +136,7 @@ const ChangePasswordPage = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                             onClick={() =>
                                                 setShowNewPassword(
                                                     (prev) => !prev
@@ -166,7 +176,7 @@ const ChangePasswordPage = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
                                             onClick={() =>
                                                 setShowConfirmPassword(
                                                     (prev) => !prev
@@ -188,7 +198,7 @@ const ChangePasswordPage = () => {
 
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="w-full cursor-pointer"
                         disabled={changePasswordMutation.isPending}
                     >
                         {changePasswordMutation.isPending

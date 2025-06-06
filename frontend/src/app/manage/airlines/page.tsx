@@ -44,7 +44,7 @@ export default function ManageAirlinesPage() {
                     <Button
                         variant="ghost"
                         onClick={() => router.push('/manage')}
-                        className="px-2 text-sm"
+                        className="px-2 text-sm cursor-pointer"
                     >
                         <ArrowLeft className="w-4 h-4 mr-1" />
                         Quay lại
@@ -53,7 +53,10 @@ export default function ManageAirlinesPage() {
                         Quản lý hãng hàng không
                     </h1>
                 </div>
-                <Button onClick={() => router.push('/manage/airlines/create')}>
+                <Button
+                    className="cursor-pointer"
+                    onClick={() => router.push('/manage/airlines/create')}
+                >
                     + Thêm hãng
                 </Button>
             </div>
@@ -133,6 +136,7 @@ export default function ManageAirlinesPage() {
                                                 <Button
                                                     variant="secondary"
                                                     size="sm"
+                                                    className="cursor-pointer"
                                                     onClick={() =>
                                                         router.push(
                                                             `/manage/airlines/update/${airline._id}`
@@ -145,6 +149,7 @@ export default function ManageAirlinesPage() {
                                                 <Button
                                                     variant="destructive"
                                                     size="sm"
+                                                    className="cursor-pointer"
                                                     onClick={() =>
                                                         handleDelete(
                                                             airline._id

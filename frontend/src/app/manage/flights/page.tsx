@@ -3,8 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFlights, useDeleteFlightMutation } from '@/queries/useFlight';
-import { Button } from '@/components/ui/button';
-import { Pencil, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -17,6 +15,9 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Pencil, Trash } from 'lucide-react';
 import {
     Pagination,
     PaginationContent,
@@ -25,7 +26,6 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ManageFlightsPage() {
     const router = useRouter();
@@ -65,14 +65,14 @@ export default function ManageFlightsPage() {
                 <Button
                     variant="ghost"
                     onClick={() => router.push('/manage')}
-                    className="mb-4 px-2 text-sm"
+                    className="mb-4 px-2 text-sm cursor-pointer"
                 >
                     ← Quay lại
                 </Button>
                 <h1 className="text-2xl font-bold">Quản lý chuyến bay</h1>
                 <Button
-                    className="cursor-pointer"
                     onClick={() => router.push('/manage/flights/create')}
+                    className="cursor-pointer text-white"
                 >
                     + Thêm chuyến bay
                 </Button>
@@ -99,7 +99,7 @@ export default function ManageFlightsPage() {
                             <TableHead>Điểm đến</TableHead>
                             <TableHead>Thời gian</TableHead>
                             <TableHead>Máy bay</TableHead>
-                            <TableHead>Giá</TableHead>
+                            <TableHead>Giá thấp nhất</TableHead>
                             <TableHead>Hành động</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -165,9 +165,11 @@ export default function ManageFlightsPage() {
                                     {isLoading || !flight ? (
                                         <Skeleton className="h-4 w-20" />
                                     ) : (
-                                        `${flight.price.toLocaleString(
-                                            'vi-VN'
-                                        )} ₫`
+                                        `${Math.min(
+                                            ...flight.fareOptions.map(
+                                                (f: any) => f.price
+                                            )
+                                        ).toLocaleString('vi-VN')} ₫`
                                     )}
                                 </TableCell>
                                 <TableCell>
@@ -186,6 +188,7 @@ export default function ManageFlightsPage() {
                                                         `/manage/flights/update/${flight._id}`
                                                     )
                                                 }
+                                                className="cursor-pointer"
                                             >
                                                 <Pencil className="w-4 h-4 mr-1" />
                                                 Sửa
@@ -196,6 +199,7 @@ export default function ManageFlightsPage() {
                                                 onClick={() =>
                                                     handleDelete(flight._id)
                                                 }
+                                                className="cursor-pointer"
                                             >
                                                 <Trash className="w-4 h-4 mr-1" />
                                                 Xoá
@@ -233,6 +237,7 @@ export default function ManageFlightsPage() {
                                         <PaginationLink
                                             isActive={pagination.page === i + 1}
                                             onClick={() => setPage(i + 1)}
+                                            className="cursor-pointer"
                                         >
                                             {i + 1}
                                         </PaginationLink>

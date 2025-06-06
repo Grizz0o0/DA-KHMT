@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
     CreateAirlineReqSchema,
@@ -26,11 +26,15 @@ import {
     useUpdateAirlineMutation,
 } from '@/queries/useAirline';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useUploadMediaMutation } from '@/queries/userMedia';
+import Image from 'next/image';
 
 export default function UpdateAirlinePage() {
     const { id } = useParams();
     const router = useRouter();
-
+    const uploadMediaMutation = useUploadMediaMutation();
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const form = useForm<CreateAirlineReqType>({
         resolver: zodResolver(CreateAirlineReqSchema),
         defaultValues: {
@@ -53,6 +57,7 @@ export default function UpdateAirlinePage() {
                 logo: airline.logo || '',
                 description: airline.description || '',
             });
+            setPreviewUrl(airline.logo || null);
         }
     }, [data, form]);
 
@@ -60,13 +65,27 @@ export default function UpdateAirlinePage() {
 
     const onSubmit = async (values: CreateAirlineReqType) => {
         try {
+            let logoUrl = values.logo;
+
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+
+                const uploadResult = await uploadMediaMutation.mutateAsync(
+                    formData
+                );
+                logoUrl = uploadResult.payload.metadata.image.files[0].url;
+            }
+
             await mutation.mutateAsync({
                 airlineId: id as string,
-                body: values,
+                body: {
+                    ...values,
+                    logo: logoUrl,
+                },
             });
-            queryClient.invalidateQueries({
-                queryKey: ['airlines'],
-            });
+
+            queryClient.invalidateQueries({ queryKey: ['airlines'] });
 
             toast.success('Cập nhật thành công');
             router.push('/manage/airlines');
@@ -78,7 +97,11 @@ export default function UpdateAirlinePage() {
     return (
         <div className="max-w-xl mx-auto p-6">
             <div className="flex items-center gap-3 mb-4">
-                <Button variant="ghost" onClick={() => router.back()}>
+                <Button
+                    className="cursor-pointer"
+                    variant="ghost"
+                    onClick={() => router.back()}
+                >
                     <ArrowLeft className="w-4 h-4 mr-1" />
                     Quay lại
                 </Button>
@@ -123,12 +146,55 @@ export default function UpdateAirlinePage() {
                         control={form.control}
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Logo (URL)</FormLabel>
+                                <FormLabel>Logo hãng</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        placeholder="https://domain.com/logo.png"
-                                        {...field}
-                                    />
+                                    <div>
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file =
+                                                    e.target.files?.[0];
+                                                if (file) {
+                                                    setSelectedFile(file);
+                                                    setPreviewUrl(
+                                                        URL.createObjectURL(
+                                                            file
+                                                        )
+                                                    );
+                                                } else {
+                                                    setSelectedFile(null);
+                                                    setPreviewUrl(null);
+                                                }
+                                            }}
+                                        />
+                                        {(previewUrl || field.value) &&
+                                            (() => {
+                                                const logoSrc =
+                                                    previewUrl ?? field.value;
+                                                if (
+                                                    typeof logoSrc ===
+                                                        'string' &&
+                                                    (logoSrc.startsWith(
+                                                        'http'
+                                                    ) ||
+                                                        logoSrc.startsWith('/'))
+                                                ) {
+                                                    return (
+                                                        <div className="w-36 h-36 relative mt-2 border rounded overflow-hidden">
+                                                            <Image
+                                                                src={logoSrc}
+                                                                alt="Logo preview"
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        </div>
+                                                    );
+                                                }
+
+                                                return null;
+                                            })()}
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

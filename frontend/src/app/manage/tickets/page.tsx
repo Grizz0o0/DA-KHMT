@@ -71,14 +71,17 @@ export default function ManageTicketsPage() {
                     <Button
                         variant="ghost"
                         onClick={() => router.push('/manage')}
-                        className="px-2 text-sm"
+                        className="px-2 text-sm cursor-pointer"
                     >
                         ← Quay lại
                     </Button>
                     <h1 className="text-2xl font-bold">Quản lý vé</h1>
                 </div>
 
-                <Button onClick={() => router.push('/manage/tickets/create')}>
+                <Button
+                    className="cursor-pointer"
+                    onClick={() => router.push('/manage/tickets/create')}
+                >
                     + Tạo vé mới
                 </Button>
             </div>
@@ -156,6 +159,7 @@ export default function ManageTicketsPage() {
                                         <Button
                                             variant="outline"
                                             size="sm"
+                                            className="cursor-pointer"
                                             onClick={() =>
                                                 router.push(
                                                     `/manage/tickets/update/${ticket._id}`
@@ -169,6 +173,7 @@ export default function ManageTicketsPage() {
                                             <AlertDialogTrigger asChild>
                                                 <Button
                                                     variant="destructive"
+                                                    className="cursor-pointer"
                                                     size="sm"
                                                 >
                                                     Xóa
@@ -182,10 +187,11 @@ export default function ManageTicketsPage() {
                                                     </AlertDialogTitle>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
-                                                    <AlertDialogCancel>
+                                                    <AlertDialogCancel className="cursor-pointer">
                                                         Hủy
                                                     </AlertDialogCancel>
                                                     <AlertDialogAction
+                                                        className="cursor-pointer"
                                                         onClick={() =>
                                                             handleDelete(
                                                                 ticket._id
@@ -218,6 +224,7 @@ export default function ManageTicketsPage() {
                         <PaginationItem key={i}>
                             <PaginationLink
                                 isActive={page === i + 1}
+                                className="cursor-pointer"
                                 onClick={() => setPage(i + 1)}
                             >
                                 {i + 1}

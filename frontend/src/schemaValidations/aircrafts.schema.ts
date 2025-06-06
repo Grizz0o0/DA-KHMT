@@ -18,7 +18,7 @@ export const seatConfigurationSchema = z.object({
     [AircraftClass.Business]: SeatConfigSchema.optional(),
     [AircraftClass.FirstClass]: SeatConfigSchema.optional(),
 });
-
+export type SeatConfigType = z.infer<typeof SeatConfigSchema>;
 // ======== PAGINATION ========
 
 export const PaginationParams = z.object({

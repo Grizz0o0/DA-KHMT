@@ -60,14 +60,17 @@ export default function ManageAirportsPage() {
                     <Button
                         variant="ghost"
                         onClick={() => router.push('/manage')}
-                        className="px-2 text-sm"
+                        className="px-2 text-sm cursor-pointer"
                     >
                         <ArrowLeft className="w-4 h-4 mr-1" />
                         Quay lại
                     </Button>
                     <h1 className="text-2xl font-bold">Quản lý sân bay</h1>
                 </div>
-                <Button onClick={() => router.push('/manage/airports/create')}>
+                <Button
+                    className="cursor-pointer"
+                    onClick={() => router.push('/manage/airports/create')}
+                >
                     + Thêm sân bay
                 </Button>
             </div>
@@ -146,6 +149,7 @@ export default function ManageAirportsPage() {
                                             <Button
                                                 variant="secondary"
                                                 size="sm"
+                                                className="cursor-pointer"
                                                 onClick={() =>
                                                     router.push(
                                                         `/manage/airports/update/${airport._id}`
@@ -158,6 +162,7 @@ export default function ManageAirportsPage() {
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
+                                                className="cursor-pointer"
                                                 onClick={() =>
                                                     handleDelete(airport._id)
                                                 }
@@ -199,6 +204,7 @@ export default function ManageAirportsPage() {
                                         <PaginationLink
                                             isActive={pagination.page === i + 1}
                                             onClick={() => setPage(i + 1)}
+                                            className="cursor-pointer"
                                         >
                                             {i + 1}
                                         </PaginationLink>

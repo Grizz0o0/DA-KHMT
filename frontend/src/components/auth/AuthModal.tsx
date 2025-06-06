@@ -114,6 +114,7 @@ const getGoogleAuthUrl = () => {
     };
 
     const queryString = new URLSearchParams(query).toString();
+    console.log(queryString);
     return `${url}?${queryString}`;
 };
 

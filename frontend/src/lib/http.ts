@@ -109,7 +109,6 @@ const request = async <Response>(
     if (!isFormData) {
         baseHeaders['Content-Type'] = 'application/json';
     }
-
     const res = await fetchWithRetry(fullUrl, {
         ...options,
         method,

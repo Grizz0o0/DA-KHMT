@@ -27,6 +27,7 @@ import { UserGender } from '@/constants/users';
 import { useUploadMediaMutation } from '@/queries/userMedia';
 import { handleErrorClient } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft } from 'lucide-react';
 
 export default function UpdateProfilePage() {
     const router = useRouter();
@@ -109,7 +110,18 @@ export default function UpdateProfilePage() {
 
     return (
         <div className="max-w-xl mx-auto py-10 px-4">
-            <h1 className="text-2xl font-bold mb-6">Cập nhật hồ sơ</h1>
+            {/* Nút Quay lại */}
+            <button
+                type="button"
+                className="flex items-center mb-4 text-gray-600 hover:text-gray-800 cursor-pointer"
+                onClick={() => router.back()}
+            >
+                <ArrowLeft className="mr-2" size={15} />
+                Quay lại
+            </button>
+            <h1 className="text-2xl font-semibold mb-6 text-center">
+                Cập nhật hồ sơ
+            </h1>
 
             <Form {...form}>
                 <form
@@ -174,6 +186,7 @@ export default function UpdateProfilePage() {
                                     <Input
                                         type="date"
                                         value={field.value?.toString() || ''}
+                                        className="cursor-pointer"
                                         onChange={(e) =>
                                             field.onChange(e.target.value)
                                         }
@@ -190,7 +203,7 @@ export default function UpdateProfilePage() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Giới tính</FormLabel>
-                                <FormControl>
+                                <FormControl className="cursor-pointer">
                                     <select
                                         {...field}
                                         className="w-full border rounded px-3 py-2"
@@ -233,6 +246,7 @@ export default function UpdateProfilePage() {
                                         <Input
                                             type="file"
                                             accept="image/*"
+                                            className="cursor-pointer"
                                             onChange={(e) => {
                                                 const file =
                                                     e.target.files?.[0];
@@ -271,7 +285,7 @@ export default function UpdateProfilePage() {
 
                     <Button
                         type="submit"
-                        className="w-full mt-4"
+                        className="w-full mt-4 cursor-pointer"
                         disabled={form.formState.isSubmitting}
                     >
                         {form.formState.isSubmitting

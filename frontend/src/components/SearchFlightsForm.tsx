@@ -1,31 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { CalendarIcon, ChevronsUpDown, Users } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon, ChevronsUpDown, Users } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
-import { fetchAirports, searchFlights } from '@/lib/api';
+import { useAirports } from '@/queries/useAirport';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { AircraftClass } from '@/constants/aircrafts';
+import { FormSelectField } from '@/components/form/FormSelectField';
 
 const passengerSchema = z.object({
     adults: z.number().min(1),
@@ -33,344 +27,386 @@ const passengerSchema = z.object({
     infants: z.number().min(0),
 });
 
-const formSchema = z.object({
-    type: z.enum(['khu-hoi', 'mot-chieu']),
-    from: z.string().min(1),
-    to: z.string().min(1),
-    departureDate: z.date(),
-    returnDate: z.date().optional(),
-    passengers: passengerSchema,
-    seatClass: z.enum(['economy', 'business', 'firstClass']),
-});
+const formSchema = z
+    .object({
+        type: z.enum(['khu-hoi', 'mot-chieu']),
+        from: z.string().min(1, 'Vui lòng chọn điểm đi'),
+        to: z.string().min(1, 'Vui lòng chọn điểm đến'),
+        departureDate: z.date({ required_error: 'Vui lòng chọn ngày đi' }),
+        returnDate: z.date().optional(),
+        passengers: passengerSchema,
+        seatClass: z.nativeEnum(AircraftClass),
+    })
+    .refine((data) => data.from !== data.to, {
+        message: 'Điểm đi và điểm đến không được trùng nhau',
+        path: ['to'],
+    });
 
 type FormData = z.infer<typeof formSchema>;
-type Airport = { code: string; city: string; country: string };
 
-export default function TravelokaSearchForm() {
+export default function SearchFlightsForm() {
     const router = useRouter();
-    const [tripType, setTripType] = useState<'khu-hoi' | 'mot-chieu'>(
-        'khu-hoi'
-    );
-    const [airports, setAirports] = useState<Airport[]>([]);
+    const searchParams = useSearchParams();
     const [showPassengerModal, setShowPassengerModal] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     const {
-        register,
-        handleSubmit,
-        setValue,
-        watch,
-        // formState: { errors },
-    } = useForm<FormData>({
+        data: airportData,
+        isLoading: isAirportLoading,
+        isError,
+    } = useAirports({ page: 1, limit: 100 });
+    const airports = useMemo(
+        () => airportData?.payload?.metadata?.airports || [],
+        [airportData]
+    );
+
+    const methods = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            type: 'khu-hoi',
-            passengers: { adults: 1, children: 0, infants: 0 },
-            seatClass: 'economy',
+            type:
+                (searchParams.get('type') as 'khu-hoi' | 'mot-chieu') ??
+                'mot-chieu',
+            from: '',
+            to: '',
+            departureDate: undefined,
+            returnDate: undefined,
+            passengers: {
+                adults: Number(searchParams.get('adults') || '1'),
+                children: Number(searchParams.get('children') || '0'),
+                infants: Number(searchParams.get('infants') || '0'),
+            },
+            seatClass:
+                (searchParams.get('class') as AircraftClass) ??
+                AircraftClass.Economy,
         },
     });
 
+    const {
+        setValue,
+        handleSubmit,
+        watch,
+        control,
+        register,
+        formState: { errors },
+    } = methods;
+
+    const type = watch('type');
     const departureDate = watch('departureDate');
     const returnDate = watch('returnDate');
     const passengers = watch('passengers');
-    // const seatClass = watch('seatClass');
-    useEffect(() => {
-        fetchAirports()
-            .then((data) => setAirports(data.airports))
-            .catch(() => toast.error('Không thể tải sân bay.'));
-    }, []);
 
-    const onSubmit = async (data: FormData) => {
-        setLoading(true);
-        try {
-            await searchFlights({
-                from: data.from,
-                to: data.to,
-                departureDate: format(data.departureDate, 'yyyy-MM-dd'),
-                returnDate: data.returnDate
-                    ? format(data.returnDate, 'yyyy-MM-dd')
-                    : undefined,
-                passengers:
-                    data.passengers.adults +
-                    data.passengers.children +
-                    data.passengers.infants,
-                seatClass: data.seatClass,
-            });
-            router.push('/flights');
-        } catch {
-            toast.error('Không thể tìm chuyến bay.');
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (!airports.length) return;
+        const fromCode = searchParams.get('departureAirportCode');
+        const toCode = searchParams.get('arrivalAirportCode');
+        const dTime = searchParams.get('departureTime');
+        const rTime = searchParams.get('returnTime');
+        const type = searchParams.get('type') as 'khu-hoi' | 'mot-chieu';
+        const cls = searchParams.get('class') as AircraftClass;
+
+        if (fromCode && airports.find((a) => a.code === fromCode))
+            setValue('from', fromCode);
+        if (toCode && airports.find((a) => a.code === toCode))
+            setValue('to', toCode);
+        if (dTime) setValue('departureDate', new Date(dTime));
+        if (rTime) setValue('returnDate', new Date(rTime));
+        if (type) setValue('type', type);
+        if (cls) setValue('seatClass', cls);
+    }, [airports, searchParams, setValue]);
+
+    useEffect(() => {
+        if (isError) toast.error('Không thể tải danh sách sân bay');
+    }, [isError]);
+
+    const onSubmit = (data: FormData) => {
+        const query = new URLSearchParams();
+
+        query.set('departureAirportCode', data.from);
+        query.set('arrivalAirportCode', data.to);
+        query.set('departureTime', format(data.departureDate, 'yyyy-MM-dd'));
+
+        if (data.type === 'khu-hoi' && data.returnDate) {
+            query.set('returnTime', format(data.returnDate, 'yyyy-MM-dd'));
         }
+
+        query.set('adults', String(data.passengers.adults));
+        query.set('children', String(data.passengers.children));
+        query.set('infants', String(data.passengers.infants));
+        query.set(
+            'passengerCount',
+            (
+                data.passengers.adults +
+                data.passengers.children +
+                data.passengers.infants
+            ).toString()
+        );
+        query.set('class', data.seatClass);
+        query.set('type', data.type);
+        query.set('page', '1');
+        query.set('limit', '10');
+
+        router.push(`/flights?${query.toString()}`);
     };
 
     return (
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="max-w-6xl mx-auto rounded-xl shadow-lg border bg-white px-6 py-6 space-y-4"
-        >
-            {/* Tabs + Passenger */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <Tabs
-                    defaultValue="khu-hoi"
-                    onValueChange={(val) => {
-                        setTripType(val as any);
-                        setValue('type', val as any);
-                    }}
-                >
-                    <TabsList className="rounded-full border bg-gray-100">
-                        <TabsTrigger
-                            value="mot-chieu"
-                            className="px-4 py-1 data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-full cursor-pointer"
-                        >
-                            Một chiều
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="khu-hoi"
-                            className="px-4 py-1 data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-full cursor-pointer"
-                        >
-                            Khứ hồi
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-
-                <div className="flex gap-3">
-                    <Popover
-                        open={showPassengerModal}
-                        onOpenChange={setShowPassengerModal}
+        <FormProvider {...methods}>
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="max-w-7xl mx-auto rounded-xl shadow-lg border bg-white px-6 py-6 space-y-4"
+            >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <Tabs
+                        value={type}
+                        onValueChange={(val) => setValue('type', val as any)}
                     >
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="rounded-full px-4 py-2 flex items-center gap-2 cursor-pointer"
+                        <TabsList className="rounded-full border bg-gray-100">
+                            <TabsTrigger
+                                value="mot-chieu"
+                                className="cursor-pointer"
                             >
-                                <Users size={16} />
-                                <span className="text-sm">
-                                    {passengers.adults} Người lớn,{' '}
-                                    {passengers.children} Trẻ em,{' '}
-                                    {passengers.infants} Em bé
-                                </span>
-                                <ChevronsUpDown className="w-4 h-4" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[320px] space-y-3 rounded-xl shadow-xl">
-                            {['adults', 'children', 'infants'].map((key) => (
-                                <div
-                                    key={key}
-                                    className="flex items-center justify-between"
+                                Một chiều
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="khu-hoi"
+                                className="cursor-pointer"
+                            >
+                                Khứ hồi
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+
+                    <div className="flex gap-3">
+                        <Popover
+                            open={showPassengerModal}
+                            onOpenChange={setShowPassengerModal}
+                        >
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className="rounded-full px-4 py-2"
                                 >
-                                    <div>
-                                        <p className="font-medium">
-                                            {key === 'adults'
-                                                ? 'Người lớn'
-                                                : key === 'children'
-                                                ? 'Trẻ em'
-                                                : 'Em bé'}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            {key === 'adults'
-                                                ? 'Từ 12 tuổi'
-                                                : key === 'children'
-                                                ? 'Từ 2 - 11 tuổi'
-                                                : 'Dưới 2 tuổi'}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            type="button"
-                                            size="icon"
-                                            variant="outline"
-                                            className="cursor-pointer"
-                                            onClick={() =>
-                                                setValue(
-                                                    `passengers.${key}` as
-                                                        | 'passengers.adults'
-                                                        | 'passengers.children'
-                                                        | 'passengers.infants',
-                                                    Math.max(
-                                                        0,
-                                                        passengers[
-                                                            key as keyof typeof passengers
-                                                        ] - 1
+                                    <Users size={16} />
+                                    <span className="text-sm cursor-pointer">
+                                        {passengers.adults} Người lớn,{' '}
+                                        {passengers.children} Trẻ em,{' '}
+                                        {passengers.infants} Em bé
+                                    </span>
+                                    <ChevronsUpDown className="w-4 h-4" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[320px] space-y-3 rounded-xl shadow-xl">
+                                {(
+                                    ['adults', 'children', 'infants'] as const
+                                ).map((key) => (
+                                    <div
+                                        key={key}
+                                        className="flex items-center justify-between"
+                                    >
+                                        <div>
+                                            <p className="font-medium">
+                                                {key === 'adults'
+                                                    ? 'Người lớn'
+                                                    : key === 'children'
+                                                    ? 'Trẻ em'
+                                                    : 'Em bé'}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {key === 'adults'
+                                                    ? 'Từ 12 tuổi'
+                                                    : key === 'children'
+                                                    ? 'Từ 2 - 11 tuổi'
+                                                    : 'Dưới 2 tuổi'}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                size="icon"
+                                                variant="outline"
+                                                className="cursor-pointer"
+                                                onClick={() =>
+                                                    setValue(
+                                                        `passengers.${key}`,
+                                                        Math.max(
+                                                            0,
+                                                            passengers[key] - 1
+                                                        )
                                                     )
-                                                )
-                                            }
-                                        >
-                                            -
-                                        </Button>
-                                        <span className="w-6 text-center">
-                                            {
-                                                passengers[
-                                                    key as keyof typeof passengers
-                                                ]
-                                            }
-                                        </span>
-                                        <Button
-                                            type="button"
-                                            size="icon"
-                                            variant="outline"
-                                            className="cursor-pointer"
-                                            onClick={() =>
-                                                setValue(
-                                                    `passengers.${key}` as
-                                                        | 'passengers.adults'
-                                                        | 'passengers.children'
-                                                        | 'passengers.infants',
-                                                    Math.min(
-                                                        9,
-                                                        passengers[
-                                                            key as keyof typeof passengers
-                                                        ] + 1
+                                                }
+                                            >
+                                                -
+                                            </Button>
+                                            <span className="w-6 text-center">
+                                                {passengers[key]}
+                                            </span>
+                                            <Button
+                                                type="button"
+                                                size="icon"
+                                                variant="outline"
+                                                className="cursor-pointer"
+                                                onClick={() =>
+                                                    setValue(
+                                                        `passengers.${key}`,
+                                                        Math.min(
+                                                            9,
+                                                            passengers[key] + 1
+                                                        )
                                                     )
-                                                )
-                                            }
-                                        >
-                                            +
-                                        </Button>
+                                                }
+                                            >
+                                                +
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
+                                ))}
+                                <Button
+                                    type="button"
+                                    className="w-full mt-2 bg-blue-500 text-white"
+                                    onClick={() => setShowPassengerModal(false)}
+                                >
+                                    Xong
+                                </Button>
+                            </PopoverContent>
+                        </Popover>
+
+                        <FormSelectField
+                            name="seatClass"
+                            label=""
+                            placeholder="Chọn hạng ghế"
+                            control={control}
+                            options={[
+                                {
+                                    value: AircraftClass.Economy,
+                                    label: 'Phổ thông',
+                                },
+                                {
+                                    value: AircraftClass.Business,
+                                    label: 'Thương gia',
+                                },
+                                {
+                                    value: AircraftClass.FirstClass,
+                                    label: 'Hạng nhất',
+                                },
+                            ]}
+                        />
+                    </div>
+                </div>
+
+                {/* Input fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div>
+                        <label className="text-sm">Từ</label>
+                        <select
+                            {...register('from')}
+                            className="w-full border rounded px-3 py-2 mt-1 text-sm cursor-pointer"
+                        >
+                            <option value="">Chọn điểm đi</option>
+                            {airports.map((a) => (
+                                <option key={a.code} value={a.code}>
+                                    {a.city} ({a.code})
+                                </option>
                             ))}
-                            <Button
-                                type="button"
-                                className="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-                                onClick={() => setShowPassengerModal(false)}
-                            >
-                                Xong
-                            </Button>
-                        </PopoverContent>
-                    </Popover>
-
-                    <Select {...register('seatClass')} defaultValue="economy">
-                        <SelectTrigger className="w-30 cursor-pointer">
-                            <SelectValue placeholder="Chọn hạng ghế" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                className="cursor-pointer"
-                                value="economy"
-                            >
-                                Phổ thông
-                            </SelectItem>
-                            <SelectItem
-                                className="cursor-pointer"
-                                value="business"
-                            >
-                                Thương gia
-                            </SelectItem>
-                            <SelectItem
-                                className="cursor-pointer"
-                                value="firstClass"
-                            >
-                                Hạng nhất
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-
-            {/* Form fields */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div>
-                    <label className="text-sm">Từ</label>
-                    <select
-                        {...register('from')}
-                        className="w-full border rounded px-3 py-2 mt-1 text-sm cursor-pointer"
+                        </select>
+                        {errors.from && (
+                            <p className="text-xs text-red-500 mt-1">
+                                {errors.from.message}
+                            </p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-sm">Đến</label>
+                        <select
+                            {...register('to')}
+                            className="w-full border rounded px-3 py-2 mt-1 text-sm cursor-pointer"
+                        >
+                            <option value="">Chọn điểm đến</option>
+                            {airports.map((a) => (
+                                <option key={a.code} value={a.code}>
+                                    {a.city} ({a.code})
+                                </option>
+                            ))}
+                        </select>
+                        {errors.to && (
+                            <p className="text-xs text-red-500 mt-1">
+                                {errors.to.message}
+                            </p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-sm">Ngày đi</label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className="w-full justify-start mt-1 text-sm cursor-pointer"
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {departureDate
+                                        ? format(departureDate, 'dd/MM/yyyy')
+                                        : 'Chọn ngày'}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={departureDate}
+                                    onSelect={(date) =>
+                                        setValue('departureDate', date!)
+                                    }
+                                    locale={vi}
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        {errors.departureDate && (
+                            <p className="text-xs text-red-500 mt-1">
+                                {errors.departureDate.message}
+                            </p>
+                        )}
+                    </div>
+                    <div
+                        className={
+                            type === 'mot-chieu'
+                                ? 'opacity-50 pointer-events-none'
+                                : ''
+                        }
                     >
-                        <option value="">Chọn điểm đi</option>
-                        {airports.map((a) => (
-                            <option key={a.code} value={a.code}>
-                                {a.city} ({a.code})
-                            </option>
-                        ))}
-                    </select>
+                        <label className="text-sm">Ngày về</label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className="w-full justify-start mt-1 text-sm cursor-pointer"
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {returnDate
+                                        ? format(returnDate, 'dd/MM/yyyy')
+                                        : 'Chọn ngày'}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={returnDate}
+                                    onSelect={(date) =>
+                                        setValue('returnDate', date!)
+                                    }
+                                    locale={vi}
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                    <div className="flex items-end">
+                        <Button
+                            type="submit"
+                            disabled={isAirportLoading}
+                            className="w-full bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
+                        >
+                            {isAirportLoading
+                                ? 'Đang tìm...'
+                                : 'Tìm chuyến bay'}
+                        </Button>
+                    </div>
                 </div>
-                <div>
-                    <label className="text-sm">Đến</label>
-                    <select
-                        {...register('to')}
-                        className="w-full border rounded px-3 py-2 mt-1 text-sm cursor-pointer"
-                    >
-                        <option value="">Chọn điểm đến</option>
-                        {airports.map((a) => (
-                            <option key={a.code} value={a.code}>
-                                {a.city} ({a.code})
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="text-sm">Ngày đi</label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="w-full justify-start mt-1 text-sm cursor-pointer"
-                            >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {departureDate
-                                    ? format(departureDate, 'dd/MM/yyyy')
-                                    : 'Chọn ngày'}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={departureDate}
-                                onSelect={(date) =>
-                                    setValue('departureDate', date!)
-                                }
-                                locale={vi}
-                                className="w-full rounded-md border bg-white shadow-md"
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-                <div
-                    className={
-                        tripType === 'mot-chieu'
-                            ? 'opacity-50 pointer-events-none'
-                            : ''
-                    }
-                >
-                    <label className="text-sm">Ngày về</label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="w-full justify-start mt-1 text-sm cursor-pointer"
-                            >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {returnDate
-                                    ? format(returnDate, 'dd/MM/yyyy')
-                                    : 'Chọn ngày'}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                locale={vi}
-                                selected={returnDate}
-                                onSelect={(date) =>
-                                    setValue('returnDate', date!)
-                                }
-                                mode="single"
-                                disabled={(d) =>
-                                    d < (departureDate || new Date())
-                                }
-                                className="rounded-md border bg-white shadow-md"
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-                <div className="flex items-end">
-                    <Button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 cursor-pointer"
-                    >
-                        {loading ? 'Đang tìm...' : 'Tìm chuyến bay'}
-                    </Button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </FormProvider>
     );
 }
