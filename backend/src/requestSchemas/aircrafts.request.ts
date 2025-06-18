@@ -20,11 +20,11 @@ const seatClassConfigSchema = z.object({
   rows: z
     .number({ required_error: 'Số hàng ghế không được để trống' })
     .int('Số hàng ghế phải là số nguyên')
-    .positive('Số hàng ghế phải > 0'),
+    .nonnegative('Số hàng ghế phải >= 0'),
   seatsPerRow: z
     .number({ required_error: 'Số ghế mỗi hàng không được để trống' })
     .int('Số ghế mỗi hàng phải là số nguyên')
-    .positive('Số ghế mỗi hàng phải > 0')
+    .nonnegative('Số ghế mỗi hàng phải >= 0')
 })
 
 export const createAircraftSchema = {

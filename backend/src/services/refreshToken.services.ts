@@ -34,7 +34,6 @@ class RefreshTokenService {
   }
 
   static findByUserId = async (userId: string) => {
-    console.log(`userId:::${userId}`)
     const { userId: validatedUserId } = findByUserIdSchema.parse({ userId })
     return await databaseService.refreshTokens.findOne({ userId: validatedUserId })
   }

@@ -66,10 +66,7 @@ export default function CreateTicketPage() {
             toast.error('Không tìm thấy thông tin người dùng');
             return;
         }
-        console.log({
-            ...data,
-            userId,
-        });
+
         createTicket(
             {
                 ...data,

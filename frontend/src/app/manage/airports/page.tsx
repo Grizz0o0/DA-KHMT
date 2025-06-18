@@ -39,7 +39,6 @@ export default function ManageAirportsPage() {
     const deleteMutation = useDeleteAirportMutation();
     const airports = data?.payload?.metadata?.airports || [];
     const pagination = data?.payload.pagination;
-    console.log(pagination);
     const handleDelete = async (id: string) => {
         const confirmed = confirm('Bạn có chắc chắn muốn xoá sân bay này?');
         if (!confirmed) return;
@@ -56,17 +55,15 @@ export default function ManageAirportsPage() {
         <div className="p-6 max-w-6xl mx-auto">
             {/* Nút quay lại và tiêu đề */}
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/manage')}
-                        className="px-2 text-sm cursor-pointer"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-1" />
-                        Quay lại
-                    </Button>
-                    <h1 className="text-2xl font-bold">Quản lý sân bay</h1>
-                </div>
+                <Button
+                    variant="ghost"
+                    onClick={() => router.push('/manage')}
+                    className="px-2 text-sm cursor-pointer"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    Quay lại
+                </Button>
+                <h1 className="text-2xl font-bold">Quản lý sân bay</h1>
                 <Button
                     className="cursor-pointer"
                     onClick={() => router.push('/manage/airports/create')}

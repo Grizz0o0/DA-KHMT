@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useLoginOAuthMutation } from '@/queries/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { UserRole } from '@/constants/users';
+import { UserRole, UserVerifyStatus } from '@/constants/users';
 import { Loader2 } from 'lucide-react';
 export default function OAuthCallbackPage() {
     const searchParams = useSearchParams();
@@ -15,17 +15,20 @@ export default function OAuthCallbackPage() {
         const accessToken = searchParams.get('access_token');
         const refreshToken = searchParams.get('refresh_token');
         const role = searchParams.get('role') as UserRole;
+        const verify = UserVerifyStatus.Verified;
         if (userId && accessToken && refreshToken && role) {
             localStorage.setItem('userId', userId);
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('role', role);
+            localStorage.setItem('verify', verify.toString());
 
             loginMutation.mutateAsync({
                 accessToken,
                 refreshToken,
                 userId,
                 role,
+                verify,
             });
             toast.success('Đăng nhập thành công');
             window.location.href = '/';

@@ -11,7 +11,7 @@ import {
     RegisterSchemaBody,
     RegisterReqBodyType,
 } from '@/schemaValidations/users.schema';
-import { useLoginMutation, useRegisterMutation } from '@/queries/useAuth';
+import { useRegisterMutation } from '@/queries/useAuth';
 import { handleErrorClient } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -22,7 +22,6 @@ type Props = {
 export default function RegisterFormFields({ setOpen }: Props) {
     const [isChecked, setIsChecked] = useState(false);
     const registerMutation = useRegisterMutation();
-    const loginMutation = useLoginMutation();
     const form = useForm<RegisterReqBodyType>({
         resolver: zodResolver(RegisterSchemaBody),
         defaultValues: {
@@ -37,10 +36,10 @@ export default function RegisterFormFields({ setOpen }: Props) {
     const onSubmit = async (values: RegisterReqBodyType) => {
         if (registerMutation.isPending) return;
         try {
-            console.log(values);
-            const result = await registerMutation.mutateAsync(values);
-            toast.message(result.payload.message);
-            await loginMutation.mutateAsync(values);
+            await registerMutation.mutateAsync(values);
+            toast.success(
+                `Đăng ký thành công. Vui lòng xác thực email để đăng nhập.`
+            );
             setOpen(false);
         } catch (error) {
             handleErrorClient({ error, setError: form.setError });

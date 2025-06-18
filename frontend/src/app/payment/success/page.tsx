@@ -71,7 +71,7 @@ export default function PaymentSuccessPage() {
             {
                 onSuccess: () => {
                     alert('Tạo vé thành công!');
-                    router.push(`/tickets?bookingId=${bookingId}`);
+                    router.push(`/`);
                 },
                 onError: () => {
                     alert('Tạo vé thất bại. Vui lòng thử lại.');

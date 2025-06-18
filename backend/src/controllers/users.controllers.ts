@@ -29,6 +29,30 @@ class UserController {
     }
   }
 
+  verifyEmail = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const result = await userService.verifyEmail(req.body)
+      new OK({
+        message: 'Verify email success',
+        metadata: result
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  resendVerifyEmail = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
+    try {
+      const result = await userService.resendVerifyEmail(req.body)
+      new OK({
+        message: 'Resend verify email success',
+        metadata: result
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
   oAuthGoogle = async (req: Request<ParamsDictionary, any, any>, res: Response, next: NextFunction) => {
     try {
       const { userId, accessToken, refreshToken, role } = await userService.oAuthGoogle(req.query.code as string)
@@ -102,6 +126,22 @@ class UserController {
       const result = await userService.verifyForgotPassword(req.body)
       new OK({
         message: 'Verify token success',
+        metadata: result
+      }).send(res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  resendVerifyForgotPassword = async (
+    req: Request<ParamsDictionary, any, verifyForgotPasswordReqBodyType>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await userService.resendVerifyForgotPasswordEmail(req.body)
+      new OK({
+        message: 'Resend verify token success',
         metadata: result
       }).send(res)
     } catch (error) {

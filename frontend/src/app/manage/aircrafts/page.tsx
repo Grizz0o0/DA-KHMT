@@ -57,18 +57,16 @@ export default function ManageAircraftsPage() {
     return (
         <div className="p-6 max-w-6xl mx-auto">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/manage')}
-                        className="cursor-pointer"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-1" />
-                        Quay lại
-                    </Button>
-                    <h1 className="text-2xl font-bold">Quản lý máy bay</h1>
-                </div>
+            <div className="flex justify-between items-center mb-6">
+                <Button
+                    variant="ghost"
+                    onClick={() => router.push('/manage')}
+                    className="cursor-pointer"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    Quay lại
+                </Button>
+                <h1 className="text-2xl font-bold">Quản lý máy bay</h1>
                 <Button
                     className="cursor-pointer"
                     onClick={() => router.push('/manage/aircrafts/create')}

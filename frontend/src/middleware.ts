@@ -8,6 +8,7 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const role = request.cookies.get('role')?.value;
     const isAuth = request.cookies.get('accessToken')?.value;
+    const verify = request.cookies.get('verify')?.value;
     const isAdmin = role === 'admin';
 
     if (adminOnlyPaths.some((path) => pathname.startsWith(path) && !isAdmin))
@@ -16,6 +17,12 @@ export function middleware(request: NextRequest) {
     if (authRequiredPaths.some((path) => pathname.startsWith(path)) && !isAuth)
         return NextResponse.redirect(new URL('/', request.url));
 
+    if (
+        authRequiredPaths.some((path) => pathname.startsWith(path)) &&
+        isAuth &&
+        verify !== '1'
+    )
+        return NextResponse.redirect(new URL('/verify-email', request.url));
     return NextResponse.next();
 }
 

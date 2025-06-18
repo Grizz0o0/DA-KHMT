@@ -91,7 +91,6 @@ class AircraftService {
       limit,
       select
     })
-    console.log(validatedQuery)
     if (!validatedQuery.content || validatedQuery.content.trim() === '') {
       return { aircrafts: [], pagination: createPagination(1, 10, 0) }
     }
@@ -155,7 +154,6 @@ class AircraftService {
 
   static async getAircraftByManufacturer({ manufacturer, page = 1, limit = 10 }: getAircraftByManufacturerTypeQuery) {
     const validatedQuery = getAircraftByManufacturerSchema.query.parse({ manufacturer, page, limit })
-    console.log(validatedQuery)
     if (!validatedQuery.manufacturer || validatedQuery.manufacturer.trim() === '') {
       return { aircrafts: [], pagination: createPagination(1, 10, 0) }
     }

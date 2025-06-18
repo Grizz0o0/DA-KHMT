@@ -31,8 +31,7 @@ export default function LoginFormFields({ setOpen }: Props) {
     const onSubmit = async (data: LoginReqBodyType) => {
         if (loginMutation.isPending) return;
         try {
-            const result = await loginMutation.mutateAsync(data);
-            toast.message(result.payload.message);
+            await loginMutation.mutateAsync(data);
             setOpen(false);
         } catch (error) {
             handleErrorClient({ error, setError: form.setError });

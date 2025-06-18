@@ -89,16 +89,14 @@ export default function ManageBookingsPage() {
     return (
         <div className="p-6 max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/manage')}
-                        className="px-2 text-sm cursor-pointer"
-                    >
-                        ← Quay lại
-                    </Button>
-                    <h1 className="text-2xl font-bold">Quản lý đặt chỗ</h1>
-                </div>
+                <Button
+                    variant="ghost"
+                    onClick={() => router.push('/manage')}
+                    className="px-2 text-sm cursor-pointer"
+                >
+                    ← Quay lại
+                </Button>
+                <h1 className="text-2xl font-bold">Quản lý đặt chỗ</h1>
                 <Button
                     className="cursor-pointer"
                     onClick={() => router.push('/manage/bookings/create')}

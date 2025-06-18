@@ -107,8 +107,8 @@ export default function CreateFlightForm() {
             await createMutation.mutateAsync(values);
             toast.success('Tạo chuyến bay thành công');
             form.reset();
-        } catch {
-            toast.error('Đã có lỗi xảy ra khi tạo chuyến bay');
+        } catch (error: any) {
+            toast.error(error.message);
         }
     };
 

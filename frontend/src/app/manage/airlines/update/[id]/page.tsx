@@ -45,7 +45,7 @@ export default function UpdateAirlinePage() {
         },
     });
 
-    const { data, isLoading } = useAirlineDetail(id as string);
+    const { data } = useAirlineDetail(id as string);
     const mutation = useUpdateAirlineMutation();
 
     useEffect(() => {

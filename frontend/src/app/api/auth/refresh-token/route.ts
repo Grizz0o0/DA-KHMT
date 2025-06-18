@@ -1,5 +1,5 @@
 import authApiRequest from '@/app/apiRequests/auth';
-import { getExpireAt, getRoleFromToken } from '@/lib/utils';
+import { getExpireAt } from '@/lib/utils';
 import { cookies } from 'next/headers';
 
 export async function POST() {
@@ -23,8 +23,8 @@ export async function POST() {
         const refreshTokenExp = getExpireAt(
             payload.metadata.tokens.refreshToken
         );
-        const role = getRoleFromToken(accessToken)!;
-
+        const role = payload.metadata.user.role;
+        const verify = payload.metadata.user.verify;
         cookieStore.set('accessToken', accessToken, {
             path: '/',
             httpOnly: true,
@@ -54,7 +54,12 @@ export async function POST() {
             secure: true,
             expires: accessTokenExp,
         });
-
+        cookieStore.set('verify', String(verify), {
+            path: '/',
+            sameSite: 'lax',
+            secure: true,
+            expires: accessTokenExp,
+        });
         return Response.json(payload);
     } catch (error) {
         console.error('Refresh token route error:', error);

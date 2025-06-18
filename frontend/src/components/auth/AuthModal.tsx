@@ -85,9 +85,13 @@ export default function AuthModal({
                                 Đăng nhập với Google
                             </Link>
                         </Button>
-                        <p className="text-sm text-center text-blue-500 cursor-pointer">
+                        <Link
+                            href="/forgot-password"
+                            className="text-sm text-center text-blue-500 hover:underline block mt-2"
+                            onClick={() => setOpen(false)}
+                        >
                             Quên mật khẩu?
-                        </p>
+                        </Link>
                     </>
                 ) : (
                     <RegisterFormFields setOpen={setOpen} />
@@ -114,7 +118,6 @@ const getGoogleAuthUrl = () => {
     };
 
     const queryString = new URLSearchParams(query).toString();
-    console.log(queryString);
     return `${url}?${queryString}`;
 };
 

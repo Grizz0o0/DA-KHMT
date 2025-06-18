@@ -17,6 +17,8 @@ const FlightCardTraveloka: React.FC<FlightCardTravelokaProps> = ({
         <div className="bg-white rounded-xl shadow-md overflow-hidden w-full max-w-xs">
             <div className="relative">
                 <Image
+                    width={50}
+                    height={50}
                     src="/images/flight-default.jpg"
                     alt="Flight"
                     className="w-full h-40 object-cover"

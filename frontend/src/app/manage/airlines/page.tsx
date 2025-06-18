@@ -40,19 +40,15 @@ export default function ManageAirlinesPage() {
         <div className="p-6 max-w-5xl mx-auto">
             {/* Nút quay lại + tiêu đề */}
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/manage')}
-                        className="px-2 text-sm cursor-pointer"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-1" />
-                        Quay lại
-                    </Button>
-                    <h1 className="text-2xl font-bold">
-                        Quản lý hãng hàng không
-                    </h1>
-                </div>
+                <Button
+                    variant="ghost"
+                    onClick={() => router.push('/manage')}
+                    className="px-2 text-sm cursor-pointer"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    Quay lại
+                </Button>
+                <h1 className="text-2xl font-bold">Quản lý hãng hàng không</h1>
                 <Button
                     className="cursor-pointer"
                     onClick={() => router.push('/manage/airlines/create')}
@@ -65,11 +61,11 @@ export default function ManageAirlinesPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Logo</TableHead>
+                            <TableHead className="text-center">Logo</TableHead>
                             <TableHead>Tên hãng</TableHead>
                             <TableHead>Mã hãng</TableHead>
                             <TableHead>Mô tả</TableHead>
-                            <TableHead className="text-right">
+                            <TableHead className="text-center">
                                 Hành động
                             </TableHead>
                         </TableRow>
@@ -89,9 +85,9 @@ export default function ManageAirlinesPage() {
                                             <Image
                                                 src={airline.logo}
                                                 alt={airline.name}
-                                                className="h-8 w-auto rounded-md"
-                                                width={32}
-                                                height={32}
+                                                className="rounded-full object-cover"
+                                                width={70}
+                                                height={70}
                                             />
                                         ) : (
                                             <span className="text-gray-400 italic">

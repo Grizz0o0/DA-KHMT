@@ -36,7 +36,7 @@ export const createTicketSchema = {
     userId: objectIdSchema,
     bookingId: objectIdSchema,
     flightId: objectIdSchema,
-    seatNumber: z.string().min(1, 'Seat number is required'),
+    seatNumber: z.string().optional(),
     seatClass: z.nativeEnum(AircraftClass),
     passenger: passengerSchema,
     price: z.number().min(0, 'Price must be non-negative'),
@@ -54,7 +54,7 @@ export const createMultipleTicketsSchema = {
     seatClass: z.nativeEnum(AircraftClass),
     tickets: z.array(
       z.object({
-        seatNumber: z.string().min(1, 'Seat number is required'),
+        seatNumber: z.string().optional(),
         passenger: passengerSchema,
         price: z.number().min(0, 'Price must be non-negative'),
         status: z.nativeEnum(TicketStatus).default(TicketStatus.Unused)

@@ -53,17 +53,17 @@ export default function ManagePaymentsPage() {
 
     return (
         <div className="p-6 max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/manage')}
-                        className="px-2 text-sm cursor-pointer"
-                    >
-                        ← Quay lại
-                    </Button>
-                    <h1 className="text-2xl font-bold">Quản lý thanh toán</h1>
-                </div>
+            <div className="relative flex items-center justify-center mb-6">
+                <Button
+                    variant="ghost"
+                    onClick={() => router.push('/manage')}
+                    className="absolute left-0 flex items-center text-gray-600 hover:text-gray-800 cursor-pointer"
+                >
+                    ← Quay lại
+                </Button>
+                <h1 className="text-2xl font-bold mb-6 text-center">
+                    Quản lý thanh toán
+                </h1>
             </div>
 
             <div className="mb-4 text-sm text-muted-foreground">

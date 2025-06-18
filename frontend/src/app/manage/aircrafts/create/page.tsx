@@ -45,7 +45,6 @@ export default function CreateAircraftPage() {
     const { data: airlines } = useAirlines();
 
     const onSubmit = async (values: CreateAircraftReqType) => {
-        console.log('Submitting:', values);
         try {
             await mutation.mutateAsync(values);
             toast.success('Thêm máy bay thành công');

@@ -111,17 +111,20 @@ export default function UpdateProfilePage() {
     return (
         <div className="max-w-xl mx-auto py-10 px-4">
             {/* Nút Quay lại */}
-            <button
-                type="button"
-                className="flex items-center mb-4 text-gray-600 hover:text-gray-800 cursor-pointer"
-                onClick={() => router.back()}
-            >
-                <ArrowLeft className="mr-2" size={15} />
-                Quay lại
-            </button>
-            <h1 className="text-2xl font-semibold mb-6 text-center">
-                Cập nhật hồ sơ
-            </h1>
+            <div className="relative flex items-center justify-center mb-6">
+                <Button
+                    variant="ghost"
+                    type="button"
+                    className="absolute left-0 flex items-center text-gray-600 hover:text-gray-800 cursor-pointer"
+                    onClick={() => router.back()}
+                >
+                    <ArrowLeft size={15} />
+                    Quay lại
+                </Button>
+                <h1 className="text-2xl font-semibold mb-6 text-center">
+                    Cập nhật hồ sơ
+                </h1>
+            </div>
 
             <Form {...form}>
                 <form

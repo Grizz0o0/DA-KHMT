@@ -321,8 +321,6 @@ class FlightServices {
 
       const paginatedDeparting = departingFlights.slice((page - 1) * limit, page * limit)
       const paginatedReturning = returningFlights.slice((page - 1) * limit, page * limit)
-      console.log(paginatedReturning)
-      console.log(paginatedDeparting)
       return {
         departingFlights: paginatedDeparting,
         returningFlights: paginatedReturning,

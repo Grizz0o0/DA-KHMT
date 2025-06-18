@@ -9,9 +9,11 @@ export async function POST() {
     const userId = (await cookieStore).get('userId')?.value;
 
     // 2. Xoá toàn bộ cookie liên quan
-    ['accessToken', 'refreshToken', 'userId', 'role'].forEach(async (key) => {
-        (await cookieStore).delete(key);
-    });
+    ['accessToken', 'refreshToken', 'userId', 'role', 'verify'].forEach(
+        async (key) => {
+            (await cookieStore).delete(key);
+        }
+    );
 
     // 3. Nếu thiếu thông tin, vẫn trả 200 – logout là idempotent
     if (!accessToken || !userId) {

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const body = (await request.json()) as LoginOAuthReqBodyType;
     const cookieStore = await cookies();
     try {
-        const { accessToken, refreshToken, userId, role } = body;
+        const { accessToken, refreshToken, userId, role, verify } = body;
         const accessTokenExp = getExpireAt(accessToken);
         const refreshTokenExp = getExpireAt(refreshToken);
 
@@ -49,6 +49,12 @@ export async function POST(request: Request) {
             expires: accessTokenExp,
         });
 
+        cookieStore.set('verify', String(verify), {
+            path: '/',
+            sameSite: 'lax',
+            secure: true,
+            expires: accessTokenExp,
+        });
         return Response.json(body);
     } catch (error) {
         console.error('Login route error:', error);

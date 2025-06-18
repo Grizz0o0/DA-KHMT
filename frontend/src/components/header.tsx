@@ -25,7 +25,7 @@ function Header() {
 
     return (
         <>
-            <header className="bg-white shadow-sm py-4 px-6 sticky top-0 z-50">
+            <header className="bg-white shadow-sm py-4 px-20 sticky top-0 z-50">
                 <div className="container mx-auto flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <Plane className="h-6 w-6 text-blue-500" />

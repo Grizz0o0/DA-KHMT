@@ -1,4 +1,4 @@
-import { UserGender, UserRole } from '@/constants/users';
+import { UserGender, UserRole, UserVerifyStatus } from '@/constants/users';
 import { z } from 'zod';
 
 export const objectIdStringSchema = z
@@ -31,6 +31,7 @@ export const BasicUserSchema = z.object({
     email: z.string(),
     phoneNumber: z.string(),
     role: z.enum(['user', 'admin']),
+    verify: z.nativeEnum(UserVerifyStatus),
 });
 
 export const FullUserSchema = BasicUserSchema.extend({
@@ -75,6 +76,7 @@ export const LoginOAuthSchemaBody = z.object({
     refreshToken: z.string(),
     userId: z.string(),
     role: z.nativeEnum(UserRole),
+    verify: z.nativeEnum(UserVerifyStatus),
 });
 export type LoginOAuthReqBodyType = z.infer<typeof LoginOAuthSchemaBody>;
 export const LoginSchemaBody = z.object({
@@ -140,6 +142,14 @@ export type ForgotPasswordReqBodyType = z.infer<
     typeof ForgotPasswordSchemaBody
 >;
 
+export const ForgotPasswordResBodyType = BaseResponseSchema.extend({
+    metadata: z.object({
+        email: z.string().email('Email không hợp lệ'),
+        forgotPasswordToken: z.string(),
+    }),
+});
+export type ForgotPasswordResType = z.infer<typeof ForgotPasswordResBodyType>;
+
 export const VerifyForgotPasswordSchemaBody = z.object({
     forgotPasswordToken: z
         .string({ required_error: 'forgotPasswordToken không được để trống' })
@@ -153,6 +163,44 @@ export type VerifyForgotPasswordReqBodyType = z.infer<
     typeof VerifyForgotPasswordSchemaBody
 >;
 
+export const VerifyForgotPasswordResBodyType = BaseResponseSchema.extend({
+    metadata: z.object({
+        userId: z.string(),
+        email: z.string(),
+        role: z.nativeEnum(UserRole),
+        iat: z.number(),
+        exp: z.number(),
+    }),
+});
+export type VerifyForgotPasswordResType = z.infer<
+    typeof VerifyForgotPasswordResBodyType
+>;
+
+export const VerifyEmailRegisterSchemaBody = z.object({
+    verifyEmailToken: z
+        .string({ required_error: 'verifyEmailToken không được để trống' })
+        .trim(),
+    email: z
+        .string({ required_error: 'Email không được để trống' })
+        .email('Email không hợp lệ')
+        .trim(),
+});
+export type VerifyEmailRegisterReqBodyType = z.infer<
+    typeof VerifyEmailRegisterSchemaBody
+>;
+
+export const VerifyEmailRegisterResBodyType = BaseResponseSchema.extend({
+    metadata: z.object({
+        userId: z.string(),
+        email: z.string(),
+        role: z.nativeEnum(UserRole),
+        iat: z.number(),
+        exp: z.number(),
+    }),
+});
+export type VerifyEmailRegisterResType = z.infer<
+    typeof VerifyEmailRegisterResBodyType
+>;
 export const ResetPasswordSchemaBody = z
     .object({
         password: StrongPasswordSchema,
@@ -170,6 +218,19 @@ export const ResetPasswordSchemaBody = z
         path: ['confirm_password'],
     });
 export type ResetPasswordReqBodyType = z.infer<typeof ResetPasswordSchemaBody>;
+
+export const ResetPasswordResBodyType = BaseResponseSchema.extend({
+    metadata: z.object({
+        user: z.object({
+            _id: z.string(),
+            username: z.string(),
+            email: z.string(),
+            phoneNumber: z.string(),
+            role: z.nativeEnum(UserRole),
+        }),
+    }),
+});
+export type ResetPasswordResType = z.infer<typeof ResetPasswordResBodyType>;
 
 export const UpdateMeReqBody = z.object({
     username: z

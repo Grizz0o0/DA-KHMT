@@ -31,7 +31,7 @@ const UserDropdown = ({ variant = 'desktop' }: Props) => {
         if (logoutMutation.isPending) return;
         try {
             const result: any = await logoutMutation.mutateAsync();
-            toast.message(result?.payload?.message || 'Đăng xuất thành công');
+            toast.success(result?.payload?.message || 'Đăng xuất thành công');
             router.push('/');
         } catch (err: any) {
             handleErrorClient(err);

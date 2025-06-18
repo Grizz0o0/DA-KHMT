@@ -90,7 +90,7 @@ const FlightList = () => {
                                 alt={flight.airline.name}
                                 width={40}
                                 height={40}
-                                className="rounded"
+                                className="rounded object-contain h-auto w-auto"
                             />
                             <p>{flight.airline.name}</p>
                         </div>

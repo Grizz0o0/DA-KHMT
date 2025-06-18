@@ -1,7 +1,5 @@
 import FlightList from '@/components/FlightList';
 import SearchFlightsForm from '@/components/SearchFlightsForm';
-import { Button } from '@/components/ui/button';
-import { Heart } from 'lucide-react';
 
 export default function HomePage() {
     return (
@@ -62,30 +60,6 @@ export default function HomePage() {
                     Danh Sách Chuyến Bay
                 </h2>
                 <FlightList />
-            </section>
-
-            {/* Call to Action */}
-            <section className="bg-gradient-to-r from-airline-blue to-airline-orange py-16">
-                <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-3xl font-bold text-white mb-4">
-                        Sẵn Sàng Cho Chuyến Đi Tiếp Theo?
-                    </h2>
-                    <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-                        Đăng ký nhận thông tin về các ưu đãi đặc biệt và cập
-                        nhật mới nhất từ Fly24h
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
-                        <input
-                            type="email"
-                            placeholder="Nhập email của bạn"
-                            className="px-4 py-3 rounded-lg flex-1 w-full sm:w-auto"
-                        />
-                        <Button className="bg-white text-airline-blue hover:bg-gray-100 px-8 py-3 w-full sm:w-auto">
-                            <Heart className="h-4 w-4 mr-2" />
-                            Đăng Ký
-                        </Button>
-                    </div>
-                </div>
             </section>
         </main>
     );

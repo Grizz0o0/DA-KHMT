@@ -1,5 +1,5 @@
 import authApiRequest from '@/app/apiRequests/auth';
-import { getExpireAt, getRoleFromToken, getUserIdFromToken } from '@/lib/utils';
+import { getExpireAt, getUserIdFromToken } from '@/lib/utils';
 import { LoginReqBodyType } from '@/schemaValidations/users.schema';
 import { cookies } from 'next/headers';
 
@@ -9,8 +9,8 @@ export async function POST(request: Request) {
     try {
         const { payload } = await authApiRequest.sLogin(body);
         const { accessToken, refreshToken } = payload.metadata.tokens;
+        const { role, verify } = payload.metadata.user;
         const userId = getUserIdFromToken(accessToken);
-        const role = getRoleFromToken(accessToken);
         const accessTokenExp = getExpireAt(accessToken);
         const refreshTokenExp = getExpireAt(refreshToken);
 
@@ -53,10 +53,16 @@ export async function POST(request: Request) {
             expires: accessTokenExp,
         });
 
+        cookieStore.set('verify', String(verify), {
+            path: '/',
+            sameSite: 'lax',
+            secure: true,
+            expires: accessTokenExp,
+        });
         return Response.json(payload);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Login route error:', error);
-        return new Response(JSON.stringify({ message: 'Login failed' }), {
+        return new Response(JSON.stringify({ message: error.message }), {
             status: 500,
         });
     }

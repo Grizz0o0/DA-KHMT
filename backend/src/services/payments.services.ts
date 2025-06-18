@@ -75,7 +75,6 @@ class PaymentsService {
   static async paymentMoMoIpn(body: MomoPaymentConfirmResponse) {
     const { orderId, resultCode, transId, responseTime, message } = body
     const newStatus = resultCode === 0 ? PaymentStatus.SUCCESS : PaymentStatus.FAILED
-    console.log('newStatus', newStatus)
 
     const payment = await databaseService.payments.findOne({ orderId })
     if (!payment) throw new NotFoundError('Payment not found')
@@ -91,7 +90,6 @@ class PaymentsService {
         $currentDate: { updatedAt: true }
       }
     )
-    console.log(`updatedPayment`, updatedPayment)
     if (updatedPayment.modifiedCount === 0) throw new Error('Failed to update payment status')
 
     if (newStatus === PaymentStatus.SUCCESS) {

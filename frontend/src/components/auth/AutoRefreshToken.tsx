@@ -16,7 +16,6 @@ export default function TokenAutoRefresh() {
             const accessToken = getAccessTokenFromLocalStorage();
             const refreshToken = getRefreshTokenFromLocalStorage();
             if (!accessToken || !refreshToken) return;
-            console.log(accessToken, refreshToken);
 
             const decodeAccessToken = decodeJWT(accessToken) as {
                 exp: number;

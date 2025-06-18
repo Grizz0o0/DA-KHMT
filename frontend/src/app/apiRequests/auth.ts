@@ -1,11 +1,15 @@
 import http from '@/lib/http';
 import {
+    ForgotPasswordResType,
     LoginOAuthReqBodyType,
     LoginReqBodyType,
     LoginResType,
     RefreshTokenResBodyType,
     RegisterReqBodyType,
     RegisterResType,
+    ResetPasswordResType,
+    VerifyEmailRegisterResType,
+    VerifyForgotPasswordResType,
 } from '@/schemaValidations/users.schema';
 
 const authApiRequest = {
@@ -28,7 +32,6 @@ const authApiRequest = {
         }),
 
     sLogout: (body: { userId: string; accessToken: string }) => {
-        console.log(body);
         return http.post(
             '/v1/api/users/logout',
             {},
@@ -57,6 +60,44 @@ const authApiRequest = {
         http.post<RefreshTokenResBodyType>('/api/auth/refresh-token', null, {
             baseUrl: '',
         }),
+
+    sVerifyEmailRegister: (body: { verifyEmailToken: string; email: string }) =>
+        http.post<VerifyEmailRegisterResType>(
+            '/v1/api/users/verify-email',
+            body
+        ),
+
+    verifyEmailRegister: (body: { verifyEmailToken: string; email: string }) =>
+        http.post<VerifyEmailRegisterResType>('/api/auth/verify-email', body, {
+            baseUrl: '',
+        }),
+
+    verifyForgotPassword: (body: {
+        forgotPasswordToken: string;
+        email: string;
+    }) =>
+        http.post<VerifyForgotPasswordResType>(
+            '/v1/api/users/verify-forgot-password',
+            body
+        ),
+
+    forgotPassword: (body: { email: string }) =>
+        http.post<ForgotPasswordResType>('/v1/api/users/forgot-password', body),
+
+    resetPassword: (body: { forgotPasswordToken: string; password: string }) =>
+        http.post<ResetPasswordResType>('/v1/api/users/reset-password', body),
+
+    resendVerifyEmail: (body: { email: string }) =>
+        http.post<VerifyForgotPasswordResType>(
+            '/v1/api/users/resend-verify-email',
+            body
+        ),
+
+    resendVerifyForgotPassword: (body: { email: string }) =>
+        http.post<ForgotPasswordResType>(
+            '/v1/api/users/resend-verify-password',
+            body
+        ),
 };
 
 export default authApiRequest;

@@ -117,6 +117,58 @@ export const verifyForgotPasswordSchema = {
 }
 export type verifyForgotPasswordReqBodyType = z.infer<typeof verifyForgotPasswordSchema.body>
 
+export const verifyEmailSchema = {
+  body: z.object({
+    email: z
+      .string({ required_error: 'Email không được để trống' })
+      .email('Email không hợp lệ')
+      .trim()
+      .refine(
+        async (email) => {
+          const isExistEmail = await databaseService.users.findOne({ email })
+          return !!isExistEmail
+        },
+        { message: 'Email chưa được đăng ký' }
+      ),
+    verifyEmailToken: z.string({ required_error: 'verifyEmailToken không được để trống' }).trim()
+  })
+}
+export type verifyEmailReqBodyType = z.infer<typeof verifyEmailSchema.body>
+
+export const resendForgotPasswordSchema = {
+  body: z.object({
+    email: z
+      .string({ required_error: 'Email không được để trống' })
+      .email('Email không hợp lệ')
+      .trim()
+      .refine(
+        async (email) => {
+          const isExistEmail = await databaseService.users.findOne({ email })
+          return !!isExistEmail
+        },
+        { message: 'Email chưa được đăng ký' }
+      )
+  })
+}
+export type resendForgotPasswordReqBodyType = z.infer<typeof resendForgotPasswordSchema.body>
+
+export const resendVerifyEmailSchema = {
+  body: z.object({
+    email: z
+      .string({ required_error: 'Email không được để trống' })
+      .email('Email không hợp lệ')
+      .trim()
+      .refine(
+        async (email) => {
+          const isExistEmail = await databaseService.users.findOne({ email })
+          return !!isExistEmail
+        },
+        { message: 'Email chưa được đăng ký' }
+      )
+  })
+}
+export type resendVerifyEmailReqBodyType = z.infer<typeof resendVerifyEmailSchema.body>
+
 export const resetPasswordSchema = {
   body: z
     .object({

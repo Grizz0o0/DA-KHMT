@@ -96,7 +96,7 @@ class TicketsServices {
       seatNumber
     })
     const result = await databaseService.tickets.insertOne(ticket)
-
+    await databaseService.users.updateOne({ _id: booking.userId }, { $addToSet: { tickets: result.insertedId } })
     return result
   }
 
@@ -152,7 +152,15 @@ class TicketsServices {
     }
 
     const result = await databaseService.tickets.insertMany(tickets)
-    return { insertedCount: result.insertedCount, tickets }
+    const insertedIds = Object.values(result.insertedIds)
+
+    // Cập nhật user
+    await databaseService.users.updateOne({ _id: payload.userId }, { $addToSet: { tickets: { $each: insertedIds } } })
+    return {
+      insertedCount: result.insertedCount,
+      insertedIds,
+      tickets
+    }
   }
 
   static async updateTicket(ticketId: ObjectId, payload: updateTicketTypeBody) {
@@ -189,11 +197,14 @@ class TicketsServices {
   static async deleteTicket(id: ObjectId) {
     const { ticketId } = deleteTicketSchema.params.parse({ ticketId: id })
 
-    const del = await databaseService.tickets.updateOne(
+    const del = await databaseService.tickets.findOneAndUpdate(
       { _id: ticketId },
-      { $set: { status: TicketStatus.Cancelled }, $currentDate: { updatedAt: true } }
+      { $set: { status: TicketStatus.Cancelled }, $currentDate: { updatedAt: true } },
+      { returnDocument: 'after' }
     )
-    if (del.modifiedCount === 0) throw new BadRequestError('Delete Ticket failed')
+    if (!del) throw new BadRequestError('Delete Ticket failed')
+
+    await databaseService.users.updateOne({ _id: del.userId }, { $pull: { tickets: ticketId } })
     return del
   }
 

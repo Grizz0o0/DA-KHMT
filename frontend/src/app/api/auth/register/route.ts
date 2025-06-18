@@ -54,9 +54,9 @@ export async function POST(request: Request) {
         });
 
         return Response.json(payload);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Register route error:', error);
-        return new Response(JSON.stringify({ message: 'Register failed' }), {
+        return new Response(JSON.stringify({ message: error.message }), {
             status: 500,
         });
     }

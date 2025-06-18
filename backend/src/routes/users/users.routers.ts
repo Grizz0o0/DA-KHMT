@@ -20,6 +20,9 @@ import { UserRole } from '~/constants/users'
 const userRouter = Router()
 
 userRouter.post('/register', validateRequest({ body: registerSchema.body }), asyncHandler(userController.register))
+userRouter.post('/verify-email', asyncHandler(userController.verifyEmail))
+userRouter.post('/resend-verify-email', asyncHandler(userController.resendVerifyEmail))
+userRouter.post('/resend-verify-password', asyncHandler(userController.resendVerifyForgotPassword))
 userRouter.post('/login', validateRequest({ body: loginSchema.body }), asyncHandler(userController.login))
 userRouter.get('/oauth/google', asyncHandler(userController.oAuthGoogle))
 userRouter.post(

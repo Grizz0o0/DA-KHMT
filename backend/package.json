@@ -37,6 +37,7 @@
     "typescript-eslint": "^8.25.0"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.826.0",
     "@types/lodash": "^4.17.16",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
