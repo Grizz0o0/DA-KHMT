@@ -4,6 +4,7 @@ import { HTTP_CONFIG } from '@/config/http.config';
 import {
     LoginResType,
     RegisterResType,
+    RefreshTokenResBodyType,
 } from '@/schemaValidations/users.schema';
 import {
     getUserIdFromLocalStorage,
@@ -56,6 +57,7 @@ export class HttpError extends Error {
 }
 
 let clientLogoutRequest: null | Promise<any> = null;
+let clientRefreshRequest: null | Promise<any> = null;
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
     baseUrl?: string;
@@ -124,6 +126,49 @@ const request = async <Response>(
     if (!res.ok) {
         if (res.status === AUTHENTICATION_STATUS) {
             if (isClient()) {
+                // Thử tự refresh token trước khi logout
+                if (!clientRefreshRequest) {
+                    clientRefreshRequest = fetch('/api/auth/refresh-token', {
+                        method: 'POST',
+                        body: null,
+                        headers: { ...baseHeaders },
+                    });
+                }
+                const refreshRes = await clientRefreshRequest;
+                clientRefreshRequest = null;
+
+                if (refreshRes.ok) {
+                    const refreshData = await refreshRes.json();
+                    const {
+                        metadata: {
+                            tokens: { accessToken: newAccessToken, refreshToken: newRefreshToken },
+                            user: { _id: newUserId, role: newRole },
+                        },
+                    } = refreshData as any;
+                    saveAuthTokens(newAccessToken, newRefreshToken, newUserId, newRole);
+                    baseHeaders.authorization = `${newAccessToken}`;
+                    baseHeaders['x-client-id'] = newUserId;
+
+                    const retryRes = await fetchWithRetry(fullUrl, {
+                        ...options,
+                        method,
+                        body,
+                        headers: { ...baseHeaders, ...options?.headers },
+                    });
+                    const retryPayload: Response = await retryRes.json();
+                    if (retryRes.ok) {
+                        return { status: retryRes.status, payload: retryPayload };
+                    }
+
+                    if (retryRes.status !== AUTHENTICATION_STATUS) {
+                        throw new HttpError({
+                            status: retryRes.status,
+                            message: (retryPayload as any).message || 'Unknown error',
+                            payload: retryPayload,
+                        });
+                    }
+                }
+
                 if (!clientLogoutRequest) {
                     clientLogoutRequest = fetch('/api/auth/logout', {
                         method: 'POST',
@@ -154,8 +199,15 @@ const request = async <Response>(
     if (isClient()) {
         const path = normalizePath(url);
         console.log(path);
-        if (path === 'api/auth/login' || path === 'api/auth/signup') {
-            const resPayload = payload as LoginResType | RegisterResType;
+        if (
+            path === 'api/auth/login' ||
+            path === 'api/auth/signup' ||
+            path === 'api/auth/refresh-token'
+        ) {
+            const resPayload = payload as
+                | LoginResType
+                | RegisterResType
+                | RefreshTokenResBodyType;
 
             const {
                 metadata: {

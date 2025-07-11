@@ -3,7 +3,7 @@ import { getExpireAt } from '@/lib/utils';
 import { cookies } from 'next/headers';
 
 export async function POST() {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const refreshToken = cookieStore.get('refreshToken')?.value;
     const userId = cookieStore.get('userId')?.value;
 
